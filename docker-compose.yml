@@ -5,10 +5,10 @@ services:
     build: .
     ports:
       - "8000:8000"
+    volumes:
+      - .:/app
     env_file:
       - .env
-    environment:
-      - MONGO_URI=mongodb://admin:password@mongodb:27017
     depends_on:
       - mongodb
 
@@ -17,8 +17,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-password}
     volumes:
       - mongo_data:/data/db
 
