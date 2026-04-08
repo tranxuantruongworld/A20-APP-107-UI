@@ -38,18 +38,27 @@ Ghi lại các quyết định kỹ thuật, phân công, và brainstorming củ
 
 **Hệ quả:** Đồng bộ hóa định dạng Tensor/Input, dễ dàng tối ưu hóa bằng Hugging Face Optimum (để chạy nhanh hơn trên CPU/GPU). Chấp nhận có thể tốn chi phí để triển khai tại giai đoạn này.
 
-### Sprint 1: 08/04 → 12/04/2026
+### [ADR-3] Dùng MongoDB thay vì PostgreSQL — 09/04/2026
 
-| Task ID | Người thực hiện | Trạng thái | Note |
-| :--- | :--- | :--- | :--- |
-| **Task 1.1** | Trường | ⏳ Chờ | |
-| **Task 1.2** | Trường | ⏳ Chờ | |
-| **Task 2.1** | Bân | 🔄 Đang làm | |
-| **Task 2.2** | Bân | ⏳ Chờ | |
-| **Task 2.3** | Bân | ⏳ Chờ | |
-| **Task 2.4** | Bân | ⏳ Chờ | |
-| **Task 3.2** | Triểu, Trường | 🔄 Đang làm | |
-| **Task 3.3** | Triểu, Trường | 🔄 Đang làm | |
+**Bối cảnh:** Dữ liệu Q&A có schema linh hoạt, không cố định. PostgreSQL yêu cầu migration mỗi lần thêm field.
+
+**Các lựa chọn đã xem xét:**
+- PostgreSQL: Rigid schema, cần migration. Nhưng có ACID, backup dễ.
+- MongoDB: Flexible schema, JSON-oriented. Nhưng không ACID, scale khó hơn.
+
+**Quyết định:** Chọn MongoDB vì dữ liệu Q&A metadata không cố định, schema cần thay đổi nhanh. MongoDB linh hoạt hơn trong giai đoạn prototype.
+
+**Hệ quả:** Chấp nhận mất ACID transactions và đánh đổi một phần tính nhất quán dữ liệu để ưu tiên tốc độ triển khai dự án.
+
+### Sprint 1 — 08/04 → 12/04/2026
+
+| Task | Người làm | Deadline | Trạng thái |
+|---|---|---|---|
+| Dùng AI trợ lý cho A20 | Xuân Trường | 09/04/2026 | 🔄 Đang làm |
+| Hoàn thiện PRD Review + use cases + task docs | xtruong | 10/04/2026 | ✅ Xong |
+| Cập nhật resources.md | tranxuantruongworld | 10/04/2026 | ✅ Xong |
+| Draft PRD | xtruong | 10/04/2026 | ✅ Xong |
+| Cập nhật JOURNAL.md tuần 1 | trienvtran | 10/04/2026 | ✅ Xong |
 
 ---
 

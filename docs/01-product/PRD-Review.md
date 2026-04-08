@@ -4,7 +4,7 @@
 ## Điểm mạnh
 - PRD cover đầy đủ luồng xử lý từ đề bài: ASR → clustering → ưu tiên → TTS → Q&A log. Nhóm hiểu đúng bài toán.
 - Phân tách P0/P1 rõ ràng — MVP scope hợp lý, có acceptance criteria cụ thể (>90% accuracy, 80% duplicate detection).
-- Tech stack lựa chọn hợp lý: FastAPI + React + Whisper + pgvector. Đã bắt đầu prototype UI.
+- Tech stack lựa chọn hợp lý: FastAPI + React + Whisper + MongoDB Atlas Vector Search. Phù hợp với Q&A metadata thay đổi nhanh ở giai đoạn prototype.
 
 ## Cần cải thiện
 - **Chưa có architecture diagram** — hệ thống có 5+ components kết nối nhau, không có sơ đồ thì mỗi người hình dung khác nhau → conflict khi code.

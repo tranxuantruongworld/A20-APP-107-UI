@@ -51,7 +51,7 @@ Dự án nhằm giải quyết tình trạng hỗn loạn trong các phiên Q&A 
 | **Speech-to-Text** | Whisper Large-v3 (Turbo) | Hiện là SOTA cho tiếng Việt, có thể tự host để giảm latency. |
 | **LLM Engine** | GPT-4o / Claude 3.5 | Xử lý logic hội thoại và phân loại câu hỏi phức tạp. |
 | **Text-to-Speech** | FPT.AI hoặc Azure TTS | Giọng đọc tiếng Việt tự nhiên nhất hiện nay. |
-| **Database** | PostgreSQL + pgvector | Lưu trữ log và hỗ trợ tìm kiếm ngữ nghĩa (Semantic Search). |
+| **Database** | MongoDB + Atlas Vector Search | Phù hợp với schema linh hoạt của Q&A metadata và vẫn hỗ trợ semantic search. |
 
 ---
 
