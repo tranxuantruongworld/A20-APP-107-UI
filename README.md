@@ -18,7 +18,18 @@ A template for building AI Agents in Python.
 ├── AGENTS.md           # Rules for using AI coding agents
 ├── JOURNAL.md          # Weekly journal — product journey & learnings
 └── WORKLOG.md          # Technical decisions, task assignments, brainstorming
+└── docs/
+	├── SITE.md         # Documentation index
+	├── 01-product/     # PRD, use cases, task planning
+	└── 02-architecture/# System design docs by dependency order
 ```
+
+## Documentation
+
+Start here: [docs/SITE.md](docs/SITE.md)
+
+- Product docs: [docs/01-product](docs/01-product)
+- Architecture docs: [docs/02-architecture](docs/02-architecture)
 
 ## Getting Started
 

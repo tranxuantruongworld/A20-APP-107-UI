@@ -1,2 +1,0 @@
-- giao diện mô phỏng: https://gemini.google.com/share/0c47768879b8
-- workflow: https://gemini.google.com/share/d3379dd5838f

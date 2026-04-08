@@ -6,6 +6,63 @@ Ghi lại các quyết định kỹ thuật, phân công, và brainstorming củ
 
 ---
 
+### [ADR-1] Kiến trúc Giao tiếp Realtime: WebSocket thay vì Polling — 08/04/2026
+**Bối cảnh:** Admin Dashboard cần hiển thị câu hỏi từ khán giả ngay lập tức để Moderator duyệt kịp thời trong sự kiện trực tiếp.
+
+**Các lựa chọn đã xem xét:**
+
+- HTTP Polling: Dễ triển khai nhưng gây độ trễ lớn và lãng phí tài nguyên server.
+
+- WebSocket: Kết nối hai chiều liên tục, độ trễ cực thấp, phù hợp cho streaming audio và update UI realtime.
+
+**Quyết định:** Chọn WebSocket để đảm bảo tính thời thực cho luồng đẩy câu hỏi lên Dashboard và truyền nhận audio stream từ client.
+
+**Hệ quả:** Cần xử lý được vấn đề chuyển đổi ARS realtime khi nhận audio stream từ người dùng, đồng bộ realtime với admin dashboard.
+
+### [ADR-2] Đồng bộ hóa Pipeline AI qua Hệ sinh thái Hugging Face — 08/04/2026
+**Bối cảnh:** Nhóm cần đảm bảo tính nhất quán giữa các mô hình STT, LLM và TTS để đẩy nhanh tốc độ triển khai và dễ dàng bảo trì code.
+
+**Các lựa chọn đã xem xét:**
+- Tự tìm kiếm các mô hình chạy local: Chất lượng thấp, khó triển khai.
+- Sử dụng API hỗn hợp (OpenAI, ElevenLabs, Google): Chất lượng cao nhưng khó quản lý key, chi phí biến động và khó đồng bộ hóa định dạng dữ liệu.
+
+- Hệ sinh thái Hugging Face (Transformers, Diffusers, Optimum): Cung cấp thư viện thống nhất, hỗ trợ tải mô hình local (tăng tính riêng tư) và cộng đồng hỗ trợ cực lớn.
+
+**Quyết định:** Sử dụng Hugging Face làm nền tảng chủ đạo cho toàn bộ các mô hình AI trong dự án. Cụ thể:
+
+- STT (Task 3.2): Sử dụng openai/whisper-large-v3 hoặc bản distil qua thư viện transformers.
+
+- LLM (Task 2.2, 2.3): Sử dụng các dòng Open-source như Llama-3 hoặc Mistral-7B để xử lý gộp (clustering) và xếp hạng (ranking).
+
+- TTS (Task 3.3): Triển khai các mô hình TTS từ Hugging Face để chuyển văn bản sang giọng nói.
+
+**Hệ quả:** Đồng bộ hóa định dạng Tensor/Input, dễ dàng tối ưu hóa bằng Hugging Face Optimum (để chạy nhanh hơn trên CPU/GPU). Chấp nhận có thể tốn chi phí để triển khai tại giai đoạn này.
+
+### [ADR-3] Dùng MongoDB thay vì PostgreSQL — 09/04/2026
+
+**Bối cảnh:** Dữ liệu Q&A có schema linh hoạt, không cố định. PostgreSQL yêu cầu migration mỗi lần thêm field.
+
+**Các lựa chọn đã xem xét:**
+- PostgreSQL: Rigid schema, cần migration. Nhưng có ACID, backup dễ.
+- MongoDB: Flexible schema, JSON-oriented. Nhưng không ACID, scale khó hơn.
+
+**Quyết định:** Chọn MongoDB vì dữ liệu Q&A metadata không cố định, schema cần thay đổi nhanh. MongoDB linh hoạt hơn trong giai đoạn prototype.
+
+**Hệ quả:** Chấp nhận mất ACID transactions và đánh đổi một phần tính nhất quán dữ liệu để ưu tiên tốc độ triển khai dự án.
+
+### Sprint 1 — 08/04 → 12/04/2026
+
+| Task | Người làm | Deadline | Trạng thái |
+|---|---|---|---|
+| Dùng AI trợ lý cho A20 | Xuân Trường | 09/04/2026 | 🔄 Đang làm |
+| Hoàn thiện PRD Review + use cases + task docs | xtruong | 10/04/2026 | ✅ Xong |
+| Cập nhật resources.md | tranxuantruongworld | 10/04/2026 | ✅ Xong |
+| Draft PRD | xtruong | 10/04/2026 | ✅ Xong |
+| Cập nhật JOURNAL.md tuần 1 | trienvtran | 10/04/2026 | ✅ Xong |
+
+---
+
+
 ## Template
 
 ### Quyết định kỹ thuật
