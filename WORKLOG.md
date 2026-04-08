@@ -38,18 +38,15 @@ Ghi lại các quyết định kỹ thuật, phân công, và brainstorming củ
 
 **Hệ quả:** Đồng bộ hóa định dạng Tensor/Input, dễ dàng tối ưu hóa bằng Hugging Face Optimum (để chạy nhanh hơn trên CPU/GPU). Chấp nhận có thể tốn chi phí để triển khai tại giai đoạn này.
 
-### Sprint 1: 08/04 → 12/04/2026
+### Sprint 1 — 08/04 → 12/04/2026
 
-| Task ID | Người thực hiện | Trạng thái | Note |
-| :--- | :--- | :--- | :--- |
-| **Task 1.1** | Trường | ⏳ Chờ | |
-| **Task 1.2** | Trường | ⏳ Chờ | |
-| **Task 2.1** | Bân | 🔄 Đang làm | |
-| **Task 2.2** | Bân | ⏳ Chờ | |
-| **Task 2.3** | Bân | ⏳ Chờ | |
-| **Task 2.4** | Bân | ⏳ Chờ | |
-| **Task 3.2** | Triểu, Trường | 🔄 Đang làm | |
-| **Task 3.3** | Triểu, Trường | 🔄 Đang làm | |
+| Task | Người làm | Deadline | Trạng thái |
+|---|---|---|---|
+| Dùng AI trợ lý cho A20 | Xuân Trường | 09/04/2026 | 🔄 Đang làm |
+| Hoàn thiện PRD Review + use cases + task docs | xtruong | 10/04/2026 | ✅ Xong |
+| Cập nhật resources.md | tranxuantruongworld | 10/04/2026 | ✅ Xong |
+| Draft PRD | xtruong | 10/04/2026 | ✅ Xong |
+| Cập nhật JOURNAL.md tuần 1 | trienvtran | 10/04/2026 | ✅ Xong |
 
 ---
 
