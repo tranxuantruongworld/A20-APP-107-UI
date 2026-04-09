@@ -5,7 +5,6 @@
     ".codex": true,
     ".cursor": true,
     ".gemini": true,
-    ".github": true,
     "**/__pycache__": true
   }
 }
