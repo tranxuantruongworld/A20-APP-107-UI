@@ -1,0 +1,120 @@
+{
+  "text": "Ask me a really difficult dental question. Tell me the steps of root canal objuration. Critica, that's fantastic. Look, so anytime I get a question that I don't know and I can't in that moment lose all credibility, I just go, look, that is wonderful. And I know many of you may be thinking of the same thing. One of the important things is that that's a very big conversation for us to have. Do you mind if we take that conversation offline? We've only got a small allotment of time and that's why I'm doing this. That's going to be a much larger conversation that may not necessarily add value to everyone here. And if that does, we'll make sure we record that call and make it available for everyone. Okay. I have no idea what you even asked me. Okay? But if you deliver it in that way, people go, oh yeah, yeah. Time. Ah.",
+  "language": "en",
+  "language_probability": 0.982038140296936,
+  "model_size": "small",
+  "device": "cpu",
+  "compute_type": "int8",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 2.5,
+      "text": "Ask me a really difficult dental question."
+    },
+    {
+      "start": 2.5,
+      "end": 5.4,
+      "text": "Tell me the steps of root canal objuration."
+    },
+    {
+      "start": 5.4,
+      "end": 6.5,
+      "text": "Critica, that's fantastic."
+    },
+    {
+      "start": 6.5,
+      "end": 9.4,
+      "text": "Look, so anytime I get a question that I don't know"
+    },
+    {
+      "start": 9.4,
+      "end": 11.8,
+      "text": "and I can't in that moment lose all credibility,"
+    },
+    {
+      "start": 11.8,
+      "end": 13.2,
+      "text": "I just go, look, that is wonderful."
+    },
+    {
+      "start": 13.2,
+      "end": 15.0,
+      "text": "And I know many of you may be thinking of the same thing."
+    },
+    {
+      "start": 15.0,
+      "end": 16.6,
+      "text": "One of the important things is that that's a very big"
+    },
+    {
+      "start": 16.6,
+      "end": 17.8,
+      "text": "conversation for us to have."
+    },
+    {
+      "start": 17.8,
+      "end": 19.9,
+      "text": "Do you mind if we take that conversation offline?"
+    },
+    {
+      "start": 19.9,
+      "end": 21.7,
+      "text": "We've only got a small allotment of time"
+    },
+    {
+      "start": 21.7,
+      "end": 22.6,
+      "text": "and that's why I'm doing this."
+    },
+    {
+      "start": 22.6,
+      "end": 24.6,
+      "text": "That's going to be a much larger conversation"
+    },
+    {
+      "start": 24.6,
+      "end": 26.8,
+      "text": "that may not necessarily add value to everyone here."
+    },
+    {
+      "start": 26.8,
+      "end": 28.8,
+      "text": "And if that does, we'll make sure we record that call"
+    },
+    {
+      "start": 28.8,
+      "end": 30.8,
+      "text": "and make it available for everyone."
+    },
+    {
+      "start": 30.8,
+      "end": 31.8,
+      "text": "Okay."
+    },
+    {
+      "start": 31.8,
+      "end": 33.8,
+      "text": "I have no idea what you even asked me."
+    },
+    {
+      "start": 33.8,
+      "end": 34.8,
+      "text": "Okay?"
+    },
+    {
+      "start": 34.8,
+      "end": 36.8,
+      "text": "But if you deliver it in that way, people go, oh yeah, yeah."
+    },
+    {
+      "start": 36.8,
+      "end": 37.8,
+      "text": "Time."
+    },
+    {
+      "start": 37.8,
+      "end": 38.8,
+      "text": "Ah."
+    }
+  ]
+}
