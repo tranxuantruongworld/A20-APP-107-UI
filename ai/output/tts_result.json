@@ -1,0 +1,9 @@
+{
+  "text": "tôi thích bạn",
+  "output_audio": "output\\voice.wav",
+  "rate": 180,
+  "volume": 1.0,
+  "voice": null,
+  "engine": "pyttsx3",
+  "offline": true
+}
