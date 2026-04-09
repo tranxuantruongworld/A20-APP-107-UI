@@ -1,0 +1,11 @@
+{
+  "files.exclude": {
+    ".ai-log": true,
+    ".claude": true,
+    ".codex": true,
+    ".cursor": true,
+    ".gemini": true,
+    ".github": true,
+    "**/__pycache__": true
+  }
+}
