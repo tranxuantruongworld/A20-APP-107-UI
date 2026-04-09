@@ -4,55 +4,28 @@ import argparse
 import json
 from pathlib import Path
 
-from asr.asr import transcribe_audio
+from asr.asr import add_asr_subparser, run_asr_from_args
+from tts.tts import add_tts_subparser, run_tts_from_args
 
 
 def parse_args() -> argparse.Namespace:
 	parser = argparse.ArgumentParser(description="Run AI utilities")
-
-	parser.add_argument(
-		"audio_path",
-		type=str,
-		help="Path to audio file for speech-to-text",
-	)
-	parser.add_argument(
-		"--language",
-		type=str,
-		default=None,
-		help="Language hint like 'vi' or 'en'",
-	)
-	parser.add_argument(
-		"--model-size",
-		type=str,
-		default=None,
-		help="Whisper model: tiny, base, small, medium, large-v3",
-	)
-	parser.add_argument(
-		"--beam-size",
-		type=int,
-		default=1,
-		help="Beam size (1 is fastest)",
-	)
-	parser.add_argument(
-		"--save-json",
-		type=str,
-		default="output/asr_result.json",
-		help="Output json file path",
-	)
+	subparsers = parser.add_subparsers(dest="feature", required=True)
+	add_asr_subparser(subparsers)
+	add_tts_subparser(subparsers)
 
 	return parser.parse_args()
 
 
 def main() -> None:
 	args = parse_args()
-
-	result = transcribe_audio(
-		audio_path=args.audio_path,
-		model_size=args.model_size,
-		language=args.language,
-		beam_size=args.beam_size,
-		vad_filter=True,
-	)
+	if args.feature == "asr":
+		result = run_asr_from_args(args)
+	elif args.feature == "tts":
+		result = run_tts_from_args(args)
+		print(f"Generated speech file: {result['output_audio']}")
+	else:
+		raise ValueError(f"Unsupported feature: {args.feature}")
 
 	output_path = Path(args.save_json)
 	output_path.parent.mkdir(parents=True, exist_ok=True)

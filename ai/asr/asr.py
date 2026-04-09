@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import os
 from pathlib import Path
 from typing import Any
@@ -102,3 +103,44 @@ def transcribe_audio(
 		"compute_type": compute_type,
 		"segments": segment_rows,
 	}
+
+
+def add_asr_subparser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+	"""Register ASR command-line arguments."""
+	asr_parser = subparsers.add_parser("asr", help="Automatic speech recognition")
+	asr_parser.add_argument("audio_path", type=str, help="Path to input audio file")
+	asr_parser.add_argument(
+		"--language",
+		type=str,
+		default=None,
+		help="Language hint like 'vi' or 'en'",
+	)
+	asr_parser.add_argument(
+		"--model-size",
+		type=str,
+		default=None,
+		help="Whisper model: tiny, base, small, medium, large-v3",
+	)
+	asr_parser.add_argument(
+		"--beam-size",
+		type=int,
+		default=1,
+		help="Beam size (1 is fastest)",
+	)
+	asr_parser.add_argument(
+		"--save-json",
+		type=str,
+		default="output/asr_result.json",
+		help="Output json file path",
+	)
+
+
+def run_asr_from_args(args: argparse.Namespace) -> dict[str, Any]:
+	"""Execute ASR from parsed command-line args."""
+	return transcribe_audio(
+		audio_path=args.audio_path,
+		model_size=args.model_size,
+		language=args.language,
+		beam_size=args.beam_size,
+		vad_filter=True,
+	)

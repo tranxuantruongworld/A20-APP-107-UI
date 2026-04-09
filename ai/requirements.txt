@@ -6,3 +6,6 @@ pydantic>=2.0.0
 
 # ASR - Automatic Speech Recognition
 faster-whisper>=1.0.0
+
+# TTS - Offline Text To Speech
+pyttsx3>=2.90

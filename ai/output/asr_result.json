@@ -1,7 +1,7 @@
 {
   "text": "Ask me a really difficult dental question. Tell me the steps of root canal objuration. Critica, that's fantastic. Look, so anytime I get a question that I don't know and I can't in that moment lose all credibility, I just go, look, that is wonderful. And I know many of you may be thinking of the same thing. One of the important things is that that's a very big conversation for us to have. Do you mind if we take that conversation offline? We've only got a small allotment of time and that's why I'm doing this. That's going to be a much larger conversation that may not necessarily add value to everyone here. And if that does, we'll make sure we record that call and make it available for everyone. Okay. I have no idea what you even asked me. Okay? But if you deliver it in that way, people go, oh yeah, yeah. Time. Ah.",
   "language": "en",
-  "language_probability": 0.982038140296936,
+  "language_probability": 1,
   "model_size": "small",
   "device": "cpu",
   "compute_type": "int8",
