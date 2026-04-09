@@ -9,3 +9,4 @@ uvicorn
 motor
 pydantic-settings
 email-validator
+python-socketio
