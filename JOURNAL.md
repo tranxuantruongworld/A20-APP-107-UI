@@ -46,102 +46,41 @@ Thành viên: Bân, Trường, Triển
 - Setup cơ bản (môi trường chạy, dependencies, cấu hình `.env`)
 
 
-## Template
+---
+## Tuần 2 — 10/04/2026
 
-```markdown
-## Tuần N — DD/MM/YYYY
+**Thành viên:** tranxuantruongworld, BanBannBannn, trienvtran
 
 ### Đã làm
--
+- Hoàn thiện luồng AI trong thư mục `ai` với 2 tính năng chính.
+- ASR: chuyển audio sang text bằng Whisper, có CLI để chạy nhanh.
+- TTS: chuyển text sang speech theo hướng offline/free.
+- Refactor CLI để tách tính năng theo hướng độc lập, tránh xung đột khi phát triển.
+- Bổ sung tài liệu sử dụng cho module AI, cập nhật cách chạy và output.
+- Cập nhật thêm tài liệu kiến trúc và product docs (PRD review, use case, task/use case).
+- Cập nhật cấu hình workspace để giảm nhiễu khi làm việc trong VS Code.
+- Có commit merge và review qua các nhánh docs/main/dev trong tuần.
 
 ### Khó nhất tuần này
--
+- Tách kiến trúc ASR và TTS để phát triển độc lập nhưng vẫn giữ một entrypoint chung, tránh lỗi phụ thuộc chéo.
+- Cân bằng giữa tốc độ chạy thử, tính miễn phí (offline), và độ ổn định khi demo CLI.
 
 ### AI tool đã dùng
 | Tool | Dùng để làm gì | Kết quả |
 |---|---|---|
-| Claude Code | | |
+| Copilot | Hỗ trợ code/refactor luồng CLI, tách ASR-TTS, kiểm tra trước PR | Hoàn thành refactor và chạy test lệnh thành công |
 
 ### Học được
--
+- Tách boundary theo feature ngay từ đầu giúp giảm conflict khi mở rộng tính năng.
+- Luồng CLI bằng subcommand rõ ràng hơn so với gom tất cả args vào một parser.
+- Với bài toán demo nhanh, ưu tiên giải pháp offline/free giúp chủ động hơn khi không có API key.
 
 ### Nếu làm lại, sẽ làm khác
--
+- Chốt convention tách module từ đầu sprint để giảm thời gian refactor về sau.
+- Viết checklist test cho từng feature sớm hơn (ASR-only, TTS-only, integration).
 
 ### Kế hoạch tuần tới
--
-```
-
----
-
-## Ví dụ
-
-### Tuần 1 — 31/03/2026
-
-**Thành viên:** Nguyễn Văn A, Trần Thị B, Lê Văn C
-
-#### Đã làm
-- Setup project TypeScript + cấu hình `.env`
-- Xây dựng agent loop cơ bản: nhận input → gọi Claude API → in output
-- Thêm tool `search_web` đầu tiên (dùng Brave Search API)
-- Viết README cho repo nhóm
-
-#### Khó nhất tuần này
-- Tool call response của Claude trả về sai format — mất 2 tiếng debug mới phát hiện ra thiếu `"type": "tool_result"` trong message history.
-- Lần đầu dùng TypeScript nên type error khá nhiều, phải học cách dùng `as` và generic.
-
-#### AI tool đã dùng
-| Tool | Dùng để làm gì | Kết quả |
-|---|---|---|
-| Claude Code | Giải thích Anthropic tool use API, debug message format | Giải quyết được bug trong 15 phút |
-| Cursor | Autocomplete TypeScript types | Tiết kiệm khoảng 30% thời gian gõ |
-
-#### Học được
-- Tool use trong Claude hoạt động theo vòng lặp: model gọi tool → app trả kết quả → model tiếp tục. Cần giữ đúng message history.
-- `zod` rất hữu ích để validate tool input schema.
-- Nên đặt timeout cho API call ngay từ đầu, không để sau mới thêm.
-
-#### Nếu làm lại, sẽ làm khác
-- Setup TypeScript strict mode ngay từ đầu thay vì thêm sau (refactor mệt hơn).
-- Viết unit test cho `parseToolCall()` trước khi tích hợp vào agent loop.
-
-#### Kế hoạch tuần tới
-- Thêm tool `read_file` và `write_file`
-- Implement memory: lưu conversation history vào file JSON
-- Thử chạy agent giải 1 bài tập thực tế
-
----
-
-### Tuần 2 — 07/04/2026
-
-**Thành viên:** Nguyễn Văn A, Trần Thị B, Lê Văn C
-
-#### Đã làm
-- Thêm tool `read_file`, `write_file`, `list_dir`
-- Agent có thể tự đọc file trong repo và đề xuất refactor
-- Implement conversation memory: lưu 20 message gần nhất
-- Thử nghiệm: cho agent tự fix 3 bug đơn giản → thành công 2/3
-
-#### Khó nhất tuần này
-- Memory bị lỗi khi conversation quá dài (vượt context window). Phải implement sliding window: chỉ giữ system prompt + 20 message gần nhất.
-- Agent đôi khi loop vô hạn khi tool trả lỗi — chưa có stop condition tốt.
-
-#### AI tool đã dùng
-| Tool | Dùng để làm gì | Kết quả |
-|---|---|---|
-| Claude Code | Thiết kế sliding window memory, review code agent loop | Phát hiện thêm edge case khi tool throw exception |
-| Gemini CLI | So sánh approach lưu memory: file JSON vs SQLite | Tư vấn dùng JSON cho prototype, SQLite khi cần query |
-
-#### Học được
-- Context window là resource có hạn — cần thiết kế memory strategy từ sớm.
-- Stop condition quan trọng không kém gì agent logic: `max_iterations`, `no_new_tool_calls`, `explicit_done`.
-- AI agent review code của mình rất có ích: Claude Code tìm ra 2 potential null pointer mà mình bỏ sót.
-
-#### Nếu làm lại, sẽ làm khác
-- Viết interface `Memory` trước, rồi implement sau — thay vì hard-code array từ đầu.
-- Log tất cả tool call ra file ngay từ đầu để debug dễ hơn.
-
-#### Kế hoạch tuần tới
-- Fix vòng lặp vô hạn: thêm `max_iterations = 10`
-- Thêm tool `run_tests` để agent tự kiểm tra code sau khi sửa
-- Demo cho instructor cuối tuần
+- Hoàn thiện test case cho ASR và TTS riêng biệt.
+- Dọn lại output artifacts để tránh commit file sinh tự động không cần thiết.
+- Bổ sung docs kiến trúc cho luồng audio end-to-end.
+- Chuẩn hóa PR checklist và template mô tả thay đổi theo file.

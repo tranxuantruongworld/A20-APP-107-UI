@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    ".ai-log": true,
+    ".claude": true,
+    ".codex": true,
+    ".cursor": true,
+    ".gemini": true,
+    "**/__pycache__": true
+  }
+}
