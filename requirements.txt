@@ -9,6 +9,7 @@ uvicorn
 motor
 pydantic-settings
 email-validator
+python-socketio
 
 # faster-whisper
 # pyttsx3
