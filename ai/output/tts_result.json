@@ -1,7 +1,7 @@
 {
-  "text": "tôi thích bạn",
-  "output_audio": "output\\voice.wav",
-  "rate": 180,
+  "text": "Xin chao 123456 asdasjdanjkdnajksd",
+  "output_audio": "output/voice.wav",
+  "rate": 190,
   "volume": 1.0,
   "voice": null,
   "engine": "pyttsx3",

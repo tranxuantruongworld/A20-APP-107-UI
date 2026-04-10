@@ -10,3 +10,14 @@ motor
 pydantic-settings
 email-validator
 python-socketio
+
+# faster-whisper
+# pyttsx3
+torch
+python-multipart
+
+# ASR - Automatic Speech Recognition
+faster-whisper>=1.0.0
+
+# TTS - Offline Text To Speech
+pyttsx3>=2.90
