@@ -1,7 +1,20 @@
+# Environment
 .env
-.venv
+
+# Python
 __pycache__/
-*.pyc
-*.log
-*.json
+*.py[cod]
+*$py.class
+venv/
+.venv/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# OS
 .DS_Store
+
+# AI logs — tracked structure, ignored content
+.ai-log/*.jsonl
+ai20k-build-phase/
