@@ -48,6 +48,15 @@ async def audience_app():
         raise HTTPException(status_code=404, detail="Frontend app not found")
     return FileResponse(index_path)
 
+
+@app.get("/demo")
+async def full_demo_app():
+    """Serve full product demo UI that simulates all completed use cases."""
+    demo_path = FRONTEND_DIR / "demo-full.html"
+    if not demo_path.exists():
+        raise HTTPException(status_code=404, detail="Demo app not found")
+    return FileResponse(demo_path)
+
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
 
 combined_app = socketio.ASGIApp(sio, app)

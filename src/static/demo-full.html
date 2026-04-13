@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Q&A Moderator - Full Product Demo UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #071218;
+      --bg1: #102532;
+      --bg2: #16394a;
+      --card: rgba(255, 255, 255, 0.9);
+      --ink: #0f2230;
+      --muted: #4a6574;
+      --accent: #ff7a18;
+      --accent2: #11c5bf;
+      --ok: #18964a;
+      --warn: #a97300;
+      --danger: #be352d;
+      --line: rgba(12, 29, 41, 0.12);
+      --ring: rgba(17, 197, 191, 0.3);
+      --chip: #edf7f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Manrope", sans-serif;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(255, 122, 24, 0.28), transparent 34%),
+        radial-gradient(circle at 87% 22%, rgba(17, 197, 191, 0.3), transparent 38%),
+        linear-gradient(145deg, var(--bg0), var(--bg1) 50%, var(--bg2));
+      padding: 20px;
+    }
+
+    .shell {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.93), rgba(245, 250, 252, 0.9));
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      animation: lift 0.55s ease-out;
+    }
+
+    @keyframes lift {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      padding: 22px 24px;
+      color: #f4fbff;
+      background:
+        linear-gradient(110deg, rgba(7, 18, 24, 0.92), rgba(16, 37, 50, 0.92)),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.04) 0 10px, transparent 10px 20px);
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(1.2rem, 2.2vw, 2rem);
+      letter-spacing: 0.03em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(244, 251, 255, 0.88);
+      font-size: 0.95rem;
+      max-width: 900px;
+      line-height: 1.5;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .tab {
+      border: 1px solid rgba(11, 34, 48, 0.15);
+      border-radius: 999px;
+      background: #fff;
+      color: #153244;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .tab.active {
+      background: linear-gradient(95deg, var(--accent), #ff9c4b);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 20px rgba(255, 122, 24, 0.35);
+    }
+
+    .view {
+      display: none;
+      padding: 18px;
+      gap: 14px;
+    }
+
+    .view.active {
+      display: grid;
+      animation: fade 0.22s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      color: #143445;
+    }
+
+    .meta {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 10px;
+      background: #fcffff;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #95a6b0;
+      box-shadow: 0 0 0 5px rgba(149, 166, 176, 0.2);
+      transition: 0.2s ease;
+    }
+
+    .step.active .dot {
+      background: var(--accent2);
+      box-shadow: 0 0 0 5px rgba(17, 197, 191, 0.2);
+    }
+
+    .step.done .dot {
+      background: var(--ok);
+      box-shadow: 0 0 0 5px rgba(24, 150, 74, 0.2);
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fcfeff;
+    }
+
+    .item .head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .item .text {
+      margin: 0;
+      font-size: 0.93rem;
+      line-height: 1.45;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--chip);
+      color: #15505d;
+      border: 1px solid rgba(21, 80, 93, 0.2);
+    }
+
+    .pill.ok { background: rgba(24, 150, 74, 0.12); color: #15693a; border-color: rgba(24, 150, 74, 0.25); }
+    .pill.warn { background: rgba(169, 115, 0, 0.13); color: #8a5d00; border-color: rgba(169, 115, 0, 0.25); }
+    .pill.danger { background: rgba(190, 53, 45, 0.12); color: #9d2f28; border-color: rgba(190, 53, 45, 0.24); }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 8px 11px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-main { background: linear-gradient(95deg, var(--accent), #ff9a4c); color: #fff; }
+    .btn-alt { background: #123444; color: #fff; }
+    .btn-ghost { background: rgba(16, 37, 50, 0.08); color: #173a4a; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fbfeff;
+    }
+
+    .stat .k {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #112f40;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .stat .l {
+      margin: 2px 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .event {
+      border-left: 3px solid #77aab8;
+      padding: 8px 10px;
+      background: #f7fcff;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.86rem;
+    }
+
+    .event strong { color: #11354a; }
+
+    .report {
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin: 0;
+      border: 1px dashed rgba(17, 53, 74, 0.3);
+      border-radius: 12px;
+      background: #fbfdff;
+      padding: 12px;
+      max-height: 360px;
+      overflow: auto;
+    }
+
+    .deck-upload {
+      border: 1px dashed rgba(17, 53, 74, 0.25);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 122, 24, 0.07), rgba(17, 197, 191, 0.07));
+      padding: 12px;
+    }
+
+    .seed-grid {
+      display: grid;
+      grid-template-columns: 0.96fr 1.04fr;
+      gap: 14px;
+    }
+
+    .seed-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fcfeff;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .seed-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .seed-question {
+      margin: 0;
+      font-size: 0.93rem;
+      line-height: 1.45;
+    }
+
+    .likes {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255, 122, 24, 0.12);
+      color: #9b4d00;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .mini {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2, .grid-3, .seed-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 620px) {
+      body { padding: 10px; }
+      .hero { padding: 16px; }
+      .tabs { padding: 10px; }
+      .view { padding: 10px; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <h1>AI Q&A Moderator - Full Product Demo</h1>
+      <p>Giao diện mô phỏng trạng thái app sau khi hoàn thiện 4 use case: hội thảo Q&A realtime, hội thảo offline có kiểm duyệt và tổng hợp, họp online tạo minutes/Q&A cuối buổi, và Speaker Copilot sinh câu hỏi mồi từ slide deck.</p>
+      <div class="badge-row">
+        <span class="badge">Use Case 1: Voice Agent Moderator</span>
+        <span class="badge">Use Case 2: Offline Hall Dashboard</span>
+        <span class="badge">Use Case 3: Online Meeting Summary</span>
+        <span class="badge">Use Case 4: Speaker Seed Questions</span>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-view="uc1">Use Case 1</button>
+      <button class="tab" data-view="uc2">Use Case 2</button>
+      <button class="tab" data-view="uc3">Use Case 3</button>
+      <button class="tab" data-view="uc4">Use Case 4</button>
+      <button class="tab" data-view="analytics">Benchmark & Ops</button>
+    </nav>
+
+    <section class="view active" id="uc1">
+      <div class="grid-2">
+        <article class="card">
+          <h3>Realtime Moderator Console</h3>
+          <p class="meta">Luồng live: audience gửi câu hỏi -> AI gộp trùng -> moderator duyệt -> TTS phát cho speaker.</p>
+          <div class="stats" style="margin: 10px 0 12px;">
+            <div class="stat"><p class="k" id="sPending">4</p><p class="l">Pending</p></div>
+            <div class="stat"><p class="k" id="sMerged">7</p><p class="l">Merged</p></div>
+            <div class="stat"><p class="k" id="sApproved">12</p><p class="l">Approved</p></div>
+            <div class="stat"><p class="k" id="sLatency">1.8s</p><p class="l">ASR Avg</p></div>
+          </div>
+          <div class="list" id="pendingList"></div>
+          <div class="toolbar">
+            <button class="btn-main" id="btnApproveTop">Approve Top + Play TTS</button>
+            <button class="btn-alt" id="btnMergePair">Auto Merge Similar</button>
+            <button class="btn-ghost" id="btnInjectQ">Inject New Audience Question</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Pipeline Status</h3>
+          <p class="meta">Mô phỏng trạng thái từng bước trong pipeline thời gian thực.</p>
+          <div class="flow" id="flowUC1">
+            <div class="step active"><span class="dot"></span> Audience gửi voice/text</div>
+            <div class="step"><span class="dot"></span> ASR transcript trong 2s</div>
+            <div class="step"><span class="dot"></span> NLP clustering + ranking</div>
+            <div class="step"><span class="dot"></span> Moderator approve</div>
+            <div class="step"><span class="dot"></span> TTS phát câu hỏi qua loa</div>
+          </div>
+          <h3 style="margin-top: 14px;">Live Event Timeline</h3>
+          <div class="timeline" id="timelineUC1"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="view" id="uc2">
+      <div class="grid-2">
+        <article class="card">
+          <h3>Offline Hall Dashboard</h3>
+          <p class="meta">Màn hình lớn hiển thị Q&A đã duyệt trong hội trường.</p>
+          <div class="list" id="hallList"></div>
+          <div class="toolbar">
+            <button class="btn-main" id="btnPushHall">Push Approved To Hall Screen</button>
+            <button class="btn-alt" id="btnRejectOne">Reject Noisy Segment</button>
+            <button class="btn-ghost" id="btnEndEvent">End Event + Generate Report</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>ASR + Moderation Queue (Offline Audio Ingest)</h3>
+          <p class="meta">Dữ liệu đến từ mixer/audio line, cần moderator xác nhận trước khi hiển thị.</p>
+          <div class="flow" id="flowUC2">
+            <div class="step active"><span class="dot"></span> Audio mixer ingest</div>
+            <div class="step"><span class="dot"></span> Whisper chunk transcript</div>
+            <div class="step"><span class="dot"></span> Extract cặp hỏi/đáp</div>
+            <div class="step"><span class="dot"></span> Human moderation</div>
+            <div class="step"><span class="dot"></span> Hall dashboard broadcast</div>
+          </div>
+          <h3 style="margin-top: 14px;">Session Feed</h3>
+          <div class="timeline" id="timelineUC2"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="view" id="uc3">
+      <div class="grid-2">
+        <article class="card">
+          <h3>Online Meeting Analyzer</h3>
+          <p class="meta">Sau cuộc họp, batch job tạo meeting minutes và bộ Q&A.</p>
+          <div class="stats" style="margin: 10px 0 12px;">
+            <div class="stat"><p class="k">56m</p><p class="l">Duration</p></div>
+            <div class="stat"><p class="k">9</p><p class="l">Speakers</p></div>
+            <div class="stat"><p class="k">18</p><p class="l">Q&A Pairs</p></div>
+            <div class="stat"><p class="k">92%</p><p class="l">Extraction Confidence</p></div>
+          </div>
+          <div class="toolbar" style="margin-top: 0;">
+            <button class="btn-main" id="btnSummarize">Run Post-Meeting Summary</button>
+            <button class="btn-alt" id="btnExport">Export Minutes + Q&A</button>
+            <button class="btn-ghost" id="btnRefreshOnline">Refresh Transcript Feed</button>
+          </div>
+          <div class="timeline" id="timelineUC3" style="margin-top: 10px;"></div>
+        </article>
+
+        <article class="card">
+          <h3>Generated Report Preview</h3>
+          <p class="meta">Output mô phỏng gửi qua email/workspace sau khi xử lý.</p>
+          <pre class="report" id="onlineReport"></pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="view" id="uc4">
+      <div class="seed-grid">
+        <article class="card">
+          <h3>Speaker Copilot</h3>
+          <p class="meta">Diễn giả upload slide/outlines trước sự kiện, AI sinh câu hỏi mồi theo độ sâu và gắn đúng thời điểm trình bày.</p>
+          <div class="deck-upload" style="margin: 10px 0 12px;">
+            <div class="seed-top">
+              <span>demo_deck_today.pdf</span>
+              <span class="pill ok">12 slides parsed</span>
+            </div>
+            <p class="mini" style="margin: 8px 0 0;">Topics extracted: benchmark strategy, realtime moderation, model selection, product rollout.</p>
+          </div>
+          <div class="stats" style="margin: 0 0 12px;">
+            <div class="stat"><p class="k" id="seedCount">6</p><p class="l">Seed Questions</p></div>
+            <div class="stat"><p class="k" id="seedLikes">87</p><p class="l">Total Likes</p></div>
+            <div class="stat"><p class="k" id="seedLive">Slide 05</p><p class="l">Current Moment</p></div>
+            <div class="stat"><p class="k" id="seedTop">26</p><p class="l">Top Likes</p></div>
+          </div>
+          <div class="toolbar" style="margin-top: 0;">
+            <button class="btn-main" id="btnGenerateSeeds">Generate Seed Questions</button>
+            <button class="btn-alt" id="btnTriggerSeed">Trigger Suggested Question</button>
+            <button class="btn-ghost" id="btnAdvanceSlide">Advance Presentation Moment</button>
+          </div>
+          <div class="flow" id="flowUC4" style="margin-top: 14px;">
+            <div class="step active"><span class="dot"></span> Speaker upload slide deck</div>
+            <div class="step"><span class="dot"></span> LLM extracts themes and concepts</div>
+            <div class="step"><span class="dot"></span> AI generates seed question bank</div>
+            <div class="step"><span class="dot"></span> Moderator triggers question at the right moment</div>
+            <div class="step"><span class="dot"></span> Audience likes update popularity in realtime</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Seed Question Bank + Audience Likes</h3>
+          <p class="meta">Danh sách câu hỏi mồi từ dễ đến sâu, có upvote realtime để moderator biết nên đẩy câu nào.</p>
+          <div class="list" id="seedList"></div>
+          <h3 style="margin-top: 14px;">Use Case 4 Timeline</h3>
+          <div class="timeline" id="timelineUC4"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="view" id="analytics">
+      <div class="grid-3">
+        <article class="card">
+          <h3>ASR Benchmark</h3>
+          <p class="meta">Đánh giá chất lượng mô hình chuyển giọng nói thành văn bản.</p>
+          <div class="list">
+            <div class="item"><div class="head"><span>Model</span><span class="pill ok">Selected</span></div><p class="text">whisper-small: WER 0.19 | CER 0.08 | Avg Latency 1.8s</p></div>
+            <div class="item"><div class="head"><span>Model</span><span class="pill">Candidate</span></div><p class="text">distil-whisper-large-v3: WER 0.17 | CER 0.07 | Avg Latency 2.6s</p></div>
+            <div class="item"><div class="head"><span>Model</span><span class="pill warn">Too Slow</span></div><p class="text">whisper-large-v3: WER 0.15 | CER 0.06 | Avg Latency 4.8s</p></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>NLP Duplicate & Ranking</h3>
+          <p class="meta">So sánh quality detect trùng nghĩa và xếp hạng câu hỏi.</p>
+          <div class="list">
+            <div class="item"><div class="head"><span>llama-3.1-8b-instant</span><span class="pill ok">Default</span></div><p class="text">F1 duplicate: 0.86 | NDCG@5: 0.81 | p95 latency: 1.2s</p></div>
+            <div class="item"><div class="head"><span>gpt-4o-mini</span><span class="pill">Eval</span></div><p class="text">F1 duplicate: 0.88 | NDCG@5: 0.84 | p95 latency: 2.1s</p></div>
+            <div class="item"><div class="head"><span>rule-based</span><span class="pill danger">Fallback</span></div><p class="text">F1 duplicate: 0.62 | NDCG@5: 0.54 | p95 latency: 0.2s</p></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>TTS Benchmark</h3>
+          <p class="meta">Theo dõi độ tự nhiên giọng đọc và độ ổn định pipeline TTS.</p>
+          <div class="list">
+            <div class="item"><div class="head"><span>pyttsx3 offline</span><span class="pill warn">MVP</span></div><p class="text">Success: 100% | p95 latency: 3.8s | MOS nội bộ: 3.1/5</p></div>
+            <div class="item"><div class="head"><span>ElevenLabs vi voice</span><span class="pill">Candidate</span></div><p class="text">Success: 98% | p95 latency: 1.9s | MOS nội bộ: 4.4/5</p></div>
+            <div class="item"><div class="head"><span>FPT.AI TTS</span><span class="pill">Candidate</span></div><p class="text">Success: 96% | p95 latency: 2.3s | MOS nội bộ: 4.0/5</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const views = Array.from(document.querySelectorAll('.view'));
+
+    const pendingSeed = [
+      { speaker: 'Lan', room: 'hall_a', score: 0.92, text: 'Dữ liệu benchmark có đủ đại diện cho giọng địa phương chưa?' },
+      { speaker: 'Minh', room: 'hall_a', score: 0.89, text: 'Nếu mất mạng tạm thời thì app có fallback như thế nào?' },
+      { speaker: 'Quang', room: 'hall_a', score: 0.85, text: 'Có thể hiển thị top câu hỏi theo chủ đề realtime không?' },
+      { speaker: 'Nhi', room: 'hall_a', score: 0.81, text: 'Chất lượng TTS sẽ được đánh giá bằng chỉ số nào?' }
+    ];
+
+    let pending = [...pendingSeed];
+    let approved = [
+      { speaker: 'Hà', text: 'Hệ thống đang dùng metric nào để đo độ trùng câu hỏi?' },
+      { speaker: 'Khoa', text: 'Có hỗ trợ cả câu hỏi text và voice trên mobile không?' }
+    ];
+    let mergedCount = 7;
+
+    const pendingList = document.getElementById('pendingList');
+    const hallList = document.getElementById('hallList');
+    const timelineUC1 = document.getElementById('timelineUC1');
+    const timelineUC2 = document.getElementById('timelineUC2');
+    const timelineUC3 = document.getElementById('timelineUC3');
+    const timelineUC4 = document.getElementById('timelineUC4');
+    const reportBox = document.getElementById('onlineReport');
+    const seedList = document.getElementById('seedList');
+
+    let currentSlide = 5;
+    let seedQuestions = [
+      { level: 'Popular', timing: 'Slide 03', likes: 11, live: false, text: 'Nếu team nhỏ, nên ưu tiên benchmark nào trước để chọn model nhanh mà vẫn đáng tin?' },
+      { level: 'Clarifying', timing: 'Slide 05', likes: 18, live: true, text: 'Tại sao duplicate detection phải đi cùng ranking thay vì chỉ gom câu hỏi giống nhau?' },
+      { level: 'Applied', timing: 'Slide 06', likes: 26, live: false, text: 'Trong buổi hội thảo thật, khi nào moderator nên tung câu hỏi mồi để kích thích khán giả tham gia?' },
+      { level: 'Deep Dive', timing: 'Slide 07', likes: 14, live: false, text: 'Nếu dữ liệu benchmark lệch domain, quyết định chọn model sẽ bị sai như thế nào và sửa ra sao?' },
+      { level: 'Critical', timing: 'Slide 09', likes: 9, live: false, text: 'Có nguy cơ seed question làm lệch hướng thảo luận khỏi câu hỏi thật của audience không?' },
+      { level: 'Executive', timing: 'Closing', likes: 9, live: false, text: 'Sau sự kiện, những tín hiệu nào từ lượt like nên được dùng để cải thiện deck và prompt cho lần sau?' }
+    ];
+
+    function switchTab(key) {
+      tabs.forEach((btn) => btn.classList.toggle('active', btn.dataset.view === key));
+      views.forEach((v) => v.classList.toggle('active', v.id === key));
+    }
+
+    tabs.forEach((btn) => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.view));
+    });
+
+    function renderPending() {
+      pendingList.innerHTML = pending.map((q, idx) => `
+        <div class="item">
+          <div class="head">
+            <span>${q.room} · ${q.speaker}</span>
+            <span class="pill">priority ${(q.score * 100).toFixed(0)}</span>
+          </div>
+          <p class="text">${q.text}</p>
+          <div class="toolbar" style="margin-top:8px;">
+            <button class="btn-main" onclick="approveOne(${idx})">Approve + TTS</button>
+            <button class="btn-ghost" onclick="rejectOne(${idx})">Reject</button>
+          </div>
+        </div>
+      `).join('') || '<p class="meta">Không có câu hỏi pending.</p>';
+
+      document.getElementById('sPending').textContent = String(pending.length);
+      document.getElementById('sMerged').textContent = String(mergedCount);
+      document.getElementById('sApproved').textContent = String(approved.length + 10);
+    }
+
+    function renderSeeds() {
+      const totalLikes = seedQuestions.reduce((sum, item) => sum + item.likes, 0);
+      const topLikes = Math.max(...seedQuestions.map((item) => item.likes));
+      document.getElementById('seedCount').textContent = String(seedQuestions.length);
+      document.getElementById('seedLikes').textContent = String(totalLikes);
+      document.getElementById('seedLive').textContent = `Slide ${String(currentSlide).padStart(2, '0')}`;
+      document.getElementById('seedTop').textContent = String(topLikes);
+
+      seedList.innerHTML = seedQuestions.map((item, index) => `
+        <div class="seed-card">
+          <div class="seed-top">
+            <span>${item.timing} · ${item.level}</span>
+            <span class="${item.live ? 'pill ok' : 'pill'}">${item.live ? 'Live now' : 'Queued'}</span>
+          </div>
+          <p class="seed-question">${item.text}</p>
+          <div class="toolbar" style="margin-top: 0;">
+            <span class="likes">${item.likes} likes</span>
+            <button class="btn-main" onclick="likeSeed(${index})">Audience Like</button>
+            <button class="btn-ghost" onclick="pinSeed(${index})">Push To Moderator</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function logTimeline(target, text) {
+      const now = new Date().toLocaleTimeString('vi-VN');
+      target.innerHTML = `<div class="event"><strong>${now}</strong> - ${text}</div>` + target.innerHTML;
+    }
+
+    function pulseFlow(flowId) {
+      const steps = Array.from(document.querySelectorAll(`#${flowId} .step`));
+      steps.forEach((s) => s.classList.remove('active', 'done'));
+      let i = 0;
+      const timer = setInterval(() => {
+        steps.forEach((s, idx) => {
+          s.classList.toggle('done', idx < i);
+          s.classList.toggle('active', idx === i);
+        });
+        i += 1;
+        if (i >= steps.length) {
+          clearInterval(timer);
+          steps.forEach((s) => s.classList.add('done'));
+        }
+      }, 230);
+    }
+
+    window.approveOne = function approveOne(index) {
+      const item = pending[index];
+      if (!item) return;
+      approved.push(item);
+      pending.splice(index, 1);
+      renderPending();
+      logTimeline(timelineUC1, `Moderator approved: "${item.text}" -> TTS playback started.`);
+      logTimeline(timelineUC2, `Approved question pushed to hall screen: "${item.text}".`);
+      pulseFlow('flowUC1');
+    }
+
+    window.rejectOne = function rejectOne(index) {
+      const item = pending[index];
+      if (!item) return;
+      pending.splice(index, 1);
+      renderPending();
+      logTimeline(timelineUC1, `Question rejected as low relevance/noisy: "${item.text}".`);
+    }
+
+    function renderHall() {
+      hallList.innerHTML = approved.slice().reverse().map((q) => `
+        <div class="item">
+          <div class="head"><span>${q.speaker}</span><span class="pill ok">Approved</span></div>
+          <p class="text">${q.text}</p>
+        </div>
+      `).join('') || '<p class="meta">Chưa có nội dung được duyệt.</p>';
+    }
+
+    window.likeSeed = function likeSeed(index) {
+      const item = seedQuestions[index];
+      if (!item) return;
+      item.likes += 1;
+      renderSeeds();
+      logTimeline(timelineUC4, `Audience liked seed question: "${item.text}".`);
+    }
+
+    window.pinSeed = function pinSeed(index) {
+      const item = seedQuestions[index];
+      if (!item) return;
+      pending.unshift({ speaker: 'AI Seed', room: 'speaker_flow', score: 0.93, text: item.text });
+      renderPending();
+      renderHall();
+      logTimeline(timelineUC4, `Moderator pushed seed question into live queue: "${item.text}".`);
+      logTimeline(timelineUC1, `Seed question inserted into moderator queue for live discussion.`);
+      pulseFlow('flowUC4');
+    }
+
+    document.getElementById('btnApproveTop').addEventListener('click', () => {
+      approveOne(0);
+      renderHall();
+    });
+
+    document.getElementById('btnMergePair').addEventListener('click', () => {
+      if (pending.length < 2) return;
+      mergedCount += 1;
+      pending[0].text = `${pending[0].text} (merged insight)`;
+      pending.splice(1, 1);
+      renderPending();
+      logTimeline(timelineUC1, 'AI clustering merged 2 similar questions into 1 representative question.');
+      pulseFlow('flowUC1');
+    });
+
+    document.getElementById('btnInjectQ').addEventListener('click', () => {
+      const samples = [
+        'Có dashboard riêng cho online meeting và offline hall không?',
+        'Mô hình nào đang được chọn sau benchmark tuần này?',
+        'Khi ASR confidence thấp thì moderator nhận cảnh báo thế nào?'
+      ];
+      const text = samples[Math.floor(Math.random() * samples.length)];
+      pending.unshift({ speaker: 'Audience Live', room: 'hall_a', score: 0.8 + Math.random() * 0.18, text });
+      renderPending();
+      logTimeline(timelineUC1, `New audience question received via voice: "${text}".`);
+      pulseFlow('flowUC1');
+    });
+
+    document.getElementById('btnPushHall').addEventListener('click', () => {
+      renderHall();
+      logTimeline(timelineUC2, 'Moderator broadcasted latest approved questions to main hall screen.');
+      pulseFlow('flowUC2');
+    });
+
+    document.getElementById('btnRejectOne').addEventListener('click', () => {
+      logTimeline(timelineUC2, 'Noisy transcript segment rejected before display to audience.');
+    });
+
+    document.getElementById('btnEndEvent').addEventListener('click', () => {
+      logTimeline(timelineUC2, 'Event ended. Triggered post-event summarization and Q&A export.');
+      switchTab('uc3');
+      pulseFlow('flowUC2');
+    });
+
+    document.getElementById('btnSummarize').addEventListener('click', () => {
+      reportBox.textContent =
+`# Meeting Minutes - Product Demo Session
+
+## Key Decisions
+- Chốt use case 1 làm xương sống realtime moderation.
+- Ưu tiên whisper-small cho cân bằng chất lượng/độ trễ.
+- Dùng ranking score + duplicate merge để giảm nhiễu câu hỏi trùng.
+
+## Main Q&A Extracted
+1. Q: Dataset benchmark có đủ đa dạng giọng nói chưa?
+   A: Đã thêm tập voice_eval theo nhiều accent, đang mở rộng nhiễu hội trường.
+2. Q: Nếu mạng lỗi, hệ thống có degrade mode không?
+   A: Có fallback text mode + queue moderation local.
+3. Q: Chỉ số chọn model là gì?
+   A: Dựa trên WER/CER/latency cho ASR và F1/NDCG cho NLP.
+
+## Action Items
+- Mở rộng tập dữ liệu ranking theo ngữ cảnh event.
+- Chạy regression benchmark sau mỗi thay đổi prompt/model.
+- Hoàn thiện report export Markdown + JSON cho release.`;
+      logTimeline(timelineUC3, 'Batch analyzer completed: generated minutes and Q&A pairs.');
+    });
+
+    document.getElementById('btnExport').addEventListener('click', () => {
+      logTimeline(timelineUC3, 'Export completed: meeting_minutes.md and qa_report.json sent to workspace.');
+    });
+
+    document.getElementById('btnRefreshOnline').addEventListener('click', () => {
+      logTimeline(timelineUC3, 'Refreshed online transcript feed and speaker diarization metadata.');
+    });
+
+    document.getElementById('btnGenerateSeeds').addEventListener('click', () => {
+      seedQuestions[0].likes += 2;
+      renderSeeds();
+      logTimeline(timelineUC4, 'LLM regenerated seed question bank from uploaded deck and speaker notes.');
+      pulseFlow('flowUC4');
+    });
+
+    document.getElementById('btnTriggerSeed').addEventListener('click', () => {
+      const liveItem = seedQuestions.find((item) => item.live) || seedQuestions[0];
+      pending.unshift({ speaker: 'AI Seed', room: 'speaker_flow', score: 0.95, text: liveItem.text });
+      renderPending();
+      logTimeline(timelineUC4, `Triggered live seed question at ${liveItem.timing}: "${liveItem.text}".`);
+      logTimeline(timelineUC1, 'Moderator received AI-seeded engagement question in the live queue.');
+      pulseFlow('flowUC4');
+    });
+
+    document.getElementById('btnAdvanceSlide').addEventListener('click', () => {
+      currentSlide = currentSlide >= 9 ? 3 : currentSlide + 1;
+      seedQuestions = seedQuestions.map((item) => ({ ...item, live: item.timing === `Slide ${String(currentSlide).padStart(2, '0')}` }));
+      renderSeeds();
+      logTimeline(timelineUC4, `Presentation advanced to Slide ${String(currentSlide).padStart(2, '0')}; suggested seed question updated.`);
+    });
+
+    function seedTimelines() {
+      [
+        'Audience question queued with duplicate score 0.84.',
+        'Moderator edited one ASR typo before approval.',
+        'TTS audio generated in 1.7s and played on speaker.'
+      ].forEach((t) => logTimeline(timelineUC1, t));
+
+      [
+        'Mixer stream connected and transcript chunking started.',
+        '2 candidate Q/A pairs extracted for moderation.'
+      ].forEach((t) => logTimeline(timelineUC2, t));
+
+      [
+        'Meeting transcript imported with 9 speakers.',
+        'Post-meeting pipeline waiting for summarize trigger.'
+      ].forEach((t) => logTimeline(timelineUC3, t));
+
+      [
+        'Speaker uploaded slide deck and AI extracted 12 key concepts.',
+        'Initial seed question bank generated with 6 questions across 5 depth levels.'
+      ].forEach((t) => logTimeline(timelineUC4, t));
+    }
+
+    renderPending();
+    renderHall();
+    renderSeeds();
+    seedTimelines();
+    reportBox.textContent = 'Nhấn "Run Post-Meeting Summary" để xem bản minutes và Q&A được tạo tự động.';
+  </script>
+</body>
+</html>
