@@ -21,3 +21,9 @@ faster-whisper>=1.0.0
 
 # TTS - Offline Text To Speech
 pyttsx3>=2.90
+
+# Benchmark and evaluation
+pytest>=8.0.0
+jiwer>=3.0.4
+datasets>=2.20.0,<3.0.0
+soundfile>=0.12.1

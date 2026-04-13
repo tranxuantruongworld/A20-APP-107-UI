@@ -30,6 +30,7 @@ Start here: [docs/SITE.md](docs/SITE.md)
 
 - Product docs: [docs/01-product](docs/01-product)
 - Architecture docs: [docs/02-architecture](docs/02-architecture)
+- Test docs: [tests/docs](tests/docs)
 
 ## Getting Started
 

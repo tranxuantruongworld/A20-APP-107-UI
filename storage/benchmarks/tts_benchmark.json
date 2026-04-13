@@ -1,0 +1,9 @@
+{
+  "total_sentences": 3,
+  "successful_sentences": 3,
+  "success_rate": 1.0,
+  "avg_latency_sec": 0.7395391333460187,
+  "p95_latency_sec": 2.5647080399561673,
+  "avg_output_bytes": 199546,
+  "errors": []
+}
