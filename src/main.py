@@ -1,21 +1,52 @@
-from fastapi import FastAPI
-import socketio
-from .routes import health
-
-import os
-import shutil
 from pathlib import Path
-from fastapi import UploadFile, File, BackgroundTasks, Form
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from .asr.asr import transcribe_audio
-from .tts.tts import text_to_speech
+from fastapi.staticfiles import StaticFiles
+import socketio
+
+from .routes import health, questions, asr, tts
+
 app = FastAPI(title="FastAPI Mongo Starter")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+STORAGE_DIR = Path("storage")
+STORAGE_DIR.mkdir(exist_ok=True)
+
 app.include_router(health.router)
+app.include_router(questions.router)
+app.include_router(asr.router)
+app.include_router(tts.router)
+
+FRONTEND_DIR = Path(__file__).resolve().parent / "static"
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+
 
 @app.get("/")
 async def root():
+    """Serve trang audience frontend. Trả về index.html nếu tồn tại, ngược lại trả về JSON welcome."""
+    index_path = FRONTEND_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
     return {"message": "Welcome to FastAPI MongoDB API"}
+
+
+@app.get("/app")
+async def audience_app():
+    """Alias route cho giao diện audience. Dùng khi cần link trực tiếp vào app mà không dùng route root."""
+    index_path = FRONTEND_DIR / "index.html"
+    if not index_path.exists():
+        raise HTTPException(status_code=404, detail="Frontend app not found")
+    return FileResponse(index_path)
 
 sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
 
@@ -47,57 +78,3 @@ async def handle_audio(sid, data):
     # Sau đó emit text cho cả phòng
     # await sio.emit("new_transcript", {"text": "Hello..."}, room=room_id)
     pass
-STORAGE_DIR = Path("storage")
-STORAGE_DIR.mkdir(exist_ok=True)
-
-@app.post("/asr/transcribe")
-async def api_transcribe_audio(file: UploadFile = File(...)):
-    """Endpoint nhận file audio và trả về text (ASR)"""
-    file_path = STORAGE_DIR / file.filename
-    
-    with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
-    try:
-        result = transcribe_audio(str(file_path))
-        return result
-    finally:
-        if file_path.exists():
-            os.remove(file_path)
-
-# @app.post("/tts/generate")
-# async def api_text_to_speech(text: str, background_tasks: BackgroundTasks):
-#     """Endpoint nhận text và trả về file âm thanh .wav (TTS)"""
-#     output_filename = f"tts_{os.urandom(4).hex()}.wav"
-#     output_path = STORAGE_DIR / output_filename
-    
-#     result = text_to_speech(text, output_path=str(output_path))
-    
-#     background_tasks.add_task(os.remove, str(output_path))
-    
-#     return FileResponse(
-#         path=output_path, 
-#         media_type="audio/wav", 
-#         filename="speech.wav"
-#     )
-
-@app.post("/tts/generate")
-async def api_generate_voice(text: str = Form(...), background_tasks: BackgroundTasks = None):
-    """UI gửi text lên -> Nhận về file .wav để phát ra loa"""
-    output_filename = f"voice_{os.urandom(4).hex()}.wav"
-    output_path = STORAGE_DIR / output_filename
-    
-    try:
-        # Gọi hàm TTS offline (không cần mạng, không cần torch)
-        text_to_speech(text, output_path=str(output_path), voice_hint=None)
-        
-        # Xóa file sau khi gửi xong để tránh đầy bộ nhớ Docker
-        background_tasks.add_task(os.remove, str(output_path))
-        
-        return FileResponse(
-            path=output_path, 
-            media_type="audio/wav", 
-            filename="output.wav"
-        )
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
