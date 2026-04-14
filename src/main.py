@@ -1,3 +1,10 @@
+from contextlib import asynccontextmanager
+
+from src.api.v1.endpoints import seminars
+from src.database import init_db
+
+import os
+import shutil
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -8,7 +15,14 @@ import socketio
 
 from .routes import health, questions, asr, tts
 
-app = FastAPI(title="FastAPI Mongo Starter")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🚀 Đang khởi tạo kết nối Database...")
+    await init_db()
+    yield
+    print("🛑 Đang đóng kết nối Database...")
+
+app = FastAPI(title="FastAPI Mongo Starter", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +36,7 @@ STORAGE_DIR = Path("storage")
 STORAGE_DIR.mkdir(exist_ok=True)
 
 app.include_router(health.router)
+app.include_router(seminars.router, prefix="/api/v1/seminars", tags=["Seminars"])
 app.include_router(questions.router)
 app.include_router(asr.router)
 app.include_router(tts.router)
