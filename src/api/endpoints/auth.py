@@ -67,15 +67,37 @@ async def refresh_token(request: Request, response: Response):
         await db_token.delete() # Xóa token rác
         raise HTTPException(status_code=401, detail="Refresh token expired, please login again")
 
-    # 3. Tạo Access token mới
-    new_access_token = create_access_token(data={"sub": db_token.user_id})
+    # 3. TÌM USER ĐỂ LẤY ROLE
+    if db_token.user_id is None:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+    user = await User.get(db_token.user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+        
+    # 4. XOAY VÒNG TOKEN - Refresh Token cũ sẽ bị xóa và tạo mới hoàn toàn cả Access Token lẫn Refresh Token
+    # Xóa token cũ ngay lập tức để không bị tích tụ rác trong DB
+    await db_token.delete()
     
-    # (Tùy chọn) Tạo luôn Refresh Token mới (Rotated Refresh Token) để bảo mật hơn
-    # Ở đây tôi làm đơn giản là chỉ cấp lại Access Token
+    # Tạo Access Token và Refresh Token mới hoàn toàn
+    new_access_token = create_access_token(data={
+        "sub": str(user.id), 
+        "role": user.role.value
+    })    
+    new_refresh_token_str = create_refresh_token(data={"sub": str(user.id)})
     
+    # Lưu Refresh Token mới vào DB
+    expires_at = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    new_rt = RefreshToken(token=new_refresh_token_str, user_id=str(user.id), expires_at=expires_at)
+    await new_rt.insert()
+
+    # 5. Set Cookie mới
     response.set_cookie(
         key="access_token", value=new_access_token, httponly=True, 
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60, samesite="lax"
+    )
+    response.set_cookie(
+        key="refresh_token", value=new_refresh_token_str, httponly=True, 
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, samesite="lax"
     )
     
     return {"status": "success"}
