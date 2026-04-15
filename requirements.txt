@@ -33,3 +33,5 @@ soundfile>=0.12.1
 pymongo>=4.10.0
 beanie==2.1.0
 pydantic[email]
+python-jose[cryptography]
+pwdlib[argon2,bcrypt]

@@ -1,6 +1,6 @@
 from pymongo import AsyncMongoClient
 from beanie import init_beanie
-from .models import User, Guest, Seminar, QA
+from .models import User, Guest, Seminar, QA, RefreshToken
 from .config import settings
 
 
@@ -12,7 +12,7 @@ async def init_db():
     # Khởi tạo Beanie
     await init_beanie(
         database=db, 
-        document_models=[User, Guest, Seminar, QA]
+        document_models=[User, Guest, Seminar, QA, RefreshToken]
     )
     print("✅ Kết nối Database và khởi tạo Beanie thành công!")
 
