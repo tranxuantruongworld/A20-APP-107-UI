@@ -1,14 +1,22 @@
+from enum import Enum
 from typing import List, Optional
 from beanie import Document, Link, Indexed
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
+class RoleEnum(str, Enum):
+    ADMIN = "admin"         # Toàn quyền
+    SPEAKER = "speaker"     # Diễn giả (được tạo hội thảo)
+    USER = "user"           # Khán giả bình thường có tài khoản
+    
 # 1. Entity Người dùng (User)
 class User(Document):
     username: str = Indexed(unique=True)
     email: EmailStr
     password_hash: str
     full_name: str
+
+    role: RoleEnum = Field(default=RoleEnum.USER)
     
     class Settings:
         name = "users"
@@ -59,3 +67,11 @@ class QA(Document):
 
     class Settings:
         name = "qa_sessions"
+
+class RefreshToken(Document):
+    token: str = Indexed(unique=True)
+    user_id: str # Lưu ID user cho nhanh, hoặc dùng Link[User]
+    expires_at: datetime
+    
+    class Settings:
+        name = "refresh_tokens"

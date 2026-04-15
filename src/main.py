@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from src.api.v1.endpoints import seminars
+from src.api.endpoints import seminars, auth
 from src.database import init_db
 
 import os
@@ -36,7 +36,8 @@ STORAGE_DIR = Path("storage")
 STORAGE_DIR.mkdir(exist_ok=True)
 
 app.include_router(health.router)
-app.include_router(seminars.router, prefix="/api/v1/seminars", tags=["Seminars"])
+app.include_router(seminars.router, prefix="/api/seminars", tags=["Seminars"])
+app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(questions.router)
 app.include_router(asr.router)
 app.include_router(tts.router)
