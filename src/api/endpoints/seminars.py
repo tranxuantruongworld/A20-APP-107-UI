@@ -14,6 +14,7 @@ from src.core.socket_manager import sio
 
 router = APIRouter()
 
+#TODO check api my-seminars
 @router.get("/my-seminars")
 async def get_my_seminars(
     guest_id: Optional[str] = None,

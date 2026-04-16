@@ -8,6 +8,8 @@ from src.config import settings
 from http.cookies import SimpleCookie
 import jwt
 
+
+#TODO change jwt library
 # --- HÀM HỖ TRỢ: Bóc Cookie để tìm User ---
 async def get_user_from_cookie(environ) -> User | None:
     cookie_header = environ.get("HTTP_COOKIE", "")

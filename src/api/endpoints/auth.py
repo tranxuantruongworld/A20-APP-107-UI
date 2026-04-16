@@ -59,6 +59,7 @@ async def login(response: Response, data: LoginData):
         }
     }
 
+#TODO Check logic for refresh token again
 @router.post("/refresh")
 async def refresh_token(request: Request, response: Response):
     old_refresh_token = request.cookies.get("refresh_token")
