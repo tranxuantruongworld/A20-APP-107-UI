@@ -45,24 +45,19 @@ class Seminar(Document):
 
 # 4. Entity Q&A (Câu hỏi & Trả lời)
 class QA(Document):
-    # Liên kết tới Hội thảo (1 hội thảo có nhiều Q&A)
     seminar: Link[Seminar]
     
-    # Thông tin câu hỏi
     question: str
     asked_by_user: Optional[Link[User]] = None
     asked_by_guest: Optional[Link[Guest]] = None
     
-    # Thông tin trả lời
-    answer: str
-    answered_by: Link[User] # Giả định chỉ User (diễn giả/admin) mới trả lời
+    # SỬA Ở ĐÂY: Thêm Optional vì câu hỏi mới tạo chưa có câu trả lời
+    answer: Optional[str] = None
+    answered_by: Optional[Link[User]] = None 
     
-    # Phần dành cho AI
     ai_summary: Optional[str] = None
-    ai_relevance_score: Optional[float] = Field(None, ge=0, le=10) # Thang điểm 0-10
-    
-    # Feedback từ người dùng về câu trả lời của AI
-    user_feedbacks: List[dict] = [] # Ví dụ: {"user_id": "...", "rating": 5, "comment": "..."}
+    ai_relevance_score: Optional[float] = Field(None, ge=0, le=10)
+    user_feedbacks: List[dict] = []
     guest_feedbacks: List[dict] = []
 
     class Settings:
