@@ -35,3 +35,4 @@ beanie==2.1.0
 pydantic[email]
 python-jose[cryptography]
 pwdlib[argon2,bcrypt]
+PyJWT==2.8.0

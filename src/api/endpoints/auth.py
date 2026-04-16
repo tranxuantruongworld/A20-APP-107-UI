@@ -48,8 +48,16 @@ async def login(response: Response, data: LoginData):
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, samesite="lax"
     )
 
-    # 5. Trả về đúng 1 chữ status theo yêu cầu
-    return {"status": "success"}
+    # 5. Trả về status kèm thông tin User
+    return {
+        "status": "success",
+        "user": {
+            "id": str(user.id),
+            "username": user.username,
+            "full_name": user.full_name,
+            "role": user.role
+        }
+    }
 
 @router.post("/refresh")
 async def refresh_token(request: Request, response: Response):
@@ -76,29 +84,25 @@ async def refresh_token(request: Request, response: Response):
         
     # 4. XOAY VÒNG TOKEN - Refresh Token cũ sẽ bị xóa và tạo mới hoàn toàn cả Access Token lẫn Refresh Token
     # Xóa token cũ ngay lập tức để không bị tích tụ rác trong DB
-    await db_token.delete()
+    # await db_token.delete()
     
     # Tạo Access Token và Refresh Token mới hoàn toàn
     new_access_token = create_access_token(data={
         "sub": str(user.id), 
         "role": user.role.value
-    })    
-    new_refresh_token_str = create_refresh_token(data={"sub": str(user.id)})
-    
-    # Lưu Refresh Token mới vào DB
-    expires_at = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    new_rt = RefreshToken(token=new_refresh_token_str, user_id=str(user.id), expires_at=expires_at)
-    await new_rt.insert()
+    })
+
+    # TODO delete expired refresh tokens for this user to prevent DB bloat
 
     # 5. Set Cookie mới
     response.set_cookie(
         key="access_token", value=new_access_token, httponly=True, 
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60, samesite="lax"
     )
-    response.set_cookie(
-        key="refresh_token", value=new_refresh_token_str, httponly=True, 
-        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, samesite="lax"
-    )
+    # response.set_cookie(
+    #     key="refresh_token", value=new_refresh_token_str, httponly=True, 
+    #     max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60, samesite="lax"
+    # )
     
     return {"status": "success"}
 
