@@ -56,3 +56,26 @@ class QAService:
             "asker_name": asker_name,
             "status": "Chưa trả lời"
         }
+    
+    @staticmethod
+    async def answer_question(qa_id: str, answer_text: str, current_user: User) -> dict:
+        try:
+            qa_obj = await QA.get(PydanticObjectId(qa_id), fetch_links=True)
+            if not qa_obj:
+                raise ValueError("Không tìm thấy câu hỏi này")
+            
+            # Cập nhật câu trả lời
+            qa_obj.answer = answer_text
+            qa_obj.answered_by = current_user
+            await qa_obj.save()
+
+            return {
+                "id": str(qa_obj.id),
+                "seminar_id": str(qa_obj.seminar.id),
+                "question": qa_obj.question,
+                "answer": qa_obj.answer,
+                "status": "Đã trả lời"
+            }
+        except Exception as e:
+            raise ValueError(f"Lỗi khi lưu câu trả lời: {str(e)}")
+        
