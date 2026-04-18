@@ -3,8 +3,8 @@ from cmath import log
 from fastapi import APIRouter, HTTPException, status, Depends
 from src.schemas.guest_schema import GuestJoinSchema
 from src.api.deps import get_current_user
-from src.models import QA, Guest, Seminar, User
-from src.schemas.qa_schema import QuestionCreate
+from src.models import QA, Guest, RoleEnum, Seminar, User
+from src.schemas.qa_schema import AnswerCreate, PersonInfo, QuestionCreate, QuestionListResponse, QuestionOut
 from src.schemas.seminar_schema import SeminarCreate, SeminarOut, SeminarUpdate
 from src.services.qa_service import QAService
 from src.services.seminar_service import SeminarService
@@ -31,13 +31,13 @@ async def get_my_seminars(
 
     if current_user:
         # User đã login: tìm trong mảng participants
-        query_filter = {"participants.$id": current_user.id}
+        query_filter = Seminar.participants.id == current_user.id
     elif guest_id:
         # Trường hợp là Guest: phải convert guest_id sang ObjectId
         try:
             # Ép kiểu từ string sang ObjectId để MongoDB hiểu được
             obj_id = PydanticObjectId(guest_id)
-            query_filter = {"guests.$id": obj_id}
+            query_filter = Seminar.guests.id == obj_id
         except Exception:
             raise HTTPException(status_code=400, detail="guest_id không đúng định dạng ObjectId")
 
@@ -143,30 +143,81 @@ async def ask_question(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/{seminar_id}/questions")
+@router.get("/{seminar_id}/questions", response_model=QuestionListResponse)
 async def get_seminar_questions(seminar_id: str):
     try:
         sem_id = PydanticObjectId(seminar_id)
-    except:
+    except Exception:
         raise HTTPException(status_code=400, detail="ID hội thảo không hợp lệ")
 
-    # fetch_links=True giúp lấy data thật của User/Guest thay vì chỉ lấy Link(ID)
     questions = await QA.find(QA.seminar.id == sem_id, fetch_links=True).to_list()    
+    
     result = []
     for q in questions:
-        # Xác định tên người hỏi
-        asker_name = "Ẩn danh"
-        if q.asked_by_user:
-            asker_name = q.asked_by_user.full_name
-        elif q.asked_by_guest:
-            asker_name = q.asked_by_guest.full_name
-            
-        result.append({
-            "id": str(q.id),
-            "question": q.question,
-            "answer": q.answer,
-            "asker_name": asker_name,
-            "ai_relevance_score": q.ai_relevance_score
-        })
+        # 1. Gom thông tin người hỏi (Dùng Class thay vì dict {})
+        asker_info = PersonInfo(name="Ẩn danh", type="unknown")
         
-    return {"status": "success", "data": result}
+        if q.asked_by_user:
+            asker_info.name = q.asked_by_user.full_name
+            asker_info.id = str(q.asked_by_user.id)
+            asker_info.type = "user"
+        elif q.asked_by_guest:
+            asker_info.name = q.asked_by_guest.full_name
+            asker_info.id = str(q.asked_by_guest.id)
+            asker_info.type = "guest"
+            
+        # 2. Gom thông tin người trả lời
+        answerer_info = None
+        if q.answered_by:
+            answerer_info = PersonInfo(
+                id=str(q.answered_by.id),
+                name=q.answered_by.full_name,
+                type="speaker"
+            )
+            
+        # 3. Đổ thẳng vào Khuôn QuestionOut
+        q_out = QuestionOut(
+            id=str(q.id),
+            seminar_id=str(q.seminar.id) if q.seminar else seminar_id,
+            question=q.question,
+            answer=q.answer,
+            asker=asker_info,
+            answerer=answerer_info,
+            ai_summary=q.ai_summary,
+            ai_relevance_score=q.ai_relevance_score,
+            user_feedbacks=q.user_feedbacks,
+            guest_feedbacks=q.guest_feedbacks
+        )
+        result.append(q_out)
+        
+    return QuestionListResponse(status="success", data=result)
+
+@router.post("/questions/{qa_id}/answer")
+async def answer_question_api(
+    qa_id: str,
+    payload: AnswerCreate,
+    current_user: User = Depends(get_current_user) 
+):
+    # 1. Kiểm tra quyền: Phải là Speaker mới được trả lời
+    if current_user.role.value != RoleEnum.SPEAKER.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Chỉ Speaker mới có quyền trả lời câu hỏi"
+        )
+    
+    # Note: Các check khác như "User này có phải chủ của Seminar này không" 
+    # hoặc "Seminar có đang diễn ra không" sẽ được bổ sung sau.
+
+    try:
+        # 2. Gọi service để lưu vào DB
+        qa_data = await QAService.answer_question(qa_id, payload.answer, current_user)
+        
+        # 3. PHÁT SÓNG REAL-TIME: Bắn tin cho cả phòng hội thảo
+        # room=qa_data["seminar_id"] đảm bảo chỉ những người trong phòng đó mới nhận được
+        await sio.emit("question_answered", qa_data, room=qa_data["seminar_id"])
+        
+        return {"status": "success", "data": qa_data}
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    

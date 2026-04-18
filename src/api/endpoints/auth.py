@@ -59,7 +59,6 @@ async def login(response: Response, data: LoginData):
         }
     }
 
-#TODO Check logic for refresh token again
 @router.post("/refresh")
 async def refresh_token(request: Request, response: Response):
     old_refresh_token = request.cookies.get("refresh_token")
@@ -83,17 +82,14 @@ async def refresh_token(request: Request, response: Response):
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
         
-    # 4. XOAY VÒNG TOKEN - Refresh Token cũ sẽ bị xóa và tạo mới hoàn toàn cả Access Token lẫn Refresh Token
-    # Xóa token cũ ngay lập tức để không bị tích tụ rác trong DB
-    # await db_token.delete()
+    # 4. Xoá tất cả refreshToken hết hạn
+    await RefreshToken.find(RefreshToken.expires_at < datetime.utcnow()).delete()
     
     # Tạo Access Token và Refresh Token mới hoàn toàn
     new_access_token = create_access_token(data={
         "sub": str(user.id), 
         "role": user.role.value
     })
-
-    # TODO delete expired refresh tokens for this user to prevent DB bloat
 
     # 5. Set Cookie mới
     response.set_cookie(
