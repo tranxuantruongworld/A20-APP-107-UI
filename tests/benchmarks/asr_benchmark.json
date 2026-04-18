@@ -1,0 +1,13 @@
+{
+  "total_samples": 10,
+  "successful_samples": 10,
+  "success_rate": 1.0,
+  "wer": 0.22996515679442509,
+  "cer": 0.1187648456057007,
+  "avg_latency_sec": 15.163295030000153,
+  "p95_latency_sec": 19.784125729935475,
+  "avg_rtf": 1.431747829608113,
+  "errors": [],
+  "model_size": "small",
+  "language": "vi"
+}

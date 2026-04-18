@@ -84,3 +84,35 @@ Thành viên: Bân, Trường, Triển
 - Dọn lại output artifacts để tránh commit file sinh tự động không cần thiết.
 - Bổ sung docs kiến trúc cho luồng audio end-to-end.
 - Chuẩn hóa PR checklist và template mô tả thay đổi theo file.
+
+
+---
+## Tuần 3 — 18/04/2026
+
+**Thành viên:** tranxuantruongworld, BanBannBannn, trienvtran
+
+### Đã làm
+- Hoàn thiện API: Xây dựng và đóng gói các endpoint core cho hệ thống, đảm bảo tính kết nối giữa module AI (ASR/TTS) và backend.
+- Thiết kế Form khảo sát: Tạo bảng câu hỏi khảo sát bài toán thực tế để thu thập feedback từ người dùng tiềm năng, giúp kiểm chứng giả thuyết sản phẩm.
+- Họp chốt MVP: Cùng team thảo luận và thống nhất phạm vi sản phẩm khả thi tối thiểu (MVP). Loại bỏ các tính năng "nice-to-have" để tập trung vào giá trị cốt lõi nhất.
+- Chuẩn hóa luồng dữ liệu: Đảm bảo dữ liệu đi từ Audio đầu vào -> AI xử lý -> API response một cách trơn tru.
+
+### Khó nhất tuần này
+- Định nghĩa MVP: Việc phải cắt bỏ một số ý tưởng thú vị để đảm bảo tiến độ và tính khả thi của sản phẩm cuối cùng là một thử thách về mặt ra quyết định cho cả team.
+- Thiết kế API tối ưu: Phải tính toán cấu trúc JSON trả về sao cho linh hoạt, đủ thông tin cho cả Frontend và các tác vụ hậu xử lý sau này.
+### AI tool đã dùng
+| Tool | Dùng để làm gì | Kết quả |
+|---|---|---|
+| Copilot | Gợi ý code boilerplate cho các endpoint API và viết validation logic. | Tăng tốc độ viết code backend, đảm bảo chuẩn RESTful. |
+
+### Học được
+- Tư duy MVP: "Làm ít nhưng chất". Tập trung giải quyết triệt để một bài toán nhỏ vẫn tốt hơn làm nhiều tính năng nhưng không hoàn thiện.
+- Tầm quan trọng của khảo sát: Việc đặt bút thiết kế form giúp team nhìn nhận lại bài toán dưới góc độ người dùng, thay vì chỉ đứng ở góc độ kỹ thuật.
+
+### Nếu làm lại, sẽ làm khác
+- Nên chuẩn bị các bản phác thảo (mockup) đơn giản trước khi họp chốt MVP để mọi người dễ hình dung và ra quyết định nhanh hơn.
+### Kế hoạch tuần tới
+- Triển khai Integration Test: Test tích hợp toàn bộ luồng từ Client -> API -> AI Module.
+- Phân tích dữ liệu từ Form khảo sát để điều chỉnh các tham số AI cho phù hợp thực tế.
+- Bắt đầu xây dựng giao diện (Frontend) cơ bản dựa trên các endpoint đã hoàn thiện.
+- Hoàn thiện tài liệu API (Swagger/Postman collection).

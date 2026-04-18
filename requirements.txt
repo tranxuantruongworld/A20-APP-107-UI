@@ -3,9 +3,36 @@ openai>=1.50.0
 python-dotenv>=1.0.0
 httpx>=0.27.0
 pydantic>=2.0.0
+groq>=0.11.0
 
 fastapi
 uvicorn
-motor
+# motor
 pydantic-settings
 email-validator
+python-socketio
+
+# faster-whisper
+# pyttsx3
+torch
+python-multipart
+
+# ASR - Automatic Speech Recognition
+faster-whisper>=1.0.0
+
+# TTS - Offline Text To Speech
+pyttsx3>=2.90
+
+# Benchmark and evaluation
+pytest>=8.0.0
+jiwer>=3.0.4
+datasets>=2.20.0,<3.0.0
+soundfile>=0.12.1
+
+# motor==2.5.1
+pymongo>=4.10.0
+beanie==2.1.0
+pydantic[email]
+python-jose[cryptography]
+pwdlib[argon2,bcrypt]
+PyJWT==2.8.0
