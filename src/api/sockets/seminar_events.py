@@ -1,15 +1,13 @@
-# src/api/sockets/seminar_events.py
-from cmath import log
-
+import logging
 from src.core.socket_manager import sio
 from src.services.qa_service import QAService
 from src.models import User
 from src.config import settings
 from http.cookies import SimpleCookie
-import jwt
+from jose import jwt, JWTError
 
+log = logging.getLogger(__name__)
 
-#TODO change jwt library
 # --- HÀM HỖ TRỢ: Bóc Cookie để tìm User ---
 async def get_user_from_cookie(environ) -> User | None:
     cookie_header = environ.get("HTTP_COOKIE", "")
@@ -22,12 +20,12 @@ async def get_user_from_cookie(environ) -> User | None:
     if "access_token" in cookie:
         token = cookie["access_token"].value
         try:
-            # Decode y hệt như trong deps.py của bạn
+            # Bóc token bằng jose 
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
             user_id = payload.get("sub")
             if user_id:
                 return await User.get(user_id)
-        except Exception as e:
+        except JWTError as e:
             log.error(f"Error decoding token: {e}")
             return None
     return None
@@ -55,30 +53,61 @@ async def handle_join(sid, data):
     print(f"[Socket] {sid} đã vào phòng: {room_id}")
     await sio.emit("notification", {"msg": f"Bạn đã kết nối vào phòng {room_id}"}, room=sid)
 
-# --- CASE 2: SEND QA ---
+# --- CASE 2: SEND QA (Khán giả gửi câu hỏi) ---
 @sio.on("send_qa")
 async def handle_send_qa(sid, data):
     seminar_id = data.get("seminar_id")
     question = data.get("question")
     guest_id = data.get("guest_id") 
     
-    # 1. Lấy thông tin User từ Session đã lưu lúc connect
     session = await sio.get_session(sid)
     current_user = session.get("current_user")
     
     try:
-        # 2. Gọi Service. Đưa cả current_user và guest_id vào. Service sẽ tự biết ưu tiên ai.
         qa_data = await QAService.create_question(
             seminar_id=seminar_id,
             question=question,
-            current_user=current_user, # Truyền User vào đây!
+            current_user=current_user,
             guest_id=guest_id
         )
         
-        # 3. Thành công: Bắn sự kiện "new_question" cho CẢ PHÒNG
+        # Bắn cho cả phòng thấy câu hỏi mới
         await sio.emit("new_question", qa_data, room=seminar_id)
         
+        # RETURN: Báo cho Frontend biết là "Gửi thành công rồi!"
+        return {"status": "success", "message": "Gửi câu hỏi thành công!", "data": qa_data}
+        
     except ValueError as e:
-        # 4. Thất bại: Chủ động bắn sự kiện "error_msg" vào RIÊNG mặt người gửi (room=sid)
         print(f"❌ [Socket Error] Lỗi từ {sid}: {str(e)}")
-        await sio.emit("error_msg", {"msg": str(e)}, room=sid)
+        # RETURN: Báo lỗi cho Frontend
+        return {"status": "error", "message": str(e)}
+
+# --- CASE 3: ANSWER QA (Speaker trả lời câu hỏi) ---
+@sio.on("answer_question")
+async def handle_answer_qa(sid, data):
+    qa_id = data.get("qa_id")
+    answer = data.get("answer")
+
+    session = await sio.get_session(sid)
+    current_user = session.get("current_user")
+
+    # 1. Kiểm tra bảo mật: Phải đăng nhập và Role phải là Speaker
+    if not current_user:
+        return {"status": "error", "message": "Bạn cần đăng nhập để trả lời."}
+        
+    if current_user.role.value != "speaker":
+        return {"status": "error", "message": "Chỉ Speaker mới có quyền trả lời câu hỏi!"}
+
+    try:
+        # 2. Gọi Service để update DB
+        qa_data = await QAService.answer_question(qa_id, answer, current_user)
+
+        # 3. Phát sóng câu trả lời cho toàn bộ khán giả trong phòng
+        await sio.emit("question_answered", qa_data, room=qa_data["seminar_id"])
+
+        # 4. RETURN: Báo cho màn hình của Speaker biết là cập nhật thành công
+        return {"status": "success", "message": "Đã gửi câu trả lời!", "data": qa_data}
+
+    except ValueError as e:
+        print(f"❌ [Socket Error] Lỗi trả lời từ {sid}: {str(e)}")
+        return {"status": "error", "message": str(e)}
