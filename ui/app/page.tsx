@@ -1,11 +1,15 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 
 export default function LandingPage() {
   const [showModal, setShowModal] = useState(true);
   const [eventCode, setEventCode] = useState('');
   const router = useRouter();
+  
+  // Kiểm tra trạng thái đăng nhập
+  const { isSignedIn } = useUser();
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +36,35 @@ export default function LandingPage() {
                 value={eventCode}
                 onChange={(e) => setEventCode(e.target.value.toUpperCase())}
               />
-              <button 
-                type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all"
-              >
-                Vào tham gia ngay
-              </button>
+              
+              {isSignedIn ? (
+                <button 
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all"
+                >
+                  Vào tham gia ngay
+                </button>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <SignInButton mode="modal">
+                    <button type="button" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all">
+                      Đăng nhập để tham gia
+                    </button>
+                  </SignInButton>
+                  
+                  <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-slate-200"></div>
+                    <span className="flex-shrink mx-4 text-slate-400 text-sm">hoặc</span>
+                    <div className="flex-grow border-t border-slate-200"></div>
+                  </div>
+
+                  <SignUpButton mode="modal">
+                    <button type="button" className="w-full bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold py-3 rounded-lg transition-all">
+                      Tạo tài khoản mới
+                    </button>
+                  </SignUpButton>
+                </div>
+              )}
             </form>
           </div>
         </div>
