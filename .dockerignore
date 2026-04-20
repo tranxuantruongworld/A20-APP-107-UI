@@ -1,0 +1,29 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Môi trường ảo
+.venv/
+venv/
+env/
+bin/
+lib/
+
+# Git
+.git
+.gitignore
+
+# Thông tin nhạy cảm
+.env
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Log và file tạm
+*.log
+.pytest_cache/
+.vscode/
+.idea/
+.DS_Store
