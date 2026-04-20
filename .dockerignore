@@ -27,3 +27,5 @@ Dockerfile
 .vscode/
 .idea/
 .DS_Store
+
+ui/
