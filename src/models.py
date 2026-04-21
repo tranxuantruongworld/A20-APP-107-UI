@@ -63,6 +63,44 @@ class QA(Document):
     class Settings:
         name = "qa_sessions"
 
+# 5. Entity Premium Q&A Log (Xuất Log Q&A Premium)
+class PremiumQALogStatus(str, Enum):
+    READY = "ready"           # Đã nhận file audio, sẵn sàng xử lý
+    PROCESSING = "processing" # Đang chạy ASR/LLM pipeline
+    COMPLETED = "completed"   # Hoàn thành, có final_markdown
+    FAILED = "failed"         # Lỗi trong quá trình xử lý
+
+class PremiumQALog(Document):
+    seminar: Link[Seminar]  # Liên kết với hội thảo
+    
+    # File audio gốc
+    original_audio_path: str
+    
+    # Trạng thái xử lý
+    status: PremiumQALogStatus = Field(default=PremiumQALogStatus.READY)
+    error_message: Optional[str] = None  # Chi tiết lỗi nếu failed
+    
+    # Kết quả thô từ ASR
+    raw_transcription: Optional[str] = None
+    raw_segments: Optional[List[dict]] = None  # Segments với timestamp và speaker
+    
+    # Kết quả cuối cùng từ LLM post-processing
+    final_markdown: Optional[str] = None
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    processing_started_at: Optional[datetime] = None
+    processing_completed_at: Optional[datetime] = None
+    
+    # Thông tin xử lý
+    total_chunks: Optional[int] = None
+    asr_providers_used: Optional[List[str]] = None
+    processing_time_seconds: Optional[float] = None
+
+    class Settings:
+        name = "premium_qa_logs"
+
 class RefreshToken(Document):
     token: str = Indexed(unique=True)
     user_id: str # Lưu ID user cho nhanh, hoặc dùng Link[User]
