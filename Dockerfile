@@ -19,4 +19,4 @@ RUN pip install --no-cache-dir -U pip && \
 
 COPY . .
 
-CMD ["uvicorn", "src.main:combined_app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+CMD ["sh", "-c", "uvicorn src.main:combined_app --host 0.0.0.0 --port ${PORT:-8000} --workers 2"]
