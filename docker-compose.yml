@@ -3,12 +3,15 @@ version: '3.8'
 services:
   api:
     build: .
+    volumes:
+      - .:/app  # Mount code từ máy vào container để dev
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
-    env_file:
-      - .env
+    environment:
+      - ENV=development
+      - MONGO_DETAILS=mongodb://mongodb:27017 # Ví dụ kết nối mongo local
+    # Ghi đè lệnh CMD của Dockerfile để bật --reload và 1 worker duy nhất khi dev
+    command: uvicorn src.main:combined_app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - mongodb
 
@@ -16,9 +19,6 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-admin}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-password}
     volumes:
       - mongo_data:/data/db
 

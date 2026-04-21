@@ -14,14 +14,14 @@ python-socketio
 
 # faster-whisper
 # pyttsx3
-torch
+# torch
 python-multipart
 
 # ASR - Automatic Speech Recognition
-faster-whisper>=1.0.0
+# faster-whisper>=1.0.0
 
 # TTS - Offline Text To Speech
-pyttsx3>=2.90
+# pyttsx3>=2.90
 
 # Benchmark and evaluation
 pytest>=8.0.0
