@@ -1,8 +1,19 @@
 from enum import Enum
 from typing import List, Optional
-from beanie import Document, Link, Indexed
+from beanie import Document, Link, Indexed, before_event, Replace, SaveChanges
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
+
+class BaseEntity(Document):
+    # Luôn tự động lấy giờ UTC+0 khi tạo mới
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    @before_event([Replace, SaveChanges])
+    def update_timestamp(self):
+        self.updated_at = datetime.utcnow()
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # class Settings:
+    #     is_root = True
 
 class RoleEnum(str, Enum):
     ADMIN = "admin"         # Toàn quyền
@@ -10,7 +21,7 @@ class RoleEnum(str, Enum):
     USER = "user"           # Khán giả bình thường có tài khoản
     
 # 1. Entity Người dùng (User)
-class User(Document):
+class User(BaseEntity):
     username: str = Indexed(unique=True)
     email: EmailStr
     password_hash: str
@@ -22,16 +33,16 @@ class User(Document):
         name = "users"
 
 # 2. Entity Khách mời (Guest) - Thường không cần tài khoản, chỉ cần thông tin định danh
-class Guest(Document):
-    email: EmailStr = Indexed(unique=True)
+class Guest(BaseEntity):
+    # email: EmailStr = Indexed(unique=True)
     full_name: str
-    organization: Optional[str] = None
+    # organization: Optional[str] = None
 
     class Settings:
         name = "guests"
 
 # 3. Entity Hội thảo (Seminar)
-class Seminar(Document):
+class Seminar(BaseEntity):
     title: str
     description: str
     start_time: datetime
@@ -44,7 +55,7 @@ class Seminar(Document):
         name = "seminars"
 
 # 4. Entity Q&A (Câu hỏi & Trả lời)
-class QA(Document):
+class QA(BaseEntity):
     seminar: Link[Seminar]
     
     question: str
@@ -101,7 +112,7 @@ class PremiumQALog(Document):
     class Settings:
         name = "premium_qa_logs"
 
-class RefreshToken(Document):
+class RefreshToken(BaseEntity):
     token: str = Indexed(unique=True)
     user_id: str # Lưu ID user cho nhanh, hoặc dùng Link[User]
     expires_at: datetime

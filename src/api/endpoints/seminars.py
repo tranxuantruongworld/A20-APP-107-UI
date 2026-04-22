@@ -95,7 +95,14 @@ async def join_seminar(
         # Thêm User vào danh sách participants
         seminar.participants.append(current_user)
         await seminar.save()
-        return {"status": "success", "message": f"User {current_user.full_name} đã tham gia"}
+        return {
+            "status": "success",
+            "message": f"User {current_user.full_name} đã tham gia",
+            "participant_id": str(current_user.id),
+            "participant_type": "user",
+            "full_name": current_user.full_name
+        }
+        # return {"status": "success", "message": f"User {current_user.full_name} đã tham gia"}
 
     # 3. Trường hợp là Guest (Chưa login)
     if not guest_data:
@@ -105,10 +112,10 @@ async def join_seminar(
         )
 
     # Tìm Guest cũ hoặc tạo mới dựa trên email
-    guest = await Guest.find_one(Guest.email == guest_data.email)
-    if not guest:
-        guest = Guest(**guest_data.model_dump())
-        await guest.insert()
+    # guest = await Guest.find_one(Guest.email == guest_data.email)
+    # if not guest:
+    guest = Guest(**guest_data.model_dump())
+    await guest.insert()
     
     # Kiểm tra xem Guest đã trong danh sách chưa
     if any(link.ref.id == guest.id for link in seminar.guests):
@@ -118,7 +125,14 @@ async def join_seminar(
     seminar.guests.append(guest)
     await seminar.save()
 
-    return {"status": "success", "message": f"Khách mời {guest.full_name} đã tham gia"}
+    # return {"status": "success", "message": f"Khách mời {guest.full_name} đã tham gia"}
+    return {
+        "status": "success", 
+        "message": f"Khách mời {guest.full_name} đã tham gia",
+        "participant_id": str(guest.id),
+        "participant_type": "guest",
+        "full_name": guest.full_name
+    }
 
 @router.post("/{seminar_id}/questions", status_code=status.HTTP_201_CREATED)
 async def ask_question(
