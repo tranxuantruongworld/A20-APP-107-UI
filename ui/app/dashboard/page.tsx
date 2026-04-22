@@ -1,68 +1,132 @@
 "use client";
-import { Mic, MessageSquare, Users, Settings, PlayCircle } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { PlusCircle, History, Calendar, MessageCircle, ChevronRight, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { user } = useUser();
+  const [seminars, setSeminars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Lấy danh sách seminar từ Database
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchSeminars = async () => {
+      const { data, error } = await supabase
+        .from('seminars')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (!error) setSeminars(data);
+      setLoading(false);
+    };
+
+    fetchSeminars();
+  }, [user]);
+
+  // 2. Hàm tạo phiên mới và lưu vào Supabase
+  const createNewSession = async () => {
+    if (!user) return;
+
+    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const title = `Hội thảo ngày ${new Date().toLocaleDateString('vi-VN')}`;
+
+    const { data, error } = await supabase
+      .from('seminars')
+      .insert([{ 
+        title, 
+        code: roomCode, 
+        user_id: user.id,
+        status: 'live' 
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Lỗi tạo phiên:", error.message);
+      return;
+    }
+
+    // Redirect sang trang session với ID vừa tạo
+    router.push(`/session/${data.id}`);
+  };
+
   return (
-    <div className="flex h-screen bg-slate-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col">
-        <div className="text-xl font-bold mb-10 flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">V</div>
-          VoiceAgent
+    <div className="min-h-screen bg-slate-50">
+      <nav className="bg-white border-b px-6 py-3 flex justify-between items-center sticky top-0 z-10">
+        <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
+          <MessageCircle size={24} />
+          <span>Q&A Admin</span>
         </div>
-        <nav className="space-y-4 flex-1">
-          <a href="#" className="flex items-center gap-3 bg-blue-600 p-2 rounded-lg"><Mic size={20}/> Trực tiếp</a>
-          <a href="#" className="flex items-center gap-3 text-slate-400 hover:text-white p-2"><MessageSquare size={20}/> Lịch sử Q&A</a>
-          <a href="#" className="flex items-center gap-3 text-slate-400 hover:text-white p-2"><Users size={20}/> Thính giả</a>
-        </nav>
-        <div className="pt-6 border-t border-slate-800">
-          <a href="#" className="flex items-center gap-3 text-slate-400 p-2"><Settings size={20}/> Cấu hình hệ thống</a>
+        <UserButton />
+      </nav>
+
+      <main className="max-w-5xl mx-auto p-8">
+        <div className="flex justify-between items-end mb-10">
+          <div>
+            <h2 className="text-3xl font-bold text-slate-900 font-sans">Phiên thảo luận</h2>
+            <p className="text-slate-500">Quản lý các buổi hội thảo của bạn thông qua AI.</p>
+          </div>
+          <button 
+            onClick={createNewSession}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-200 active:scale-95"
+          >
+            <PlusCircle size={20} /> Tạo phiên mới
+          </button>
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        <header className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-slate-800">Điều hành Hội thảo Trực tiếp</h2>
-          <div className="flex items-center gap-3">
-            <span className="flex h-3 w-3 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="text-sm font-medium text-slate-600">Đang hoạt động</span>
-          </div>
-        </header>
+        <div className="space-y-4">
+          <h3 className="flex items-center gap-2 font-semibold text-slate-600 mb-4">
+            <History size={18}/> Lịch sử hội nghị
+          </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Voice Visualization Card */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h3 className="text-lg font-semibold mb-4">Tín hiệu Voice Agent</h3>
-            <div className="h-64 bg-slate-100 rounded-lg flex items-center justify-center border-2 border-dashed border-slate-300">
-              {/* Image of audio waveform visualizer */}
-              <div className="text-slate-400 flex flex-col items-center">
-                <Mic size={48} className="mb-2 animate-bounce text-blue-500"/>
-                <p>Đang lắng nghe thính giả...</p>
-              </div>
+          {loading ? (
+            <div className="flex justify-center py-10 text-slate-400">
+              <Loader2 className="animate-spin" />
             </div>
-            <div className="mt-6 flex gap-4">
-              <button className="flex-1 bg-red-500 text-white py-2 rounded-lg font-medium">Ngắt Micro</button>
-              <button className="flex-1 bg-slate-800 text-white py-2 rounded-lg font-medium">Bật Loa</button>
+          ) : seminars.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+              <p className="text-slate-400">Bạn chưa có phiên hội thảo nào. Hãy tạo mới ngay!</p>
             </div>
-          </div>
-
-          {/* Pending Questions */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h3 className="text-lg font-semibold mb-4">Câu hỏi chờ duyệt</h3>
-            <div className="space-y-4">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                  <p className="text-sm text-slate-800 font-medium mb-1">Thính giả #{item*123}</p>
-                  <p className="text-xs text-slate-500 line-clamp-2">"Làm thế nào để tối ưu RAG trong môi trường thực tế?"</p>
-                  <div className="mt-2 flex gap-2">
-                    <button className="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded">Duyệt</button>
-                    <button className="text-[10px] bg-slate-200 text-slate-600 px-2 py-1 rounded">Hủy</button>
+          ) : (
+            <div className="grid gap-4">
+              {seminars.map((item) => (
+                <div 
+                  key={item.id}
+                  onClick={() => router.push(`/session/${item.id}`)}
+                  className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between group cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl transition-colors ${item.status === 'live' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600'}`}>
+                      <Calendar size={24} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800">{item.title}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded uppercase font-bold text-slate-500">
+                          Mã: {item.code}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          {new Date(item.created_at).toLocaleDateString('vi-VN')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {item.status === 'live' && (
+                      <span className="text-[10px] bg-red-100 text-red-500 px-2 py-0.5 rounded-full font-bold animate-pulse">LIVE</span>
+                    )}
+                    <ChevronRight className="text-slate-300 group-hover:text-indigo-500 transition-colors" />
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>
