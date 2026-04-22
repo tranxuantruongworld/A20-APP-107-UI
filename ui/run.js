@@ -1,4 +1,4 @@
-const apiKey = "AIzaSyBtN9o8F5mTo4qQyHJsW4nzWHCeoPo4dNk";
+const apiKey = "GEMINI_API_KEY";
 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${apiKey}`;
 
 async function testGemma() {
