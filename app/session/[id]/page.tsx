@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { QrCode, ArrowLeft, Mic, MicOff, CheckCircle2, Loader2, MessageSquareOff } from "lucide-react";
 import { supabase } from "@/lib/supabase"; // Đảm bảo đường dẫn này đúng
+import { chownSync } from "fs";
 
 export default function LiveSession() {
   const { id } = useParams(); // Đây là UUID của Seminar từ Database
@@ -14,7 +15,7 @@ export default function LiveSession() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect(() => { 
     if (!id) return;
 
     // 1. Lấy thông tin chi tiết về Seminar (để lấy mã Room Code hiển thị)
@@ -24,7 +25,6 @@ export default function LiveSession() {
         .select('*')
         .eq('id', id)
         .single();
-      
       if (data) setSeminar(data);
     };
 
@@ -35,7 +35,7 @@ export default function LiveSession() {
         .select('*')
         .eq('seminar_id', id)
         .order('created_at', { ascending: false });
-
+      if (error) console.error("Lỗi lấy dữ liệu:", error.message);
       if (data) setQuestions(data);
       setLoading(false);
     };
