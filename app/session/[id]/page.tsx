@@ -92,7 +92,6 @@ export default function LiveSession() {
 
     // 2. Optimization: Don't process very short fragments (e.g., "Yes", "Hello")
     if (text.trim().split(" ").length < 5) return;
-
     try {
       const { data, error } = await supabase.functions.invoke('ai-voice-match', {
         body: { 
@@ -101,10 +100,10 @@ export default function LiveSession() {
         }
       });
       console.log("data", data)
-      if (data?.matchedId) {
+      if (data?.matches.length > 0) {
         // Highlight the question briefly before moving it (Optional UX)
-        console.log(`AI confirmed you answered: ${data.matchedId}`);
-        await updateQuestionStatus(data.matchedId, 'answered');
+        console.log(`AI confirmed you answered: ${data?.matches[0]}`);
+        await updateQuestionStatus(data.matches[0]?.id, 'answered');
       }
     } catch (err) {
       console.error("AI Match Error:", err);
