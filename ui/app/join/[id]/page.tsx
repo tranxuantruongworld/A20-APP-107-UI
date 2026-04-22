@@ -1,20 +1,18 @@
 // app/join/[id]/page.tsx
 "use client";
 
-import { useState, useEffect, useRef, use } from "react"; // Thêm use ở đây
+import { useState, useEffect, useRef, use } from "react";
 import { supabase } from "@/lib/supabase";
 import { 
   Send, CheckCircle2, User, MessageCircle, 
-  Loader2, Sparkles, ArrowDownCircle, Hash, Users 
+  Loader2, Sparkles, ArrowDownCircle, Users 
 } from "lucide-react";
 
-// Định nghĩa kiểu dữ liệu cho params
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
 export default function JoinRoom({ params }: PageProps) {
-  // 1. Unwrap params bằng React.use()
   const resolvedParams = use(params);
   const id = resolvedParams.id;
 
@@ -28,19 +26,21 @@ export default function JoinRoom({ params }: PageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      // 2. Sử dụng biến 'id' đã unwrap
       const { data: semi } = await supabase.from("seminars").select("*").eq("id", id).single();
       setSeminar(semi);
+      
       const { data: qs } = await supabase
         .from("questions")
         .select("*")
         .eq("seminar_id", id)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: true }); // Sắp xếp cũ -> mới để giống luồng chat
+      
       setQuestions(qs || []);
       setLoading(false);
     };
     fetchData();
 
+    // REALTIME: Lắng nghe mọi thay đổi từ Admin (INSERT, UPDATE, DELETE)
     const channel = supabase
       .channel(`public_chat_${id}`)
       .on("postgres_changes", { 
@@ -50,13 +50,21 @@ export default function JoinRoom({ params }: PageProps) {
         filter: `seminar_id=eq.${id}` 
       }, 
       (payload) => {
-        if (payload.eventType === 'INSERT') setQuestions(prev => [...prev, payload.new]);
-        if (payload.eventType === 'UPDATE') setQuestions(prev => prev.map(q => q.id === payload.new.id ? payload.new : q));
+        if (payload.eventType === 'INSERT') {
+          setQuestions(prev => [...prev, payload.new]);
+        }
+        if (payload.eventType === 'UPDATE') {
+          // Cập nhật trạng thái câu hỏi ngay khi Admin nhấn "Đã trả lời" hoặc "Bỏ qua"
+          setQuestions(prev => prev.map(q => q.id === payload.new.id ? payload.new : q));
+        }
+        if (payload.eventType === 'DELETE') {
+          setQuestions(prev => prev.filter(q => q.id === payload.old.id));
+        }
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [id]); 
+  }, [id]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -66,16 +74,16 @@ export default function JoinRoom({ params }: PageProps) {
     e.preventDefault();
     if (!content.trim() || isSubmitting) return;
     setIsSubmitting(true);
-    try {
-        await supabase.from("questions").insert([{
-            seminar_id: id,
-            content: content.trim(),
-            author_name: name.trim() || "Khách ẩn danh",
-            status: "pending",
-            }]);
-    }catch(e){
-        console.log(e)
-    }
+    
+    const { error } = await supabase.from("questions").insert([{
+      seminar_id: id,
+      content: content.trim(),
+      author_name: name.trim() || "Khách ẩn danh",
+      status: "pending",
+    }]);
+
+    if (error) console.error("Lỗi gửi câu hỏi:", error.message);
+    
     setContent("");
     setIsSubmitting(false);
   };
@@ -83,145 +91,112 @@ export default function JoinRoom({ params }: PageProps) {
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center bg-white">
       <Loader2 className="animate-spin text-indigo-600 mb-4" size={40} />
-      <p className="text-slate-500 font-medium">Đang chuẩn bị khán phòng...</p>
+      <p className="text-slate-500 font-medium text-sm tracking-widest uppercase">Đang kết nối...</p>
     </div>
   );
 
   return (
-    <div className="h-[100dvh] w-screen overflow-hidden bg-white flex flex-col">
-      
-      {/* HEADER: Full Width với Border mỏng */}
-      <header className="h-20 bg-white/70 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 md:px-10 z-30 shrink-0">
+    <div className="h-[100dvh] w-screen overflow-hidden bg-slate-50 flex flex-col">
+      {/* HEADER */}
+      <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 md:px-10 z-30 shrink-0">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100 shrink-0">
-            <Sparkles size={24} />
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+            <Sparkles size={20} />
           </div>
           <div>
-            <h1 className="font-black text-slate-900 text-lg md:text-2xl tracking-tighter leading-none uppercase">
+            <h1 className="font-bold text-slate-900 text-lg md:text-xl tracking-tight uppercase">
               {seminar?.title}
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                ID: {seminar?.code} • Live Realtime
-              </p>
-            </div>
+            <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              Trực tiếp
+            </p>
           </div>
         </div>
-
-        <div className="hidden md:flex items-center gap-6">
-          <div className="text-right border-r border-slate-100 pr-6">
-            <p className="text-[10px] font-bold text-slate-400 uppercase">Khán giả</p>
-            <div className="flex items-center gap-1.5 justify-end">
-               <Users size={14} className="text-indigo-600" />
-               <span className="text-sm font-black text-slate-700 underline decoration-indigo-200">Active Session</span>
-            </div>
-          </div>
-          <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-             <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">Powered by Gemini 3 Flash</span>
-          </div>
+        <div className="bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100 hidden md:block">
+           <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Mã: {seminar?.code}</span>
         </div>
       </header>
 
-      {/* MAIN CHAT AREA: Chiếm toàn bộ chiều rộng nhưng giới hạn chiều rộng nội dung để dễ đọc */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 overflow-hidden relative flex flex-col">
-        
-        {/* Chat List */}
-        <div 
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto px-6 md:px-0 py-10 scroll-smooth custom-scrollbar"
-        >
-          <div className="max-w-3xl mx-auto space-y-10 pb-40">
-            {questions.length === 0 ? (
-              <div className="h-[50vh] flex flex-col items-center justify-center">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-indigo-100 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-                  <MessageCircle size={80} className="text-slate-100 relative z-10" />
-                </div>
-                <p className="text-slate-400 font-medium text-lg italic">Hãy đặt câu hỏi đầu tiên để bắt đầu thảo luận...</p>
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-10 scroll-smooth">
+          <div className="max-w-3xl mx-auto space-y-8 pb-40">
+            {questions.filter(q => q.status !== 'ignored').length === 0 ? (
+              <div className="h-[50vh] flex flex-col items-center justify-center text-slate-300">
+                <MessageCircle size={60} className="mb-4 opacity-20" />
+                <p className="text-sm font-medium italic">Chưa có câu hỏi nào...</p>
               </div>
             ) : (
               questions.map((q) => (
-                <div key={q.id} className="animate-in fade-in slide-in-from-bottom-6 duration-700 group">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[10px] font-black text-indigo-600 uppercase shadow-sm">
-                      {q.author_name.charAt(0)}
+                // Nếu Admin chọn "Bỏ qua" (ignored), chúng ta sẽ ẩn khỏi giao diện Guest
+                q.status !== 'ignored' && (
+                  <div key={q.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center gap-2 mb-2 ml-4">
+                      <span className="text-xs font-bold text-slate-500">@{q.author_name}</span>
+                      <span className="text-[10px] text-slate-300">• {new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <span className="text-sm font-bold text-slate-700 tracking-tight">{q.author_name}</span>
-                    <span className="text-[10px] text-slate-300 font-bold">{new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    
+                    <div className={`p-6 rounded-[2rem] border shadow-sm transition-all duration-500 ${
+                      q.status === 'answered' 
+                      ? 'bg-emerald-50/50 border-emerald-100 opacity-80' 
+                      : 'bg-white border-slate-100'
+                    }`}>
+                      <p className={`text-lg font-medium leading-relaxed ${q.status === 'answered' ? 'text-slate-500' : 'text-slate-800'}`}>
+                        {q.content}
+                      </p>
+                      {q.status === 'answered' && (
+                        <div className="mt-4 pt-4 border-t border-emerald-100/50 flex items-center gap-2 text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">
+                          <CheckCircle2 size={14} /> Diễn giả đã trả lời
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  
-                  <div className={`p-6 rounded-[2rem] transition-all duration-500 ${
-                    q.status === 'answered' 
-                    ? 'bg-slate-50 border border-transparent opacity-60 grayscale-[0.5]' 
-                    : 'bg-white border border-slate-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.06)] hover:shadow-indigo-100 hover:border-indigo-100'
-                  }`}>
-                    <p className="text-lg md:text-xl font-medium text-slate-800 leading-relaxed tracking-tight">
-                      {q.content}
-                    </p>
-                    {q.status === 'answered' && (
-                      <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-                        <CheckCircle2 size={14} /> Diễn giả đã phản hồi
-                      </div>
-                    )}
-                  </div>
-                </div>
+                )
               ))
             )}
           </div>
         </div>
 
-        {/* INPUT BOX: Floating Floating và bám vào cạnh dưới */}
+        {/* FLOATING INPUT */}
         <div className="absolute bottom-8 left-0 right-0 z-50 pointer-events-none">
-          <div className="max-w-3xl mx-auto px-6 pointer-events-auto">
-            <div className="bg-white/80 backdrop-blur-3xl p-3 rounded-[3rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.15)] border border-white">
-              <form onSubmit={handleSubmit} className="flex flex-col">
-                <div className="flex items-center px-6 py-2 mb-1">
-                  <User size={14} className="text-indigo-400 mr-2" />
-                  <input
+          <div className="max-w-2xl mx-auto px-6 pointer-events-auto">
+            <div className="bg-white/90 backdrop-blur-xl p-2 rounded-[2.5rem] shadow-2xl border border-white">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                <div className="flex-1 flex flex-col pl-4">
+                   <input
                     type="text"
-                    placeholder="Bạn là ai? (Tùy chọn)"
+                    placeholder="Tên của bạn..."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-transparent text-xs font-bold text-slate-500 outline-none w-full placeholder:text-slate-300 tracking-tighter"
+                    className="bg-transparent text-[10px] font-bold text-indigo-500 outline-none uppercase tracking-tighter"
                   />
-                </div>
-                
-                <div className="flex items-center gap-3 bg-slate-100/50 rounded-[2.5rem] p-2 transition-all focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-50 border border-transparent focus-within:border-indigo-100">
-                  <textarea
-                    rows={1}
+                  <input
                     required
-                    placeholder="Nhập nội dung câu hỏi..."
+                    placeholder="Đặt câu hỏi cho Speaker..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="flex-1 px-5 py-3 bg-transparent text-base md:text-lg outline-none resize-none max-h-32 placeholder:text-slate-400 font-medium tracking-tight"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSubmit(e);
-                      }
-                    }}
+                    className="bg-transparent py-2 text-sm md:text-base outline-none font-medium text-slate-700"
                   />
-                  <button 
-                    type="submit"
-                    disabled={isSubmitting || !content.trim()}
-                    className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 text-white w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-xl shadow-indigo-200 active:scale-90 shrink-0"
-                  >
-                    {isSubmitting ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} className="ml-1" />}
-                  </button>
                 </div>
+                <button 
+                  type="submit"
+                  disabled={isSubmitting || !content.trim()}
+                  className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 text-white w-12 h-12 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg shadow-indigo-200"
+                >
+                  {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} className="ml-0.5" />}
+                </button>
               </form>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Floating Bottom Button */}
       <button 
         onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })}
-        className="fixed bottom-36 right-10 bg-white w-12 h-12 flex items-center justify-center rounded-full shadow-2xl border border-slate-100 text-slate-400 hover:text-indigo-600 transition-all active:scale-75 z-40"
+        className="fixed bottom-32 right-8 bg-white w-10 h-10 flex items-center justify-center rounded-full shadow-lg border border-slate-100 text-slate-400 z-40"
       >
-        <ArrowDownCircle size={24} />
+        <ArrowDownCircle size={20} />
       </button>
     </div>
   );
