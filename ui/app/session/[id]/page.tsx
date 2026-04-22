@@ -99,7 +99,6 @@ export default function LiveSession() {
           questions: pending.map(q => ({ id: q.id, content: q.content })) 
         }
       });
-      console.log("data", data)
       if (data?.matches.length > 0) {
         // Highlight the question briefly before moving it (Optional UX)
         console.log(`AI confirmed you answered: ${data.matches[0]?.id}`);
