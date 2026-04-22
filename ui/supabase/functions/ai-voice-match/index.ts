@@ -13,46 +13,60 @@ serve(async (req) => {
     const apiKey = Deno.env.get("GEMINI_API_KEY")
 
     if (!apiKey) {
-      console.error("CRITICAL: GEMINI_API_KEY is not set!")
       return new Response(JSON.stringify({ error: "Missing API Key" }), { status: 500, headers: corsHeaders })
     }
 
-    // System Prompt for Semantic Ranking
+    // Đổi URL sang gemma-3-27b-it
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${apiKey}`;
+
+    // System Prompt tối ưu cho Gemma 3: Yêu cầu đánh giá TOÀN BỘ câu hỏi
     const prompt = `
-      You are an AI moderator for a live Q&A session.
-      TRANSCRIPT OF SPEAKER: "${transcript}"
-      PENDING QUESTIONS: ${JSON.stringify(questions)}
+[SYSTEM]
+Bạn là trợ lý AI điều phối Q&A. Nhiệm vụ của bạn là so sánh nội dung diễn giả đang nói (TRANSCRIPT) với DANH SÁCH CÂU HỎI.
+Bạn PHẢI trả về một JSON duy nhất, chứa điểm số tin cậy (0-10) cho TẤT CẢ câu hỏi được cung cấp, bất kể chúng có liên quan hay không.
 
-      TASK:
-      1. Compare the transcript with the list of questions.
-      2. Identify which questions the speaker is currently answering.
-      3. Assign a confidence score from 0 to 10 (10 being an exact match/direct answer).
-      4. Return the TOP 2 matches as an array.
-      5. If the speaker is not answering any question or the transcript is too short/irrelevant, return an empty array [].
+CẤU TRÚC TRẢ VỀ (BẮT BUỘC):
+{"matches": [{"id": "UUID", "score": số}, ...]}
 
-      OUTPUT FORMAT:
-      Return ONLY a JSON object with the key "matches":
-      {"matches": [{"id": "UUID", "score": 8}, {"id": "UUID", "score": 3}]}
-    `;
+[DATA]
+TRANSCRIPT: "${transcript}"
+PENDING QUESTIONS: ${JSON.stringify(questions)}
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+[OUTPUT]
+`;
+
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { 
-          responseMimeType: "application/json",
-          temperature: 0.1
+          // Lưu ý: Không dùng responseMimeType: "application/json" nếu model báo lỗi
+          temperature: 0.1,
+          maxOutputTokens: 1024
         }
       })
     })
 
     const result = await response.json()
-    
     if (result.error) throw new Error(result.error.message);
 
-    // Extract the AI text response
-    const aiText = result.candidates[0].content.parts[0].text;
+    let aiText = result.candidates[0].content.parts[0].text;
+
+    // Hậu xử lý: Gemma 3 đôi khi bọc JSON trong Markdown ```json ... ```
+    // Đoạn regex này giúp lấy nội dung JSON thuần túy
+    const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      aiText = jsonMatch[0];
+    }
+
+    // Parse thử để đảm bảo JSON hợp lệ trước khi gửi về client
+    try {
+      JSON.parse(aiText);
+    } catch (e) {
+      console.error("Gemma 3 gen JSON lỗi:", aiText);
+      throw new Error("Invalid JSON format from model");
+    }
     
     return new Response(aiText, {
       headers: { ...corsHeaders, "Content-Type": "application/json" }

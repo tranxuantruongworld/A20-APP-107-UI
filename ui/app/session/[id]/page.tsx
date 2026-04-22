@@ -102,7 +102,7 @@ export default function LiveSession() {
       console.log("data", data)
       if (data?.matches.length > 0) {
         // Highlight the question briefly before moving it (Optional UX)
-        console.log(`AI confirmed you answered: ${data?.matches[0]}`);
+        console.log(`AI confirmed you answered: ${data.matches[0]?.id}`);
         await updateQuestionStatus(data.matches[0]?.id, 'answered');
       }
     } catch (err) {
