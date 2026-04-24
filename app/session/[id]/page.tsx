@@ -2,8 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import { QrCode, ArrowLeft, Mic, MicOff, CheckCircle2, Loader2, MessageSquareOff } from "lucide-react";
+import { QrCode, ArrowLeft, Mic, MicOff, CheckCircle2, Loader2, MessageSquareOff, Sparkles, Copy, Check, Users, Clock, Zap } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function LiveSession() {
   const { id } = useParams();
@@ -13,8 +14,8 @@ export default function LiveSession() {
   const [seminar, setSeminar] = useState<any>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
   
-  // --- NEW STATES FOR REALTIME TEXT ---
   const [realtimeTranscript, setRealtimeTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
 
@@ -42,14 +43,13 @@ export default function LiveSession() {
     return () => { supabase.removeChannel(channel); };
   }, [id]);
 
-  // --- SPEECH TO TEXT LOGIC ---
   useEffect(() => {
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     if (!SpeechRecognition) return;
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
-    recognition.interimResults = true; // Crucial for realtime display
+    recognition.interimResults = true;
     recognition.lang = "vi-VN";
 
     recognition.onresult = async (event: any) => {
@@ -64,10 +64,8 @@ export default function LiveSession() {
         }
       }
 
-      // Update the UI with what is being said right now
       setRealtimeTranscript(finalTranscript || interimTranscript);
 
-      // If we have a final sentence, send it to AI to match questions
       if (finalTranscript) {
         handleAiMatch(finalTranscript);
       }
@@ -81,16 +79,14 @@ export default function LiveSession() {
       recognitionRef.current?.start();
     } else {
       recognitionRef.current?.stop();
-      setRealtimeTranscript(""); // Clear text when off
+      setRealtimeTranscript("");
     }
   }, [isMicOn]);
 
   const handleAiMatch = async (text: string) => {
-    // 1. Filter only 'pending' questions
     const pending = questions.filter(q => q.status === 'pending');
     if (pending.length === 0) return;
 
-    // 2. Optimization: Don't process very short fragments (e.g., "Yes", "Hello")
     if (text.trim().split(" ").length < 5) return;
     try {
       const { data, error } = await supabase.functions.invoke('ai-voice-match', {
@@ -100,7 +96,6 @@ export default function LiveSession() {
         }
       });
       if (data?.matches.length > 0) {
-        // Highlight the question briefly before moving it (Optional UX)
         console.log(`AI confirmed you answered: ${data.matches[0]?.id}`);
         await updateQuestionStatus(data.matches[0]?.id, 'answered');
       }
@@ -113,84 +108,203 @@ export default function LiveSession() {
     await supabase.from('questions').update({ status }).eq('id', qId);
   };
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center"><Loader2 className="text-indigo-500 animate-spin" size={40} /></div>;
+  const copyCode = () => {
+    navigator.clipboard.writeText(seminar?.code || '');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const pendingQuestions = questions.filter(q => q.status === 'pending');
+  const answeredQuestions = questions.filter(q => q.status === 'answered');
+
+  if (loading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse"></div>
+        <Loader2 className="relative text-primary animate-spin" size={48} />
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Bar */}
-      <div className="border-b border-slate-800 bg-slate-900/50 p-4 flex justify-between items-center px-8">
-        <button onClick={() => router.push('/dashboard')} className="flex items-center gap-2 text-slate-400 hover:text-white">
-          <ArrowLeft size={18}/> Quay lại
-        </button>
-        <div className="flex items-center gap-3 text-red-500 font-bold uppercase text-sm">
-          <span className="bg-red-500 w-2 h-2 rounded-full animate-pulse"></span>
-          LIVE: {seminar?.title}
+      <div className="glass border-b border-border/50 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => router.push('/dashboard')} 
+            className="w-10 h-10 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={18}/>
+          </button>
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+            <span className="text-lg font-bold hidden md:block">Conference Hub</span>
+          </Link>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-semibold text-green-500 uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            LIVE
+          </span>
+          <span className="text-muted-foreground hidden md:block">{seminar?.title}</span>
         </div>
       </div>
 
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
         {/* Sidebar */}
-        <div className="col-span-12 lg:col-span-3 border-r border-slate-800 p-8 flex flex-col bg-slate-900/30">
-          <div className="bg-white p-4 rounded-3xl mb-6 self-center shadow-lg">
-            <QrCode size={160} className="text-slate-950" />
+        <div className="col-span-12 lg:col-span-3 border-r border-border/50 p-8 flex flex-col glass">
+          {/* QR Code */}
+          <div className="bg-foreground p-6 rounded-2xl mb-6 self-center shadow-2xl shadow-black/30">
+            <QrCode size={140} className="text-background" />
           </div>
           
-          <div className="text-center mb-6">
-             <p className="text-slate-500 text-xs font-bold uppercase mb-1">Mã phòng</p>
-             <p className="text-4xl font-black text-indigo-400 tracking-tighter">{seminar?.code}</p>
+          {/* Room Code */}
+          <div className="text-center mb-8">
+            <p className="text-muted-foreground text-xs font-semibold uppercase mb-2 tracking-wider">Room Code</p>
+            <div className="flex items-center justify-center gap-3">
+              <p className="text-4xl font-black text-gradient-gold tracking-tight">{seminar?.code}</p>
+              <button 
+                onClick={copyCode}
+                className="w-10 h-10 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center transition-colors"
+              >
+                {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} className="text-muted-foreground" />}
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">Share this code with your audience</p>
           </div>
 
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="glass rounded-xl border border-border/50 p-4 text-center">
+              <p className="text-2xl font-bold text-primary">{pendingQuestions.length}</p>
+              <p className="text-xs text-muted-foreground">Pending</p>
+            </div>
+            <div className="glass rounded-xl border border-border/50 p-4 text-center">
+              <p className="text-2xl font-bold text-green-500">{answeredQuestions.length}</p>
+              <p className="text-xs text-muted-foreground">Answered</p>
+            </div>
+          </div>
+
+          {/* AI Voice Button */}
           <button 
             onClick={() => setIsMicOn(!isMicOn)}
-            className={`w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all ${
-              isMicOn ? 'bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700'
+            className={`w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-3 transition-all ${
+              isMicOn 
+                ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30' 
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20'
             }`}
           >
-            {isMicOn ? <><MicOff size={22}/> Dừng AI</> : <><Mic size={22}/> Bật AI Voice</>}
+            {isMicOn ? <><MicOff size={20}/> Stop AI Voice</> : <><Mic size={20}/> Start AI Voice</>}
           </button>
 
-          {/* --- REALTIME TRANSCRIPT DISPLAY --- */}
-          <div className="mt-8 flex-1">
-             <h3 className="text-slate-500 text-[10px] font-bold uppercase mb-3 flex items-center gap-2">
-                {isMicOn && <span className="flex gap-1"><span className="w-1 h-3 bg-red-500 animate-bounce"></span><span className="w-1 h-3 bg-red-500 animate-bounce [animation-delay:0.2s]"></span></span>}
-                Giọng nói hiện tại
-             </h3>
-             <div className="bg-black/40 rounded-xl p-4 min-h-[120px] border border-slate-800/50">
-                {isMicOn ? (
-                    <p className="text-sm leading-relaxed text-slate-300 italic">
-                        {realtimeTranscript || "Đang lắng nghe..."}
-                    </p>
-                ) : (
-                    <p className="text-xs text-slate-600 text-center mt-8">Micro đang tắt</p>
-                )}
-             </div>
+          {/* Realtime Transcript */}
+          <div className="mt-6 flex-1">
+            <h3 className="text-muted-foreground text-xs font-semibold uppercase mb-3 flex items-center gap-2">
+              {isMicOn && (
+                <span className="flex gap-0.5">
+                  <span className="w-1 h-3 bg-red-500 rounded-full animate-bounce"></span>
+                  <span className="w-1 h-3 bg-red-500 rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                  <span className="w-1 h-3 bg-red-500 rounded-full animate-bounce [animation-delay:0.3s]"></span>
+                </span>
+              )}
+              Live Transcript
+            </h3>
+            <div className="glass rounded-xl border border-border/50 p-4 min-h-[120px]">
+              {isMicOn ? (
+                <p className="text-sm leading-relaxed text-foreground/80 italic">
+                  {realtimeTranscript || "Listening..."}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground text-center mt-8">
+                  Enable AI Voice to see transcript
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Question List */}
-        <div className="col-span-12 lg:col-span-9 p-8 overflow-y-auto custom-scrollbar">
+        <div className="col-span-12 lg:col-span-9 p-8 overflow-y-auto">
           <div className="max-w-4xl mx-auto space-y-6">
-            <h2 className="text-2xl font-bold mb-8">Câu hỏi ({questions.filter(q => q.status === 'pending').length})</h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold flex items-center gap-3">
+                <Zap className="w-6 h-6 text-primary" />
+                Questions
+                <span className="text-lg text-muted-foreground font-normal">({pendingQuestions.length} pending)</span>
+              </h2>
+            </div>
+            
             {questions.length === 0 ? (
-                <div className="py-20 text-center text-slate-500"><MessageSquareOff size={48} className="mx-auto mb-4 opacity-20" />Chưa có câu hỏi.</div>
+              <div className="py-20 text-center">
+                <div className="w-20 h-20 rounded-2xl bg-secondary/50 flex items-center justify-center mx-auto mb-6">
+                  <MessageSquareOff size={32} className="text-muted-foreground/30" />
+                </div>
+                <p className="text-muted-foreground">No questions yet</p>
+                <p className="text-sm text-muted-foreground/60 mt-1">Share the room code to start receiving questions</p>
+              </div>
             ) : (
               questions.map((q) => (
-                <div key={q.id} className={`p-6 rounded-2xl border transition-all ${
-                    q.status === 'answered' ? 'bg-slate-900/40 border-slate-800 opacity-50' : 'bg-slate-900 border-slate-800'
+                <div 
+                  key={q.id} 
+                  className={`glass rounded-2xl border p-6 transition-all ${
+                    q.status === 'answered' 
+                      ? 'border-green-500/20 opacity-60' 
+                      : q.status === 'ignored'
+                        ? 'border-border/30 opacity-40'
+                        : 'border-border/50 hover:border-primary/30'
                   }`}
                 >
-                  <div className="flex justify-between items-center mb-4 text-xs">
-                    <span className="text-indigo-400 font-bold">@{q.author_name}</span>
-                    <span className="text-slate-500">{new Date(q.created_at).toLocaleTimeString()}</span>
-                  </div>
-                  <p className="text-xl font-medium mb-6">"{q.content}"</p>
-                  {q.status !== 'answered' ? (
-                    <div className="flex gap-4">
-                      <button onClick={() => updateQuestionStatus(q.id, 'ignored')} className="bg-white/5 px-6 py-2 rounded-xl text-sm">Bỏ qua</button>
-                      <button onClick={() => updateQuestionStatus(q.id, 'answered')} className="bg-indigo-600 px-6 py-2 rounded-xl text-sm font-bold">Đã xong</button>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Users size={14} className="text-primary" />
+                      </div>
+                      <div>
+                        <span className="font-semibold text-foreground">{q.author_name}</span>
+                        {q.group_count > 1 && (
+                          <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            +{q.group_count - 1} similar
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-green-500 text-sm font-bold"><CheckCircle2 size={16} /> Đã trả lời</div>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock size={12} />
+                      {new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  
+                  <p className="text-xl font-medium mb-6 text-foreground leading-relaxed">{q.content}</p>
+                  
+                  {q.status === 'pending' && (
+                    <div className="flex gap-3">
+                      <button 
+                        onClick={() => updateQuestionStatus(q.id, 'ignored')} 
+                        className="bg-secondary hover:bg-secondary/80 px-5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground transition-colors"
+                      >
+                        Skip
+                      </button>
+                      <button 
+                        onClick={() => updateQuestionStatus(q.id, 'answered')} 
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-primary/20"
+                      >
+                        Mark Answered
+                      </button>
+                    </div>
+                  )}
+                  
+                  {q.status === 'answered' && (
+                    <div className="flex items-center gap-2 text-green-500 text-sm font-semibold">
+                      <CheckCircle2 size={16} /> Answered
+                    </div>
+                  )}
+                  
+                  {q.status === 'ignored' && (
+                    <div className="text-muted-foreground text-sm">Skipped</div>
                   )}
                 </div>
               ))
