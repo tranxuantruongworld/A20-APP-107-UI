@@ -116,3 +116,40 @@ Thành viên: Bân, Trường, Triển
 - Phân tích dữ liệu từ Form khảo sát để điều chỉnh các tham số AI cho phù hợp thực tế.
 - Bắt đầu xây dựng giao diện (Frontend) cơ bản dựa trên các endpoint đã hoàn thiện.
 - Hoàn thiện tài liệu API (Swagger/Postman collection).
+
+---
+## Tuần 4 — 24/04/2026
+
+**Thành viên:** tranxuantruongworld, BanBannBannn, trienvtran
+
+### Đã làm
+- Phát triển giao diện Frontend (UI): Xây dựng Landing Page với các theme hiện đại, giao diện Q&A Dashboard, Join Room, và các màn hình tương tác Realtime.
+- Tích hợp xác thực (Authentication): Sử dụng Clerk để quản lý đăng nhập và xác thực người dùng an toàn.
+- Xây dựng Premium QA Service: Triển khai pipeline ASR (Whisper, Blaze), nhận diện người nói (Speaker ID), và tách trích xuất Q&A từ âm thanh.
+- Kết nối API & Realtime: Hoàn thiện các API trả lời câu hỏi, tìm câu trả lời cho khách, tính năng ghép giọng nói AI (AI voice match) và thiết lập luồng CI/CD.
+- Sửa lỗi và tối ưu: Xử lý lỗi port, ẩn API keys, và tối ưu hóa hệ thống để sẵn sàng kiểm thử.
+
+### Khó nhất tuần này
+- Xử lý đồng bộ dữ liệu Realtime giữa kết quả trả về từ ASR pipeline và việc hiển thị lên Q&A Dashboard để giảm thiểu độ trễ.
+- Thống nhất và điều chỉnh giao diện (sử dụng Shadcn UI) sao cho mượt mà, chuyên nghiệp và đồng bộ theo yêu cầu (chuyển đổi qua lại giữa các theme).
+
+### AI tool đã dùng
+| Tool | Dùng để làm gì | Kết quả |
+|---|---|---|
+| AI Agent | Hỗ trợ thiết kế và refactor giao diện Landing Page, chuyển đổi các màu sắc và cấu trúc theme. | Giao diện đẹp mắt, tạo cảm giác sang trọng và chuẩn responsive. |
+| Copilot | Gợi ý code cho pipeline xử lý ASR (Whisper, Blaze), các script xử lý realtime và kết nối API. | Tích hợp thành công các model, tiết kiệm thời gian code logic phức tạp. |
+
+### Học được
+- Cách setup luồng CI/CD cho dự án Fullstack có kết nối mô hình AI.
+- Quản lý State và Realtime events trên frontend kết hợp với các services AI chạy nền.
+- Cách sử dụng Clerk cho các luồng Authentication nhanh và tiện lợi.
+
+### Nếu làm lại, sẽ làm khác
+- Thiết kế hệ thống UI components chặt chẽ hơn ngay từ đầu để không tốn nhiều công sức đổi theme sau này.
+- Bổ sung unit/integration tests sớm cho API để giảm thiểu việc phải sửa lỗi lặt vặt lúc ghép nối với Frontend.
+
+### Kế hoạch tuần tới
+- Kiểm thử End-to-End toàn bộ hệ thống từ đầu vào của người dùng đến Dashboard quản lý.
+- Tối ưu hóa hiệu năng phản hồi của các mô hình AI và giảm độ trễ hiển thị Realtime.
+- Tiến hành demo thử nghiệm, ghi nhận feedback và tinh chỉnh ứng dụng.
+- Viết tài liệu tổng kết và hoàn thiện dự án.
