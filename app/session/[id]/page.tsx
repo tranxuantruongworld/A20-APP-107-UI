@@ -129,16 +129,16 @@ export default function LiveSession() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Top Bar */}
-      <div className="bg-card/95 backdrop-blur-xl border-b border-primary/20 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-lg shadow-black/10">
+      <div className="bg-card border-b border-border px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => router.push('/dashboard')} 
-            className="w-10 h-10 rounded-xl bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary hover:text-primary transition-colors border border-primary/20"
+            className="w-10 h-10 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-foreground transition-colors border border-border"
           >
             <ArrowLeft size={18}/>
           </button>
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/30">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-md">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold hidden md:block text-foreground">Conference Hub</span>
@@ -146,8 +146,8 @@ export default function LiveSession() {
         </div>
         
         <div className="flex items-center gap-4">
-          <span className="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/30">
-            <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></span>
+          <span className="text-sm font-bold text-emerald-600 uppercase tracking-wider flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-200">
+            <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
             LIVE
           </span>
           <span className="text-foreground font-medium hidden md:block">{seminar?.title}</span>
@@ -156,36 +156,36 @@ export default function LiveSession() {
 
       <div className="flex-1 grid grid-cols-12 overflow-hidden">
         {/* Sidebar */}
-        <div className="col-span-12 lg:col-span-3 border-r border-primary/10 p-8 flex flex-col bg-card/50 backdrop-blur-sm">
+        <div className="col-span-12 lg:col-span-3 border-r border-border p-8 flex flex-col bg-card">
           {/* QR Code */}
-          <div className="bg-white p-6 rounded-2xl mb-6 self-center shadow-2xl shadow-primary/20 border-4 border-primary/20">
-            <QrCode size={140} className="text-background" />
+          <div className="bg-white p-6 rounded-2xl mb-6 self-center shadow-lg border-2 border-primary/20">
+            <QrCode size={140} className="text-primary" />
           </div>
           
           {/* Room Code */}
           <div className="text-center mb-8">
-            <p className="text-primary/70 text-xs font-bold uppercase mb-3 tracking-widest">Room Code</p>
+            <p className="text-muted-foreground text-xs font-bold uppercase mb-3 tracking-widest">Room Code</p>
             <div className="flex items-center justify-center gap-3">
-              <p className="text-4xl font-black text-primary tracking-tight drop-shadow-lg">{seminar?.code}</p>
+              <p className="text-4xl font-black text-primary tracking-tight">{seminar?.code}</p>
               <button 
                 onClick={copyCode}
                 className="w-12 h-12 rounded-xl bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors border-2 border-primary/30"
               >
-                {copied ? <Check size={20} className="text-emerald-400" /> : <Copy size={20} className="text-primary" />}
+                {copied ? <Check size={20} className="text-emerald-600" /> : <Copy size={20} className="text-primary" />}
               </button>
             </div>
-            <p className="text-sm text-muted-foreground mt-3 bg-secondary/50 py-2 px-4 rounded-lg inline-block">Share this code with your audience</p>
+            <p className="text-sm text-muted-foreground mt-3 bg-secondary py-2 px-4 rounded-lg inline-block">Share this code with your audience</p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="bg-primary/10 rounded-2xl border-2 border-primary/30 p-5 text-center shadow-lg shadow-primary/10">
-              <p className="text-3xl font-black text-primary">{pendingQuestions.length}</p>
-              <p className="text-sm text-primary/70 font-semibold mt-1">Pending</p>
+            <div className="bg-amber-50 rounded-2xl border-2 border-amber-200 p-5 text-center">
+              <p className="text-3xl font-black text-amber-600">{pendingQuestions.length}</p>
+              <p className="text-sm text-amber-700 font-semibold mt-1">Pending</p>
             </div>
-            <div className="bg-emerald-500/10 rounded-2xl border-2 border-emerald-500/30 p-5 text-center shadow-lg shadow-emerald-500/10">
-              <p className="text-3xl font-black text-emerald-400">{answeredQuestions.length}</p>
-              <p className="text-sm text-emerald-400/70 font-semibold mt-1">Answered</p>
+            <div className="bg-emerald-50 rounded-2xl border-2 border-emerald-200 p-5 text-center">
+              <p className="text-3xl font-black text-emerald-600">{answeredQuestions.length}</p>
+              <p className="text-sm text-emerald-700 font-semibold mt-1">Answered</p>
             </div>
           </div>
 
@@ -194,8 +194,8 @@ export default function LiveSession() {
             onClick={() => setIsMicOn(!isMicOn)}
             className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg border-2 ${
               isMicOn 
-                ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400 shadow-lg shadow-red-500/20 border-red-500/50' 
-                : 'bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 border-primary/50'
+                ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200' 
+                : 'bg-primary hover:bg-primary/90 text-primary-foreground border-primary shadow-md'
             }`}
           >
             {isMicOn ? <><MicOff size={22}/> Stop AI Voice</> : <><Mic size={22}/> Start AI Voice</>}
@@ -203,7 +203,7 @@ export default function LiveSession() {
 
           {/* Realtime Transcript */}
           <div className="mt-6 flex-1">
-            <h3 className="text-primary/70 text-xs font-bold uppercase mb-3 flex items-center gap-2 tracking-widest">
+            <h3 className="text-muted-foreground text-xs font-bold uppercase mb-3 flex items-center gap-2 tracking-widest">
               {isMicOn && (
                 <span className="flex gap-0.5">
                   <span className="w-1.5 h-4 bg-red-500 rounded-full animate-bounce"></span>
@@ -213,7 +213,7 @@ export default function LiveSession() {
               )}
               Live Transcript
             </h3>
-            <div className="bg-card rounded-2xl border-2 border-border/50 p-5 min-h-[120px] shadow-lg">
+            <div className="bg-secondary rounded-2xl border-2 border-border p-5 min-h-[120px]">
               {isMicOn ? (
                 <p className="text-base leading-relaxed text-foreground italic">
                   {realtimeTranscript || "Listening..."}
@@ -232,18 +232,18 @@ export default function LiveSession() {
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-black flex items-center gap-3 text-foreground">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/30">
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-md">
                   <Zap className="w-5 h-5 text-primary-foreground" />
                 </div>
                 Questions
-                <span className="text-lg text-primary font-bold bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/30">({pendingQuestions.length} pending)</span>
+                <span className="text-lg text-primary font-bold bg-primary/10 px-4 py-1.5 rounded-xl border border-primary/20">({pendingQuestions.length} pending)</span>
               </h2>
             </div>
             
             {questions.length === 0 ? (
               <div className="py-20 text-center">
-                <div className="w-24 h-24 rounded-2xl bg-card border-2 border-border/50 flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <MessageSquareOff size={36} className="text-muted-foreground/50" />
+                <div className="w-24 h-24 rounded-2xl bg-secondary border-2 border-border flex items-center justify-center mx-auto mb-6">
+                  <MessageSquareOff size={36} className="text-muted-foreground" />
                 </div>
                 <p className="text-foreground font-semibold text-lg">No questions yet</p>
                 <p className="text-muted-foreground mt-1">Share the room code to start receiving questions</p>
@@ -252,29 +252,29 @@ export default function LiveSession() {
               questions.map((q) => (
                 <div 
                   key={q.id} 
-                  className={`rounded-2xl border-2 p-6 transition-all shadow-lg ${
+                  className={`rounded-2xl border-2 p-6 transition-all shadow-sm ${
                     q.status === 'answered' 
-                      ? 'bg-emerald-500/5 border-emerald-500/30 opacity-70 shadow-emerald-500/5' 
+                      ? 'bg-emerald-50 border-emerald-200' 
                       : q.status === 'ignored'
-                        ? 'bg-muted/10 border-border/30 opacity-50'
-                        : 'bg-card border-border/50 hover:border-primary/40 shadow-black/10 hover:shadow-primary/10'
+                        ? 'bg-muted/30 border-border opacity-60'
+                        : 'bg-card border-border hover:border-primary/50 hover:shadow-md'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-md shadow-primary/20">
+                      <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
                         <Users size={16} className="text-primary-foreground" />
                       </div>
                       <div>
                         <span className="font-bold text-primary text-lg">{q.author_name}</span>
                         {q.group_count > 1 && (
-                          <span className="ml-3 text-xs bg-primary/20 text-primary px-3 py-1 rounded-full font-bold border border-primary/30">
+                          <span className="ml-3 text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-bold border border-primary/20">
                             +{q.group_count - 1} similar
                           </span>
                         )}
                       </div>
                     </div>
-                    <span className="text-sm text-muted-foreground flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-lg">
+                    <span className="text-sm text-muted-foreground flex items-center gap-1.5 bg-secondary px-3 py-1.5 rounded-lg border border-border">
                       <Clock size={14} />
                       {new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
@@ -286,13 +286,13 @@ export default function LiveSession() {
                     <div className="flex gap-4">
                       <button 
                         onClick={() => updateQuestionStatus(q.id, 'ignored')} 
-                        className="bg-secondary hover:bg-secondary/80 px-6 py-3 rounded-xl text-sm font-bold text-muted-foreground transition-colors border border-border/50"
+                        className="bg-secondary hover:bg-secondary/80 px-6 py-3 rounded-xl text-sm font-bold text-muted-foreground transition-colors border border-border"
                       >
                         Skip
                       </button>
                       <button 
                         onClick={() => updateQuestionStatus(q.id, 'answered')} 
-                        className="bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-primary/30 border border-primary/50"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold transition-colors shadow-md"
                       >
                         Mark Answered
                       </button>
@@ -300,13 +300,13 @@ export default function LiveSession() {
                   )}
                   
                   {q.status === 'answered' && (
-                    <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold bg-emerald-500/20 px-4 py-2 rounded-xl w-fit border border-emerald-500/30">
+                    <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold bg-emerald-100 px-4 py-2 rounded-xl w-fit border border-emerald-200">
                       <CheckCircle2 size={18} /> Answered
                     </div>
                   )}
                   
                   {q.status === 'ignored' && (
-                    <div className="text-muted-foreground text-sm font-medium bg-muted/20 px-4 py-2 rounded-xl w-fit">Skipped</div>
+                    <div className="text-muted-foreground text-sm font-medium bg-muted px-4 py-2 rounded-xl w-fit">Skipped</div>
                   )}
                 </div>
               ))

@@ -166,9 +166,9 @@ export default function Home() {
 
       {/* Grid Pattern Overlay */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-20"
+        className="absolute inset-0 pointer-events-none opacity-30"
         style={{
-          backgroundImage: `linear-gradient(oklch(0.78 0.12 85 / 0.1) 1px, transparent 1px), linear-gradient(90deg, oklch(0.78 0.12 85 / 0.1) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(oklch(0.50 0.20 250 / 0.1) 1px, transparent 1px), linear-gradient(90deg, oklch(0.50 0.20 250 / 0.1) 1px, transparent 1px)`,
           backgroundSize: '60px 60px'
         }}
       />
