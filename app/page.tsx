@@ -315,7 +315,7 @@ export default function Home() {
                   <div className="relative">
                     <input 
                       type="text" 
-                      placeholder="Enter your room code"
+                      placeholder="e.g., CONF2026 or MEET-ABC"
                       value={roomCode}
                       onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                       className={`w-full px-6 py-5 rounded-xl bg-secondary/50 border-2 focus:ring-2 focus:ring-primary/30 outline-none transition-all text-foreground placeholder:text-muted-foreground font-mono text-xl tracking-widest text-center ${
@@ -326,6 +326,9 @@ export default function Home() {
                       <p className="text-destructive text-sm mt-3 text-center">{error}</p>
                     )}
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Examples: <span className="font-mono text-primary/80">CONF2026</span>, <span className="font-mono text-primary/80">MEET-ABC</span>, <span className="font-mono text-primary/80">QA-LIVE</span>
+                  </p>
                 </div>
                 
                 <button 
