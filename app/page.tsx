@@ -1,7 +1,7 @@
 "use client";
 
 import { SignInButton, useAuth } from "@clerk/nextjs";
-import { QrCode, ArrowRight, LogIn, Loader2, Sparkles, Shield, Zap, Users, Mic, Star, LayoutDashboard, Briefcase, MessageSquare, Send, Menu, X } from "lucide-react";
+import { ArrowRight, LogIn, Loader2, Sparkles, Shield, Zap, Users, Mic, Star, LayoutDashboard, Briefcase, MessageSquare, Send, Menu, X, Globe, BarChart3, Clock, Award, Heart, Lightbulb } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -60,32 +60,47 @@ export default function Home() {
     {
       icon: Sparkles,
       title: "AI Moderation",
-      description: "Intelligent question filtering and prioritization powered by advanced AI"
+      description: "Intelligent question filtering and prioritization powered by advanced AI algorithms"
     },
     {
       icon: Zap,
       title: "Real-time Sync",
-      description: "Instant updates across all devices with sub-second latency"
+      description: "Instant updates across all devices with sub-second latency for seamless interaction"
     },
     {
       icon: Shield,
       title: "Enterprise Security",
-      description: "Bank-level encryption and compliance for your peace of mind"
+      description: "Bank-level encryption and SOC 2 compliance for your peace of mind"
     },
     {
       icon: Users,
       title: "Unlimited Participants",
-      description: "Scale your sessions to thousands of attendees seamlessly"
+      description: "Scale your sessions to thousands of attendees without any performance issues"
     },
     {
       icon: Mic,
       title: "Voice Questions",
-      description: "Allow attendees to submit questions via voice for accessibility"
+      description: "Allow attendees to submit questions via voice for enhanced accessibility"
     },
     {
-      icon: QrCode,
-      title: "QR Code Access",
-      description: "Instant session joining with scannable QR codes"
+      icon: Globe,
+      title: "Multi-language Support",
+      description: "Real-time translation and support for 50+ languages worldwide"
+    },
+    {
+      icon: BarChart3,
+      title: "Analytics Dashboard",
+      description: "Comprehensive insights on engagement, popular topics, and audience metrics"
+    },
+    {
+      icon: Clock,
+      title: "Session Recording",
+      description: "Automatic recording and transcription of all Q&A sessions for future reference"
+    },
+    {
+      icon: Award,
+      title: "Gamification",
+      description: "Engage your audience with points, badges, and leaderboards for participation"
     },
   ];
 
@@ -93,25 +108,49 @@ export default function Home() {
     {
       name: "Sarah Chen",
       role: "Head of Events, TechCorp Global",
-      content: "Conference Hub transformed how we engage with our audience. The AI moderation saved us countless hours while ensuring every important question was addressed.",
+      content: "Conference Hub transformed how we engage with our audience. The AI moderation saved us countless hours while ensuring every important question was addressed. Absolutely revolutionary!",
       rating: 5
     },
     {
       name: "Michael Rodriguez",
       role: "CEO, StartupX",
-      content: "The real-time sync is incredible. Our remote team felt just as connected as those in the room. This platform is a game-changer for hybrid events.",
+      content: "The real-time sync is incredible. Our remote team felt just as connected as those in the room. This platform is a game-changer for hybrid events and global conferences.",
       rating: 5
     },
     {
       name: "Emily Watson",
       role: "Event Director, Global Summit",
-      content: "We&apos;ve tried many Q&A platforms, but Conference Hub stands out with its elegant design and powerful features. Our attendees love it!",
+      content: "We have tried many Q&A platforms, but Conference Hub stands out with its elegant design and powerful features. Our attendees absolutely love the seamless experience!",
       rating: 5
     },
     {
       name: "David Kim",
       role: "CTO, Innovation Labs",
-      content: "The security features gave us confidence to use this for our internal all-hands. Enterprise-grade protection with consumer-grade ease of use.",
+      content: "The security features gave us confidence to use this for our internal all-hands meetings. Enterprise-grade protection with consumer-grade ease of use is a rare combination.",
+      rating: 5
+    },
+    {
+      name: "Jennifer Park",
+      role: "VP of Marketing, TechVentures",
+      content: "The analytics dashboard provides invaluable insights into audience engagement. We can now measure the success of our events with concrete data and improve continuously.",
+      rating: 5
+    },
+    {
+      name: "Robert Martinez",
+      role: "Conference Organizer, DevCon",
+      content: "Managing Q&A for 5000+ attendees used to be a nightmare. Conference Hub made it effortless. The AI prioritization ensures the best questions always rise to the top.",
+      rating: 5
+    },
+    {
+      name: "Lisa Thompson",
+      role: "Director of Learning, EduTech Corp",
+      content: "The multi-language support opened our conferences to a global audience. Attendees can ask questions in their native language and everyone stays connected.",
+      rating: 5
+    },
+    {
+      name: "James Wilson",
+      role: "Founder, InnovateCon",
+      content: "From small workshops to massive keynotes, Conference Hub scales beautifully. The interface is intuitive and our speakers love the streamlined experience.",
       rating: 5
     },
   ];
@@ -252,84 +291,61 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Join Session Section with QR */}
+        {/* Join Session Section */}
         <section className="px-6 pb-20">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-xl mx-auto">
             <div className="glass rounded-3xl border border-border/50 p-10 md:p-12">
-              <div className="text-center mb-10">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-6">
+                  <Users className="w-8 h-8 text-primary" />
+                </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                  <span className="text-gradient-gold">Join</span> a Session
+                  <span className="text-gradient-gold">Enter</span> a Room
                 </h2>
                 <p className="text-muted-foreground">
-                  Enter your room code or scan QR to participate instantly
+                  Have a room code? Enter it below to join and participate in the session instantly.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                {/* Room Code Form */}
-                <form onSubmit={handleJoinRoom} className="space-y-4">
-                  <div className="text-center mb-4">
-                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Enter Code</span>
-                  </div>
+              <form onSubmit={handleJoinRoom} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-3 text-center uppercase tracking-wider">
+                    Room Code
+                  </label>
                   <div className="relative">
                     <input 
                       type="text" 
-                      placeholder="e.g., AI2026"
+                      placeholder="Enter your room code"
                       value={roomCode}
                       onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                      className={`w-full px-5 py-4 rounded-xl bg-secondary/50 border-2 focus:ring-2 focus:ring-primary/30 outline-none transition-all text-foreground placeholder:text-muted-foreground font-mono text-lg tracking-widest text-center ${
+                      className={`w-full px-6 py-5 rounded-xl bg-secondary/50 border-2 focus:ring-2 focus:ring-primary/30 outline-none transition-all text-foreground placeholder:text-muted-foreground font-mono text-xl tracking-widest text-center ${
                         error ? "border-destructive focus:ring-destructive/30" : "border-border/50 focus:border-primary/50"
                       }`}
                     />
                     {error && (
-                      <p className="text-destructive text-xs mt-2 text-center">{error}</p>
+                      <p className="text-destructive text-sm mt-3 text-center">{error}</p>
                     )}
                   </div>
-                  
-                  <button 
-                    disabled={loading}
-                    className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-primary-foreground font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 text-lg group/btn"
-                  >
-                    {loading ? (
-                      <Loader2 className="animate-spin w-5 h-5" />
-                    ) : (
-                      <>
-                        Join Now
-                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                {/* Divider */}
-                <div className="hidden md:flex flex-col items-center justify-center relative">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-px h-32 bg-gradient-to-b from-transparent via-border to-transparent" />
-                  
-                  <div className="flex flex-col items-center">
-                    <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Or Scan QR</div>
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl" />
-                      <div className="relative bg-secondary/80 p-8 rounded-2xl border border-primary/20">
-                        <QrCode className="w-24 h-24 text-primary" />
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-4 text-center">
-                      Point your camera at the<br />session QR code
-                    </p>
-                  </div>
                 </div>
+                
+                <button 
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-primary-foreground font-semibold py-5 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 text-lg group/btn"
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin w-5 h-5" />
+                  ) : (
+                    <>
+                      Join Session
+                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
 
-                {/* Mobile QR */}
-                <div className="md:hidden flex flex-col items-center pt-6 border-t border-border/50">
-                  <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">Or Scan QR Code</div>
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl" />
-                    <div className="relative bg-secondary/80 p-6 rounded-2xl border border-primary/20">
-                      <QrCode className="w-20 h-20 text-primary" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  Ask the host for the room code to participate in the Q&A session
+                </p>
+              </form>
             </div>
           </div>
         </section>
