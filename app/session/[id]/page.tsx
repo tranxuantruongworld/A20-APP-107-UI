@@ -15,13 +15,14 @@ import {
   Check,
   Users,
   Clock,
-  Zap,Heart
+  Zap,
+  Heart,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import {VoiceVisualizer} from "@/components/VoiceVisualizer"
+import { VoiceVisualizer } from "@/components/VoiceVisualizer";
 type FilterType = "pending" | "answered" | "ignored" | "all";
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG } from "qrcode.react";
 export default function LiveSession() {
   const { id } = useParams();
   const router = useRouter();
@@ -37,18 +38,22 @@ export default function LiveSession() {
 
   const [filter, setFilter] = useState<FilterType>("pending");
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
-  const filteredQuestions = questions.filter((q) => {
-    if (filter === "all") return true;
-    return q.status === filter;
-  }).sort((a, b) => {
-    // Calculate total score: (group_count * 3) + likes
-    const scoreA = (a.group_count * 3) + (a.likes ?? 0)
-    const scoreB = (b.group_count * 3) + (b.likes ?? 0)
-    return scoreB - scoreA
-  });
-  console.log(filteredQuestions)
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin || "http://localhost:3000";
-  const joinUrl = `${baseUrl}/join/${seminar?.code}` 
+  const filteredQuestions = questions
+    .filter((q) => {
+      if (filter === "all") return true;
+      return q.status === filter;
+    })
+    .sort((a, b) => {
+      // Calculate total score: (group_count * 3) + likes
+      const scoreA = a.group_count * 3 + (a.likes ?? 0);
+      const scoreB = b.group_count * 3 + (b.likes ?? 0);
+      return scoreB - scoreA;
+    });
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    window.location.origin ||
+    "http://localhost:3000";
+  const joinUrl = `${baseUrl}/join/${seminar?.id}`;
 
   useEffect(() => {
     if (!id) return;
@@ -86,11 +91,11 @@ export default function LiveSession() {
             setQuestions((prev) => [payload.new, ...prev]);
           if (payload.eventType === "UPDATE")
             setQuestions((prev) =>
-              prev.map((q) => (q.id === payload.new.id ? payload.new : q))
+              prev.map((q) => (q.id === payload.new.id ? payload.new : q)),
             );
           if (payload.eventType === "DELETE")
             setQuestions((prev) => prev.filter((q) => q.id !== payload.old.id));
-        }
+        },
       )
       .subscribe();
 
@@ -135,7 +140,9 @@ export default function LiveSession() {
   useEffect(() => {
     const startMic = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
         setAudioStream(stream);
         recognitionRef.current?.start();
       } catch (err) {
@@ -147,7 +154,7 @@ export default function LiveSession() {
     const stopMic = () => {
       recognitionRef.current?.stop();
       if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
+        audioStream.getTracks().forEach((track) => track.stop());
         setAudioStream(null);
       }
       setRealtimeTranscript("");
@@ -207,7 +214,7 @@ export default function LiveSession() {
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "vi-VN"; // Set to Vietnamese
-    
+
     window.speechSynthesis.speak(utterance);
   };
   if (loading)
@@ -354,98 +361,106 @@ export default function LiveSession() {
               </div>
             ) : (
               <div className="space-y-2">
-  {filteredQuestions.map((q) => (
-    <div
-      key={q.id}
-      className="bg-background border border-border rounded-xl p-3 hover:border-primary/40 transition-colors shadow-sm"
-    >
-      {/* Header: Tên và Thời gian */}
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-            <Users className="w-3 h-3 text-primary" />
-          </div>
-          <span className="font-bold text-foreground text-xs">
-            {q.author_name}
-          </span>
-          {/* Row for engagement badges */}
-    <div className="flex items-center gap-1.5 ml-1">
-      {/* LIKES BADGE - NEW */}
-      <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-pink-50 text-pink-600 font-bold flex items-center gap-1 border border-pink-100">
-        <Heart size={14} className={q.likes > 0 ? "fill-pink-600" : ""} />
-        <span className="text-xs font-bold">{q.likes || 0}</span>
-      </span>
+                {filteredQuestions.map((q) => (
+                  <div
+                    key={q.id}
+                    className="bg-background border border-border rounded-xl p-3 hover:border-primary/40 transition-colors shadow-sm"
+                  >
+                    {/* Header: Tên và Thời gian */}
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Users className="w-3 h-3 text-primary" />
+                        </div>
+                        <span className="font-bold text-foreground text-xs">
+                          {q.author_name}
+                        </span>
+                        {/* Row for engagement badges */}
+                        <div className="flex items-center gap-1.5 ml-1">
+                          {/* LIKES BADGE - NEW */}
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-pink-50 text-pink-600 font-bold flex items-center gap-1 border border-pink-100">
+                            <Heart
+                              size={14}
+                              className={q.likes > 0 ? "fill-pink-600" : ""}
+                            />
+                            <span className="text-xs font-bold">
+                              {q.likes || 0}
+                            </span>
+                          </span>
 
-      {/* SIMILAR BADGE */}
-      {q.group_count > 1 && (
-        <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 font-bold flex items-center gap-1 border border-blue-100">
-          <Users className="w-2.5 h-2.5" />
-          +{q.group_count - 1} similar
-        </span>
-      )}
-    </div>
-        </div>
-        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-          <Clock className="w-2.5 h-2.5" />
-          {new Date(q.created_at).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </span>
-      </div>
+                          {/* SIMILAR BADGE */}
+                          {q.group_count > 1 && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 font-bold flex items-center gap-1 border border-blue-100">
+                              <Users className="w-2.5 h-2.5" />+
+                              {q.group_count - 1} similar
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-2.5 h-2.5" />
+                        {new Date(q.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
 
-      {/* Nội dung câu hỏi */}
-      <p className="text-sm text-foreground mb-2 leading-snug px-1">
-        {q.content}
-      </p>
+                    {/* Nội dung câu hỏi */}
+                    <p className="text-sm text-foreground mb-2 leading-snug px-1">
+                      {q.content}
+                    </p>
 
-      {/* Thanh hành động - Tất cả dồn về bên PHẢI */}
-      <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/50">
-        
-        {/* Nút Loa (Voice) - Luôn hiển thị */}
-        <button
-          onClick={() => handleSpeak(q.content)}
-          className="p-1.5 rounded-lg bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-transparent hover:border-primary/20"
-          title="Đọc câu hỏi"
-        >
-          <Mic className="w-3.5 h-3.5" />
-        </button>
+                    {/* Thanh hành động - Tất cả dồn về bên PHẢI */}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/50">
+                      {/* Nút Loa (Voice) - Luôn hiển thị */}
+                      <button
+                        onClick={() => handleSpeak(q.content)}
+                        className="p-1.5 rounded-lg bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-transparent hover:border-primary/20"
+                        title="Đọc câu hỏi"
+                      >
+                        <Mic className="w-3.5 h-3.5" />
+                      </button>
 
-        {/* Trạng thái đã trả lời */}
-        {q.status === "answered" && (
-          <span className="flex items-center gap-1 text-green-600 text-[11px] font-bold">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Answered
-          </span>
-        )}
+                      {/* Trạng thái đã trả lời */}
+                      {q.status === "answered" && (
+                        <span className="flex items-center gap-1 text-green-600 text-[11px] font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Answered
+                        </span>
+                      )}
 
-        {/* Trạng thái đã bỏ qua */}
-        {q.status === "ignored" && (
-          <span className="text-[11px] font-bold text-muted-foreground">
-            Skipped
-          </span>
-        )}
+                      {/* Trạng thái đã bỏ qua */}
+                      {q.status === "ignored" && (
+                        <span className="text-[11px] font-bold text-muted-foreground">
+                          Skipped
+                        </span>
+                      )}
 
-        {/* Cụm nút bấm khi đang ở trạng thái Pending */}
-        {q.status === "pending" && (
-          <div className="flex gap-2">
-            <button
-              onClick={() => updateQuestionStatus(q.id, "ignored")}
-              className="px-3 py-1 rounded-lg text-[11px] font-bold text-muted-foreground bg-secondary hover:bg-secondary/80 transition-colors"
-            >
-              Skip
-            </button>
-            <button
-              onClick={() => updateQuestionStatus(q.id, "answered")}
-              className="px-3 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
-            >
-              Answer
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  ))}
-</div>
+                      {/* Cụm nút bấm khi đang ở trạng thái Pending */}
+                      {q.status === "pending" && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() =>
+                              updateQuestionStatus(q.id, "ignored")
+                            }
+                            className="px-3 py-1 rounded-lg text-[11px] font-bold text-muted-foreground bg-secondary hover:bg-secondary/80 transition-colors"
+                          >
+                            Skip
+                          </button>
+                          <button
+                            onClick={() =>
+                              updateQuestionStatus(q.id, "answered")
+                            }
+                            className="px-3 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
+                          >
+                            Answer
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </main>
@@ -457,7 +472,7 @@ export default function LiveSession() {
             <div className="w-full aspect-square rounded-xl bg-white flex items-center justify-center mb-3 p-4">
               {/* Real QR Code Generator */}
               {seminar?.code ? (
-                <QRCodeSVG 
+                <QRCodeSVG
                   value={joinUrl}
                   size={200}
                   level={"H"} // High error correction
