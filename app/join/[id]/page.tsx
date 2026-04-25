@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, use } from "react";
 import { supabase } from "@/lib/supabase";
 import { 
   Send, CheckCircle2, MessageCircle, 
-  Loader2, Sparkles, Users, ArrowLeft, User
+  Loader2, Sparkles, Users, ArrowLeft, User, Heart
 } from "lucide-react";
 import Link from "next/link";
 
@@ -86,7 +86,19 @@ export default function JoinRoom({ params }: PageProps) {
       setIsSubmitting(false);
     }
   };
+  const handleLike = async (questionId: string, currentLikes: number) => {
+    try {
+      // We target the new 'likes' column specifically
+      const { error } = await supabase
+        .from("questions")
+        .update({ likes: (currentLikes || 0) + 1 })
+        .eq("id", questionId);
 
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Error liking question:", error.message);
+    }
+  };
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center bg-background">
       <div className="relative">
@@ -145,42 +157,56 @@ export default function JoinRoom({ params }: PageProps) {
               </div>
             ) : (
               visibleQuestions.map((q) => (
-                <div key={q.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex items-center justify-between mb-3 px-1">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
-                        <User size={14} className="text-primary-foreground" />
-                      </div>
-                      <span className="text-sm font-bold text-primary">{q.author_name}</span>
-                      <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded border border-border">
-                        {new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                    {q.group_count > 1 && (
-                      <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-bold border border-primary/20">
-                        <Users size={14} /> +{q.group_count - 1} interested
-                      </div>
-                    )}
-                  </div>
-                  
+  <div key={q.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
+          <User size={14} className="text-primary-foreground" />
+        </div>
+        <span className="text-sm font-bold text-primary">{q.author_name}</span>
+        <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded border border-border">
+          {new Date(q.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+     <div className="flex items-center gap-2">
+      {/* INTERESTED BADGE */}
+    {q.group_count > 1 && (
+      <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-bold border border-primary/20 shadow-sm">
+        <Users size={14} /> 
+        <span>+{q.group_count - 1} interested</span>
+      </div>
+    )}
+    {/* LIKE BUTTON - Now on the right with a recognizable Heart icon */}
+    <button 
+      onClick={() => handleLike(q.id, q.likes)}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-pink-200 bg-pink-50 text-pink-600 transition-all active:scale-90 hover:bg-pink-100"
+    >
+      <Heart size={14} className={q.likes > 0 ? "fill-pink-600" : ""} />
+      <span className="text-xs font-bold">{q.likes || 0}</span>
+    </button>
+
+    
+  </div>
+    </div>
+
                   <div className={`rounded-2xl border-2 p-6 transition-all shadow-sm ${
-                    q.status === 'answered' 
-                      ? 'bg-emerald-50 border-emerald-200' 
-                      : 'bg-card border-border hover:border-primary/40 hover:shadow-md'
-                  }`}>
-                    <p className={`text-lg leading-relaxed font-medium ${
-                      q.status === 'answered' ? 'text-emerald-800' : 'text-foreground'
+      q.status === 'answered' 
+        ? 'bg-emerald-50 border-emerald-200' 
+        : 'bg-card border-border hover:border-primary/40 hover:shadow-md'
+    }`}>
+        <p className={`text-lg leading-relaxed font-medium ${
+          q.status === 'answered' ? 'text-emerald-800' : 'text-foreground'
                     }`}>{q.content}</p>
-                    
-                    {q.status === 'answered' && (
-                      <div className="flex items-center gap-2 mt-4 text-emerald-600 text-sm font-bold bg-emerald-100 px-3 py-1.5 rounded-lg w-fit border border-emerald-200">
-                        <CheckCircle2 size={16} />
-                        Answered
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
+        
+        {q.status === 'answered' && (
+          <div className="flex items-center gap-2 mt-4 text-emerald-600 text-sm font-bold bg-emerald-100 px-3 py-1.5 rounded-lg w-fit border border-emerald-200">
+            <CheckCircle2 size={16} />
+            Answered
+          </div>
+        )}
+    </div>
+  </div>
+))
             )}
           </div>
         </div>
