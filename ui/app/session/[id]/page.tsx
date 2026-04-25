@@ -15,13 +15,13 @@ import {
   Check,
   Users,
   Clock,
-  Zap,
+  Zap,Heart
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import {VoiceVisualizer} from "@/components/VoiceVisualizer"
 type FilterType = "pending" | "answered" | "ignored" | "all";
-
+import { QRCodeSVG } from 'qrcode.react';
 export default function LiveSession() {
   const { id } = useParams();
   const router = useRouter();
@@ -36,11 +36,19 @@ export default function LiveSession() {
   const recognitionRef = useRef<any>(null);
 
   const [filter, setFilter] = useState<FilterType>("pending");
-const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const filteredQuestions = questions.filter((q) => {
     if (filter === "all") return true;
     return q.status === filter;
+  }).sort((a, b) => {
+    // Calculate total score: (group_count * 3) + likes
+    const scoreA = (a.group_count * 3) + (a.likes ?? 0)
+    const scoreB = (b.group_count * 3) + (b.likes ?? 0)
+    return scoreB - scoreA
   });
+  console.log(filteredQuestions)
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin || "http://localhost:3000";
+  const joinUrl = `${baseUrl}/join/${seminar?.code}` 
 
   useEffect(() => {
     if (!id) return;
@@ -193,6 +201,15 @@ const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
     { key: "all", label: "All", count: questions.length },
   ];
 
+  const handleSpeak = (text: string) => {
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "vi-VN"; // Set to Vietnamese
+    
+    window.speechSynthesis.speak(utterance);
+  };
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -336,76 +353,99 @@ const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {filteredQuestions.map((q) => (
-                  <div
-                    key={q.id}
-                    className="bg-background border border-border rounded-xl p-4 hover:border-primary/40 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Users className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground text-sm">
-                            {q.author_name}
-                          </span>
-                          {q.group_count > 1 && (
-                            <span className="text-xs px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold">
-                              +{q.group_count - 1} similar
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        {new Date(q.created_at).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
+              <div className="space-y-2">
+  {filteredQuestions.map((q) => (
+    <div
+      key={q.id}
+      className="bg-background border border-border rounded-xl p-3 hover:border-primary/40 transition-colors shadow-sm"
+    >
+      {/* Header: Tên và Thời gian */}
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="w-3 h-3 text-primary" />
+          </div>
+          <span className="font-bold text-foreground text-xs">
+            {q.author_name}
+          </span>
+          {/* Row for engagement badges */}
+    <div className="flex items-center gap-1.5 ml-1">
+      {/* LIKES BADGE - NEW */}
+      <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-pink-50 text-pink-600 font-bold flex items-center gap-1 border border-pink-100">
+        <Heart size={14} className={q.likes > 0 ? "fill-pink-600" : ""} />
+        <span className="text-xs font-bold">{q.likes || 0}</span>
+      </span>
 
-                    <p className="text-foreground mb-3 leading-relaxed">
-                      {q.content}
-                    </p>
+      {/* SIMILAR BADGE */}
+      {q.group_count > 1 && (
+        <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 font-bold flex items-center gap-1 border border-blue-100">
+          <Users className="w-2.5 h-2.5" />
+          +{q.group_count - 1} similar
+        </span>
+      )}
+    </div>
+        </div>
+        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+          <Clock className="w-2.5 h-2.5" />
+          {new Date(q.created_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </span>
+      </div>
 
-                    {q.status === "pending" && (
-                      <div className="flex gap-2 justify-end">
-                        <button
-                          onClick={() =>
-                            updateQuestionStatus(q.id, "ignored")
-                          }
-                          className="bg-secondary hover:bg-secondary/80 px-5 py-2 rounded-xl text-sm font-bold text-muted-foreground transition-colors border border-border"
-                        >
-                          Skip
-                        </button>
-                        <button
-                          onClick={() =>
-                            updateQuestionStatus(q.id, "answered")
-                          }
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm"
-                        >
-                          Mark Answered
-                        </button>
-                      </div>
-                    )}
+      {/* Nội dung câu hỏi */}
+      <p className="text-sm text-foreground mb-2 leading-snug px-1">
+        {q.content}
+      </p>
 
-                    {q.status === "answered" && (
-                      <div className="flex items-center gap-2 text-green-600 text-sm font-bold">
-                        <CheckCircle2 className="w-4 h-4" /> Answered
-                      </div>
-                    )}
+      {/* Thanh hành động - Tất cả dồn về bên PHẢI */}
+      <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/50">
+        
+        {/* Nút Loa (Voice) - Luôn hiển thị */}
+        <button
+          onClick={() => handleSpeak(q.content)}
+          className="p-1.5 rounded-lg bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-transparent hover:border-primary/20"
+          title="Đọc câu hỏi"
+        >
+          <Mic className="w-3.5 h-3.5" />
+        </button>
 
-                    {q.status === "ignored" && (
-                      <p className="text-sm font-bold text-muted-foreground">
-                        Skipped
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
+        {/* Trạng thái đã trả lời */}
+        {q.status === "answered" && (
+          <span className="flex items-center gap-1 text-green-600 text-[11px] font-bold">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Answered
+          </span>
+        )}
+
+        {/* Trạng thái đã bỏ qua */}
+        {q.status === "ignored" && (
+          <span className="text-[11px] font-bold text-muted-foreground">
+            Skipped
+          </span>
+        )}
+
+        {/* Cụm nút bấm khi đang ở trạng thái Pending */}
+        {q.status === "pending" && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => updateQuestionStatus(q.id, "ignored")}
+              className="px-3 py-1 rounded-lg text-[11px] font-bold text-muted-foreground bg-secondary hover:bg-secondary/80 transition-colors"
+            >
+              Skip
+            </button>
+            <button
+              onClick={() => updateQuestionStatus(q.id, "answered")}
+              className="px-3 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
+            >
+              Answer
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
             )}
           </div>
         </main>
@@ -414,8 +454,19 @@ const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
         <aside className="col-span-12 lg:col-span-3 space-y-4">
           {/* QR Code */}
           <div className="bg-card border border-border rounded-2xl p-5 flex flex-col items-center">
-            <div className="w-full aspect-square rounded-xl bg-secondary flex items-center justify-center mb-3">
-              <QrCode className="w-24 h-24 text-foreground" />
+            <div className="w-full aspect-square rounded-xl bg-white flex items-center justify-center mb-3 p-4">
+              {/* Real QR Code Generator */}
+              {seminar?.code ? (
+                <QRCodeSVG 
+                  value={joinUrl}
+                  size={200}
+                  level={"H"} // High error correction
+                  includeMargin={false}
+                  className="w-full h-full"
+                />
+              ) : (
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+              )}
             </div>
             <p className="text-xs text-muted-foreground text-center">
               Scan to join the session
@@ -445,26 +496,6 @@ const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
             <p className="text-xs text-muted-foreground">
               Share this code with your audience
             </p>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-card border border-border rounded-2xl p-4 text-center">
-              <p className="text-2xl font-black text-foreground">
-                {pendingQuestions.length}
-              </p>
-              <p className="text-xs text-muted-foreground font-semibold">
-                Pending
-              </p>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-4 text-center">
-              <p className="text-2xl font-black text-foreground">
-                {answeredQuestions.length}
-              </p>
-              <p className="text-xs text-muted-foreground font-semibold">
-                Answered
-              </p>
-            </div>
           </div>
         </aside>
       </div>
