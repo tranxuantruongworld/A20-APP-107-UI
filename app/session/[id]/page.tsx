@@ -35,6 +35,8 @@ export default function LiveSession() {
 
   const [realtimeTranscript, setRealtimeTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
+  const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
+  const [aiMatchedIds, setAiMatchedIds] = useState<Set<string>>(new Set());
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const segmentStartRef = useRef<number>(0);
@@ -44,6 +46,8 @@ export default function LiveSession() {
   const filteredQuestions = questions
     .filter((q) => {
       if (filter === "all") return true;
+      // Keep animating cards visible even if they no longer match the filter
+      if (animatingIds.has(q.id)) return true;
       return q.status === filter;
     })
     .sort((a, b) => {
@@ -92,10 +96,38 @@ export default function LiveSession() {
         (payload: any) => {
           if (payload.eventType === "INSERT")
             setQuestions((prev) => [payload.new, ...prev]);
-          if (payload.eventType === "UPDATE")
-            setQuestions((prev) =>
-              prev.map((q) => (q.id === payload.new.id ? payload.new : q)),
-            );
+          if (payload.eventType === "UPDATE") {
+            setQuestions((prev) => {
+              // Read previous status from local state BEFORE updating
+              const prevQuestion = prev.find((q) => q.id === payload.new.id);
+              const wasJustAnswered =
+                prevQuestion?.status === "pending" &&
+                payload.new?.status === "answered";
+
+              if (wasJustAnswered) {
+                const qId: string = payload.new.id;
+                const isAi = payload.new?.answer_id != null;
+                if (isAi) setAiMatchedIds((prev) => new Set(prev).add(qId));
+                setAnimatingIds((prev) => new Set(prev).add(qId));
+                setTimeout(() => {
+                  setAnimatingIds((prev) => {
+                    const n = new Set(prev);
+                    n.delete(qId);
+                    return n;
+                  });
+                  setAiMatchedIds((prev) => {
+                    const n = new Set(prev);
+                    n.delete(qId);
+                    return n;
+                  });
+                }, 3000);
+              }
+
+              return prev.map((q) =>
+                q.id === payload.new.id ? payload.new : q,
+              );
+            });
+          }
           if (payload.eventType === "DELETE")
             setQuestions((prev) => prev.filter((q) => q.id !== payload.old.id));
         },
@@ -188,8 +220,6 @@ export default function LiveSession() {
         } else {
           await saveAsrLog(finalTranscript, null, durationMs);
         }
-
-        handleAiMatch(finalTranscript);
       }
     };
 
@@ -244,27 +274,17 @@ export default function LiveSession() {
     }
   }, [isMicOn]);
 
-  const handleAiMatch = async (text: string) => {
-    const pending = questions.filter((q) => q.status === "pending");
-    if (pending.length === 0) return;
-    if (text.trim().split(" ").length < 5) return;
-
-    try {
-      const { data } = await supabase.functions.invoke("ai-voice-match", {
-        body: {
-          transcript: text,
-          questions: pending.map((q) => ({ id: q.id, content: q.content })),
-        },
-      });
-      if (data?.matches?.length > 0) {
-        await updateQuestionStatus(data.matches[0]?.id, "answered");
-      }
-    } catch (err) {
-      console.error("AI Match Error:", err);
-    }
-  };
-
   const updateQuestionStatus = async (qId: string, status: string) => {
+    if (status === "answered") {
+      setAnimatingIds((prev) => new Set(prev).add(qId));
+      setTimeout(() => {
+        setAnimatingIds((prev) => {
+          const n = new Set(prev);
+          n.delete(qId);
+          return n;
+        });
+      }, 3000);
+    }
     await supabase.from("questions").update({ status }).eq("id", qId);
   };
 
@@ -400,7 +420,11 @@ export default function LiveSession() {
                 {filteredQuestions.map((q) => (
                   <div
                     key={q.id}
-                    className="bg-background border border-border rounded-xl p-3 hover:border-primary/40 transition-colors shadow-sm"
+                    className={`bg-background border rounded-xl p-3 transition-colors shadow-sm ${
+                      animatingIds.has(q.id)
+                        ? "animate-ai-match border-green-400"
+                        : "border-border hover:border-primary/40"
+                    }`}
                   >
                     {/* Header: Tên và Thời gian */}
                     <div className="flex items-center justify-between mb-1">
@@ -411,6 +435,12 @@ export default function LiveSession() {
                         <span className="font-bold text-foreground text-xs">
                           {q.author_name}
                         </span>
+                        {animatingIds.has(q.id) && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-green-50 text-green-700 font-bold flex items-center gap-1 border border-green-200 animate-pulse">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            {aiMatchedIds.has(q.id) ? "AI matched" : "Answered"}
+                          </span>
+                        )}
                         {/* Row for engagement badges */}
                         <div className="flex items-center gap-1.5 ml-1">
                           {/* LIKES BADGE - NEW */}
