@@ -51,6 +51,7 @@ export default function Home() {
 
   const navItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "ASR Benchmark", href: "/benchmark", icon: BarChart3 },
     { label: "Future Career", href: "#features", icon: Briefcase },
     { label: "Reviews", href: "#reviews", icon: MessageSquare },
     { label: "Feedback", href: "#feedback", icon: Send },

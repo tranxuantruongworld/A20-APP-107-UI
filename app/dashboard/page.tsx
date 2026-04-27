@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { PlusCircle, History, Calendar, MessageCircle, ChevronRight, Loader2, Sparkles, LayoutDashboard, Users, Clock, Zap } from "lucide-react";
+import { PlusCircle, History, Calendar, MessageCircle, ChevronRight, Loader2, Sparkles, LayoutDashboard, Users, Clock, Zap, BarChart3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -73,6 +73,10 @@ export default function Dashboard() {
             <Link href="/dashboard" className="text-primary font-medium text-sm flex items-center gap-2">
               <LayoutDashboard className="w-4 h-4" />
               Dashboard
+            </Link>
+            <Link href="/benchmark" className="text-muted-foreground hover:text-primary font-medium text-sm flex items-center gap-2 transition-colors">
+              <BarChart3 className="w-4 h-4" />
+              ASR Benchmark
             </Link>
             <UserButton 
               appearance={{
