@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { VoiceVisualizer } from "@/components/VoiceVisualizer";
+import { VoiceASRPanel } from "@/components/VoiceASRPanel";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
 export default function LiveSession() {
@@ -35,12 +35,19 @@ export default function LiveSession() {
 
   const [realtimeTranscript, setRealtimeTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
+  const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
+  const [aiMatchedIds, setAiMatchedIds] = useState<Set<string>>(new Set());
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const segmentStartRef = useRef<number>(0);
 
   const [filter, setFilter] = useState<FilterType>("pending");
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const filteredQuestions = questions
     .filter((q) => {
       if (filter === "all") return true;
+      // Keep animating cards visible even if they no longer match the filter
+      if (animatingIds.has(q.id)) return true;
       return q.status === filter;
     })
     .sort((a, b) => {
@@ -89,10 +96,38 @@ export default function LiveSession() {
         (payload: any) => {
           if (payload.eventType === "INSERT")
             setQuestions((prev) => [payload.new, ...prev]);
-          if (payload.eventType === "UPDATE")
-            setQuestions((prev) =>
-              prev.map((q) => (q.id === payload.new.id ? payload.new : q)),
-            );
+          if (payload.eventType === "UPDATE") {
+            setQuestions((prev) => {
+              // Read previous status from local state BEFORE updating
+              const prevQuestion = prev.find((q) => q.id === payload.new.id);
+              const wasJustAnswered =
+                prevQuestion?.status === "pending" &&
+                payload.new?.status === "answered";
+
+              if (wasJustAnswered) {
+                const qId: string = payload.new.id;
+                const isAi = payload.new?.answer_id != null;
+                if (isAi) setAiMatchedIds((prev) => new Set(prev).add(qId));
+                setAnimatingIds((prev) => new Set(prev).add(qId));
+                setTimeout(() => {
+                  setAnimatingIds((prev) => {
+                    const n = new Set(prev);
+                    n.delete(qId);
+                    return n;
+                  });
+                  setAiMatchedIds((prev) => {
+                    const n = new Set(prev);
+                    n.delete(qId);
+                    return n;
+                  });
+                }, 3000);
+              }
+
+              return prev.map((q) =>
+                q.id === payload.new.id ? payload.new : q,
+              );
+            });
+          }
           if (payload.eventType === "DELETE")
             setQuestions((prev) => prev.filter((q) => q.id !== payload.old.id));
         },
@@ -103,6 +138,40 @@ export default function LiveSession() {
       supabase.removeChannel(channel);
     };
   }, [id]);
+
+  const saveAsrLog = async (
+    transcript: string,
+    audioBlob: Blob | null,
+    durationMs: number,
+  ) => {
+    let audio_url: string | null = null;
+
+    if (audioBlob && audioBlob.size > 0) {
+      const fileName = `${id}/${Date.now()}.webm`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("asr-recordings")
+        .upload(fileName, audioBlob, {
+          contentType: "audio/webm",
+          upsert: false,
+        });
+
+      if (!uploadError && uploadData) {
+        const { data: urlData } = supabase.storage
+          .from("asr-recordings")
+          .getPublicUrl(uploadData.path);
+        audio_url = urlData.publicUrl;
+      } else {
+        console.warn("ASR audio upload failed:", uploadError?.message);
+      }
+    }
+
+    await supabase.from("asr_logs").insert({
+      seminar_id: id,
+      transcript,
+      audio_url,
+      duration_ms: durationMs,
+    });
+  };
 
   useEffect(() => {
     const SpeechRecognition =
@@ -130,7 +199,27 @@ export default function LiveSession() {
       setRealtimeTranscript(finalTranscript || interimTranscript);
 
       if (finalTranscript) {
-        handleAiMatch(finalTranscript);
+        const durationMs = Date.now() - segmentStartRef.current;
+        const mr = mediaRecorderRef.current;
+
+        if (mr && mr.state === "recording") {
+          mr.stop();
+          mr.onstop = async () => {
+            const blob = new Blob(audioChunksRef.current, {
+              type: "audio/webm",
+            });
+            audioChunksRef.current = [];
+            await saveAsrLog(finalTranscript, blob, durationMs);
+
+            if (mediaRecorderRef.current) {
+              audioChunksRef.current = [];
+              segmentStartRef.current = Date.now();
+              mediaRecorderRef.current.start();
+            }
+          };
+        } else {
+          await saveAsrLog(finalTranscript, null, durationMs);
+        }
       }
     };
 
@@ -145,6 +234,16 @@ export default function LiveSession() {
         });
         setAudioStream(stream);
         recognitionRef.current?.start();
+
+        // Start MediaRecorder to capture audio in parallel
+        const mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
+        mr.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunksRef.current.push(e.data);
+        };
+        audioChunksRef.current = [];
+        segmentStartRef.current = Date.now();
+        mr.start();
+        mediaRecorderRef.current = mr;
       } catch (err) {
         console.error("Error accessing mic:", err);
         setIsMicOn(false);
@@ -153,6 +252,14 @@ export default function LiveSession() {
 
     const stopMic = () => {
       recognitionRef.current?.stop();
+      if (
+        mediaRecorderRef.current &&
+        mediaRecorderRef.current.state !== "inactive"
+      ) {
+        mediaRecorderRef.current.stop();
+        mediaRecorderRef.current = null;
+      }
+      audioChunksRef.current = [];
       if (audioStream) {
         audioStream.getTracks().forEach((track) => track.stop());
         setAudioStream(null);
@@ -167,27 +274,17 @@ export default function LiveSession() {
     }
   }, [isMicOn]);
 
-  const handleAiMatch = async (text: string) => {
-    const pending = questions.filter((q) => q.status === "pending");
-    if (pending.length === 0) return;
-    if (text.trim().split(" ").length < 5) return;
-
-    try {
-      const { data } = await supabase.functions.invoke("ai-voice-match", {
-        body: {
-          transcript: text,
-          questions: pending.map((q) => ({ id: q.id, content: q.content })),
-        },
-      });
-      if (data?.matches?.length > 0) {
-        await updateQuestionStatus(data.matches[0]?.id, "answered");
-      }
-    } catch (err) {
-      console.error("AI Match Error:", err);
-    }
-  };
-
   const updateQuestionStatus = async (qId: string, status: string) => {
+    if (status === "answered") {
+      setAnimatingIds((prev) => new Set(prev).add(qId));
+      setTimeout(() => {
+        setAnimatingIds((prev) => {
+          const n = new Set(prev);
+          n.delete(qId);
+          return n;
+        });
+      }, 3000);
+    }
     await supabase.from("questions").update({ status }).eq("id", qId);
   };
 
@@ -257,53 +354,12 @@ export default function LiveSession() {
       <div className="grid grid-cols-12 gap-6 p-6">
         {/* LEFT SIDEBAR — AI Voice + Transcript */}
         <aside className="col-span-12 lg:col-span-3 space-y-4">
-          {/* AI Voice Button */}
-          <button
-            onClick={() => setIsMicOn(!isMicOn)}
-            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg border-2 ${
-              isMicOn
-                ? "bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
-                : "bg-primary hover:bg-primary/90 text-primary-foreground border-primary shadow-md"
-            }`}
-          >
-            {isMicOn ? (
-              <>
-                <MicOff className="w-5 h-5" /> Stop AI Voice
-              </>
-            ) : (
-              <>
-                <Mic className="w-5 h-5" /> Start AI Voice
-              </>
-            )}
-          </button>
-
-          {/* Realtime Transcript */}
-          <div className="bg-card border border-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-3">
-              {isMicOn && (
-                <span className="flex gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse [animation-delay:150ms]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse [animation-delay:300ms]" />
-                </span>
-              )}
-              <h3 className="font-bold text-foreground">Live Transcript</h3>
-            </div>
-            {isMicOn && audioStream && (
-              <div className="w-32">
-                <VoiceVisualizer stream={audioStream} />
-              </div>
-            )}
-            <div className="min-h-[200px] max-h-[400px] overflow-y-auto rounded-xl bg-secondary/50 p-4 text-sm text-foreground leading-relaxed">
-              {isMicOn ? (
-                <p>{realtimeTranscript || "Listening..."}</p>
-              ) : (
-                <p className="text-muted-foreground italic">
-                  Enable AI Voice to see transcript
-                </p>
-              )}
-            </div>
-          </div>
+          <VoiceASRPanel
+            isMicOn={isMicOn}
+            onToggleMic={() => setIsMicOn(!isMicOn)}
+            audioStream={audioStream}
+            realtimeTranscript={realtimeTranscript}
+          />
         </aside>
 
         {/* MAIN — Questions with filter tabs */}
@@ -364,7 +420,11 @@ export default function LiveSession() {
                 {filteredQuestions.map((q) => (
                   <div
                     key={q.id}
-                    className="bg-background border border-border rounded-xl p-3 hover:border-primary/40 transition-colors shadow-sm"
+                    className={`bg-background border rounded-xl p-3 transition-colors shadow-sm ${
+                      animatingIds.has(q.id)
+                        ? "animate-ai-match border-green-400"
+                        : "border-border hover:border-primary/40"
+                    }`}
                   >
                     {/* Header: Tên và Thời gian */}
                     <div className="flex items-center justify-between mb-1">
@@ -375,6 +435,12 @@ export default function LiveSession() {
                         <span className="font-bold text-foreground text-xs">
                           {q.author_name}
                         </span>
+                        {animatingIds.has(q.id) && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-green-50 text-green-700 font-bold flex items-center gap-1 border border-green-200 animate-pulse">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            {aiMatchedIds.has(q.id) ? "AI matched" : "Answered"}
+                          </span>
+                        )}
                         {/* Row for engagement badges */}
                         <div className="flex items-center gap-1.5 ml-1">
                           {/* LIKES BADGE - NEW */}
