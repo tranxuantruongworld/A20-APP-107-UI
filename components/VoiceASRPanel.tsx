@@ -25,10 +25,10 @@ export function VoiceASRPanel({
       {/* AI Voice Button */}
       <button
         onClick={onToggleMic}
-        className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg border-2 ${
+        className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg ${
           isMicOn
-            ? "bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
-            : "bg-primary hover:bg-primary/90 text-primary-foreground border-primary shadow-md"
+            ? "bg-destructive/10 hover:bg-destructive/20 text-destructive border-2 border-destructive/30"
+            : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25"
         }`}
       >
         {isMicOn ? (
@@ -48,15 +48,14 @@ export function VoiceASRPanel({
           <div className="flex items-center gap-2">
             {isMicOn && (
               <span className="flex gap-1">
-                {/* Nếu isSpeaking = true thì các chấm đỏ nháy mạnh hơn */}
                 <span
-                  className={`w-1.5 h-1.5 rounded-full bg-red-500 ${isSpeaking ? "animate-ping" : "animate-pulse"}`}
+                  className={`w-1.5 h-1.5 rounded-full bg-primary ${isSpeaking ? "animate-ping" : "animate-pulse"}`}
                 />
                 <span
-                  className={`w-1.5 h-1.5 rounded-full bg-red-500 ${isSpeaking ? "animate-ping" : "animate-pulse"} [animation-delay:150ms]`}
+                  className={`w-1.5 h-1.5 rounded-full bg-primary ${isSpeaking ? "animate-ping" : "animate-pulse"} [animation-delay:150ms]`}
                 />
                 <span
-                  className={`w-1.5 h-1.5 rounded-full bg-red-500 ${isSpeaking ? "animate-ping" : "animate-pulse"} [animation-delay:300ms]`}
+                  className={`w-1.5 h-1.5 rounded-full bg-primary ${isSpeaking ? "animate-ping" : "animate-pulse"} [animation-delay:300ms]`}
                 />
               </span>
             )}
@@ -68,10 +67,10 @@ export function VoiceASRPanel({
           {/* Badge trạng thái Voice Activity */}
           {isMicOn && (
             <span
-              className={`text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors ${
+              className={`text-[10px] px-3 py-1 rounded-full font-bold transition-colors ${
                 isSpeaking
-                  ? "bg-green-100 text-green-600"
-                  : "bg-secondary text-muted-foreground"
+                  ? "bg-accent/20 text-foreground border border-accent/30"
+                  : "bg-secondary text-muted-foreground border border-border"
               }`}
             >
               {isSpeaking ? t("voice.speaking") : t("voice.silent")}

@@ -7,11 +7,12 @@ import {
   CheckCircle2,
   MessageCircle,
   Loader2,
-  Sparkles,
+  Star,
   Users,
   ArrowLeft,
   User,
   Heart,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -129,13 +130,13 @@ export default function JoinRoom({ params }: PageProps) {
   if (loading)
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-background">
-        <div className="relative">
-          <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse"></div>
-          <Loader2
-            className="relative animate-spin text-primary mb-6"
-            size={48}
-          />
+        <div className="relative mb-8">
+          <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
+            <Star className="w-10 h-10 text-primary-foreground animate-pulse" />
+          </div>
         </div>
+        <Loader2 className="animate-spin text-primary mb-4" size={32} />
         <p className="text-muted-foreground font-medium text-sm tracking-widest uppercase">
           {t("join.connecting")}
         </p>
@@ -149,35 +150,35 @@ export default function JoinRoom({ params }: PageProps) {
   return (
     <div className="h-[100dvh] w-screen overflow-hidden bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-4 z-30 shrink-0 shadow-sm">
+      <header className="bg-card/80 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shrink-0">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="w-10 h-10 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-foreground transition-colors border border-border"
+              className="w-10 h-10 rounded-xl bg-secondary hover:bg-primary/10 hover:text-primary flex items-center justify-center text-foreground transition-all border border-border"
             >
               <ArrowLeft size={18} />
             </Link>
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-md">
-              <Sparkles size={24} className="text-primary-foreground" />
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/25">
+              <Star size={24} className="text-primary-foreground" />
             </div>
             <div>
               <h1 className="font-bold text-foreground text-lg tracking-tight">
                 {seminar?.title}
               </h1>
-              <div className="flex items-center gap-3 mt-0.5">
-                <span className="text-xs font-mono bg-primary/10 text-primary px-2.5 py-1 rounded-md font-bold border border-primary/20">
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-xs font-mono bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-bold border border-primary/20">
                   {seminar?.code}
                 </span>
-                <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5 bg-accent/20 px-3 py-1.5 rounded-lg border border-accent/30">
+                  <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
                   Live
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-xl border border-primary/20">
+          <div className="hidden md:flex items-center gap-2 bg-primary/10 px-4 py-2.5 rounded-full border border-primary/20">
             <Users size={16} className="text-primary" />
             <span className="text-primary font-bold">
               {visibleQuestions.length}
@@ -288,15 +289,15 @@ export default function JoinRoom({ params }: PageProps) {
         {/* Input Area */}
         <div className="absolute bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-background via-background to-transparent pt-20">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-card rounded-2xl border-2 border-primary/30 p-3 shadow-lg">
-              <form onSubmit={handleSubmit} className="flex items-center gap-3">
+            <div className="bg-card rounded-2xl border-2 border-primary/30 p-4 shadow-xl shadow-primary/10">
+              <form onSubmit={handleSubmit} className="flex items-center gap-4">
                 <div className="flex-1 flex flex-col px-4 py-2">
                   <input
                     type="text"
                     placeholder={t("join.namePlaceholder")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-transparent text-xs font-bold text-primary outline-none placeholder:text-muted-foreground mb-1.5 tracking-wide"
+                    className="bg-transparent text-xs font-bold text-primary outline-none placeholder:text-muted-foreground mb-2 tracking-wide"
                   />
                   <input
                     required
@@ -309,7 +310,7 @@ export default function JoinRoom({ params }: PageProps) {
                 <button
                   type="submit"
                   disabled={isSubmitting || !content.trim()}
-                  className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed text-primary-foreground w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-md"
+                  className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed text-primary-foreground w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-lg shadow-primary/25"
                 >
                   {isSubmitting ? (
                     <Loader2 className="animate-spin" size={22} />
@@ -319,9 +320,12 @@ export default function JoinRoom({ params }: PageProps) {
                 </button>
               </form>
             </div>
-            <p className="text-center text-xs text-muted-foreground mt-3 bg-secondary py-2 px-4 rounded-lg mx-auto w-fit border border-border">
-              {t("join.aiModerated")}
-            </p>
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <Sparkles size={14} className="text-accent" />
+              <p className="text-xs text-muted-foreground">
+                {t("join.aiModerated")}
+              </p>
+            </div>
           </div>
         </div>
       </main>

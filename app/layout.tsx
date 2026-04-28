@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Q&A Conference Hub - AI-Powered Conference Platform",
+  title: "Conference Hub - Nen tang Hoi nghi AI Thong minh",
   description:
-    "Experience the future of conference interaction with our AI-powered Q&A platform. Real-time engagement, intelligent moderation, seamless collaboration.",
+    "Trai nghiem tuong lai cua tuong tac hoi nghi voi nen tang Q&A AI. Tuong tac thoi gian thuc, kiem duyet thong minh, cong tac lien mach.",
 };
 
 export default async function RootLayout({
