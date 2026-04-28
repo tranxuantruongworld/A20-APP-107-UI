@@ -10,8 +10,14 @@ create table if not exists public.asr_logs (
 
 alter table public.asr_logs enable row level security;
 
-create policy "asr_logs_insert" on public.asr_logs for insert with check (true);
-create policy "asr_logs_select" on public.asr_logs for select using (true);
+do $$ begin
+  if not exists (select 1 from pg_policies where tablename='asr_logs' and policyname='asr_logs_insert') then
+    create policy "asr_logs_insert" on public.asr_logs for insert with check (true);
+  end if;
+  if not exists (select 1 from pg_policies where tablename='asr_logs' and policyname='asr_logs_select') then
+    create policy "asr_logs_select" on public.asr_logs for select using (true);
+  end if;
+end $$;
 
 -- 2. Add answer_id to questions — points to the asr_log row that answered it
 alter table public.questions
@@ -22,8 +28,13 @@ insert into storage.buckets (id, name, public)
 values ('asr-recordings', 'asr-recordings', true)
 on conflict (id) do nothing;
 
-create policy "asr_recordings_insert" on storage.objects
-  for insert with check (bucket_id = 'asr-recordings');
-
-create policy "asr_recordings_select" on storage.objects
-  for select using (bucket_id = 'asr-recordings');
+do $$ begin
+  if not exists (select 1 from pg_policies where tablename='objects' and policyname='asr_recordings_insert') then
+    create policy "asr_recordings_insert" on storage.objects
+      for insert with check (bucket_id = 'asr-recordings');
+  end if;
+  if not exists (select 1 from pg_policies where tablename='objects' and policyname='asr_recordings_select') then
+    create policy "asr_recordings_select" on storage.objects
+      for select using (bucket_id = 'asr-recordings');
+  end if;
+end $$;

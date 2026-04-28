@@ -23,6 +23,7 @@ import Link from "next/link";
 import { VoiceASRPanel } from "@/components/VoiceASRPanel";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
+import { useMicVAD, utils } from "@ricky0123/vad-react";
 export default function LiveSession() {
   const { id } = useParams();
   const router = useRouter();
@@ -35,14 +36,15 @@ export default function LiveSession() {
 
   const [realtimeTranscript, setRealtimeTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
+  const interimTextRef = useRef("");
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [aiMatchedIds, setAiMatchedIds] = useState<Set<string>>(new Set());
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const segmentStartRef = useRef<number>(0);
 
   const [filter, setFilter] = useState<FilterType>("pending");
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  // Ref để giữ instance của Speech Recognition
+  const fullTranscriptRef = useRef("");
+
   const filteredQuestions = questions
     .filter((q) => {
       if (filter === "all") return true;
@@ -139,40 +141,50 @@ export default function LiveSession() {
     };
   }, [id]);
 
+  // 4. Hàm lưu trữ lên Supabase
   const saveAsrLog = async (
     transcript: string,
-    audioBlob: Blob | null,
+    audioBlob: Blob,
     durationMs: number,
   ) => {
-    let audio_url: string | null = null;
+    try {
+      const now = new Date();
+      const datePart = now.toLocaleDateString("vi-VN").replace(/\//g, "-"); // "28-04-2026"
+      const timePart = now
+        .toLocaleTimeString("vi-VN", { hour12: false })
+        .replace(/:/g, "-"); // "10-15-30"
+      // Kết quả: "user123/10-15-30_28-04-2026.wav"
+      const fileName = `${id}/${timePart}_${datePart}.wav`;
 
-    if (audioBlob && audioBlob.size > 0) {
-      const fileName = `${id}/${Date.now()}.webm`;
+      // Upload Audio lên Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("asr-recordings")
-        .upload(fileName, audioBlob, {
-          contentType: "audio/webm",
-          upsert: false,
-        });
+        .upload(fileName, audioBlob, { contentType: "audio/wav" });
 
+      let audio_url = null;
       if (!uploadError && uploadData) {
         const { data: urlData } = supabase.storage
           .from("asr-recordings")
           .getPublicUrl(uploadData.path);
         audio_url = urlData.publicUrl;
-      } else {
-        console.warn("ASR audio upload failed:", uploadError?.message);
       }
-    }
 
-    await supabase.from("asr_logs").insert({
-      seminar_id: id,
-      transcript,
-      audio_url,
-      duration_ms: durationMs,
-    });
+      // Lưu Log vào DB
+      await supabase.from("asr_logs").insert({
+        seminar_id: id,
+        transcript: transcript,
+        audio_url: audio_url,
+        duration_ms: Math.round(durationMs),
+        asr_model: "web-speech",
+      });
+
+      console.log("Đã lưu log thành công:", transcript);
+    } catch (err) {
+      console.error("Lỗi SaveAsrLog:", err);
+    }
   };
 
+  // 1. Cấu hình Web Speech API (Chỉ khởi tạo, không tự chạy)
   useEffect(() => {
     const SpeechRecognition =
       (window as any).webkitSpeechRecognition ||
@@ -184,93 +196,90 @@ export default function LiveSession() {
     recognition.interimResults = true;
     recognition.lang = "vi-VN";
 
-    recognition.onresult = async (event: any) => {
-      let interimTranscript = "";
-      let finalTranscript = "";
-
+    recognition.onresult = (event: any) => {
+      let interim = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
+          fullTranscriptRef.current += event.results[i][0].transcript;
+          interimTextRef.current = "";
         } else {
-          interimTranscript += event.results[i][0].transcript;
+          interim += event.results[i][0].transcript;
         }
       }
-
-      setRealtimeTranscript(finalTranscript || interimTranscript);
-
-      if (finalTranscript) {
-        const durationMs = Date.now() - segmentStartRef.current;
-        const mr = mediaRecorderRef.current;
-
-        if (mr && mr.state === "recording") {
-          mr.stop();
-          mr.onstop = async () => {
-            const blob = new Blob(audioChunksRef.current, {
-              type: "audio/webm",
-            });
-            audioChunksRef.current = [];
-            await saveAsrLog(finalTranscript, blob, durationMs);
-
-            if (mediaRecorderRef.current) {
-              audioChunksRef.current = [];
-              segmentStartRef.current = Date.now();
-              mediaRecorderRef.current.start();
-            }
-          };
-        } else {
-          await saveAsrLog(finalTranscript, null, durationMs);
-        }
-      }
+      interimTextRef.current = interim;
+      setRealtimeTranscript(fullTranscriptRef.current + interim);
     };
 
     recognitionRef.current = recognition;
-  }, [questions]);
+  }, []);
+  // 2. Cấu hình Silero VAD - "Nhạc trưởng" điều khiển luồng
+  const vad = useMicVAD({
+    model: "v5",
+    baseAssetPath: "/vad/",
+    onnxWASMBasePath: "/vad/",
+    startOnLoad: false,
+    getStream: async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          echoCancellation: true,
+          autoGainControl: true,
+          noiseSuppression: true,
+        },
+      });
+      setAudioStream(stream);
+      return stream;
+    },
+    pauseStream: async (stream: MediaStream) => {
+      stream.getTracks().forEach((t) => t.stop());
+      setAudioStream(null);
+    },
 
+    onSpeechEnd: async (audio) => {
+      console.log("VAD: Kết thúc câu -> Chốt transcript & gửi log");
+
+      // Snapshot transcript tại thời điểm VAD detect silence
+      // Gộp cả interim chưa isFinal vào để không bỏ sót từ cuối câu
+      const finalSTT = (
+        fullTranscriptRef.current + interimTextRef.current
+      ).trim();
+      fullTranscriptRef.current = "";
+      interimTextRef.current = "";
+
+      if (finalSTT.length > 0) {
+        setRealtimeTranscript("");
+      }
+      // Chuyển đổi audio từ VAD sang WAV
+      const wavBuffer = utils.encodeWAV(audio);
+      const audioBlob = new Blob([wavBuffer], { type: "audio/wav" });
+
+      const durationMs = (audio.length / 16000) * 1000;
+      await saveAsrLog(finalSTT, audioBlob, durationMs);
+    },
+
+    positiveSpeechThreshold: 0.5,
+    negativeSpeechThreshold: 0.35,
+    redemptionMs: 200,
+    minSpeechMs: 150,
+  });
+
+  // 3. Đồng bộ Switch Mic với VAD
   useEffect(() => {
-    const startMic = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        setAudioStream(stream);
-        recognitionRef.current?.start();
-
-        // Start MediaRecorder to capture audio in parallel
-        const mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
-        mr.ondataavailable = (e) => {
-          if (e.data.size > 0) audioChunksRef.current.push(e.data);
-        };
-        audioChunksRef.current = [];
-        segmentStartRef.current = Date.now();
-        mr.start();
-        mediaRecorderRef.current = mr;
-      } catch (err) {
-        console.error("Error accessing mic:", err);
-        setIsMicOn(false);
-      }
-    };
-
-    const stopMic = () => {
-      recognitionRef.current?.stop();
-      if (
-        mediaRecorderRef.current &&
-        mediaRecorderRef.current.state !== "inactive"
-      ) {
-        mediaRecorderRef.current.stop();
-        mediaRecorderRef.current = null;
-      }
-      audioChunksRef.current = [];
-      if (audioStream) {
-        audioStream.getTracks().forEach((track) => track.stop());
-        setAudioStream(null);
-      }
-      setRealtimeTranscript("");
-    };
-
     if (isMicOn) {
-      startMic();
+      fullTranscriptRef.current = "";
+      interimTextRef.current = "";
+      setRealtimeTranscript("");
+      try {
+        recognitionRef.current?.start();
+      } catch (_) {}
+      try {
+        vad.start();
+      } catch (_) {}
     } else {
-      stopMic();
+      recognitionRef.current?.stop();
+      try {
+        vad.pause();
+      } catch (_) {}
     }
   }, [isMicOn]);
 
@@ -359,6 +368,8 @@ export default function LiveSession() {
             onToggleMic={() => setIsMicOn(!isMicOn)}
             audioStream={audioStream}
             realtimeTranscript={realtimeTranscript}
+            // Truyền status từ VAD để UI hiển thị sóng âm
+            isSpeaking={vad.userSpeaking}
           />
         </aside>
 
