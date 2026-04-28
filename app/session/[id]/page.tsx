@@ -22,8 +22,8 @@ import {
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { VoiceASRPanel } from "@/components/VoiceASRPanel";
-import { SessionAdminPanel } from "@/components/SessionAdminPanel";
 import { useTranslations } from "next-intl";
+import { Settings } from "lucide-react";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
 import { useMicVAD, utils } from "@ricky0123/vad-react";
@@ -339,6 +339,7 @@ export default function LiveSession() {
 
     window.speechSynthesis.speak(utterance);
   };
+
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -361,7 +362,9 @@ export default function LiveSession() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
               <Star className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-foreground text-lg tracking-tight">hoi thao</span>
+            <span className="font-bold text-foreground text-lg tracking-tight">
+              hoi thao
+            </span>
           </div>
         </div>
 
@@ -613,13 +616,14 @@ export default function LiveSession() {
             </p>
           </div>
 
-          {/* Admin Control Panel */}
-          {seminar && (
-            <SessionAdminPanel
-              seminarId={seminar.id}
-              seminarTitle={seminar.title}
-            />
-          )}
+          {/* Admin Button */}
+          <Link
+            href={`/session/${id}/admin`}
+            className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all shadow-lg shadow-primary/25"
+          >
+            <Settings className="w-5 h-5" />
+            Admin Panel
+          </Link>
         </aside>
       </div>
     </div>

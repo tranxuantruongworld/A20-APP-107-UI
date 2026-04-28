@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { setLocaleAction } from "@/lib/locale-action";
 
 const LOCALES = [
@@ -14,10 +15,12 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ currentLocale }: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleChange = (locale: string) => {
     startTransition(async () => {
       await setLocaleAction(locale);
+      router.refresh();
     });
   };
 

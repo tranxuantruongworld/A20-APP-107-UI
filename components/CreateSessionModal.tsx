@@ -95,7 +95,12 @@ export function CreateSessionModal({
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file && (file.type === "application/pdf" || file.name.endsWith(".pptx") || file.name.endsWith(".ppt"))) {
+    if (
+      file &&
+      (file.type === "application/pdf" ||
+        file.name.endsWith(".pptx") ||
+        file.name.endsWith(".ppt"))
+    ) {
       processFile(file);
     }
   }, []);
@@ -138,7 +143,10 @@ export function CreateSessionModal({
 
   const handleCreate = () => {
     if (!config.title.trim()) {
-      setConfig((prev) => ({ ...prev, title: `Phien ${new Date().toLocaleDateString("vi-VN")}` }));
+      setConfig((prev) => ({
+        ...prev,
+        title: `Phien ${new Date().toLocaleDateString("vi-VN")}`,
+      }));
     }
     onCreateSession(config);
   };
@@ -148,7 +156,10 @@ export function CreateSessionModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div className="relative w-full max-w-3xl bg-card rounded-3xl border border-border shadow-2xl overflow-hidden">
@@ -159,8 +170,12 @@ export function CreateSessionModal({
               <Settings className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-foreground">Tao phien moi</h2>
-              <p className="text-sm text-muted-foreground">Cau hinh truoc khi bat dau</p>
+              <h2 className="text-xl font-bold text-foreground">
+                Tao phien moi
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Cau hinh truoc khi bat dau
+              </p>
             </div>
           </div>
           <button
@@ -185,20 +200,30 @@ export function CreateSessionModal({
                 >
                   {step > s ? <Check className="w-4 h-4" /> : s}
                 </div>
-                <span className={`text-sm font-medium ${step >= s ? "text-foreground" : "text-muted-foreground"}`}>
-                  {s === 1 ? "Thong tin" : s === 2 ? "Upload slide" : "Cau hinh"}
+                <span
+                  className={`text-sm font-medium ${step >= s ? "text-foreground" : "text-muted-foreground"}`}
+                >
+                  {s === 1
+                    ? "Thong tin"
+                    : s === 2
+                      ? "Upload slide"
+                      : "Cau hinh"}
                 </span>
-                {s < 3 && <div className={`flex-1 h-0.5 ${step > s ? "bg-primary" : "bg-border"}`} />}
+                {s < 3 && (
+                  <div
+                    className={`flex-1 h-0.5 ${step > s ? "bg-primary" : "bg-border"}`}
+                  />
+                )}
               </div>
             ))}
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 min-h-[400px]">
+        <div className="p-6 max-h-[50vh] overflow-y-auto">
           {/* Step 1: Basic Info */}
           {step === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-6 py-2">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Ten phien hoi thao
@@ -207,14 +232,21 @@ export function CreateSessionModal({
                   type="text"
                   placeholder="vd: Workshop AI & Machine Learning"
                   value={config.title}
-                  onChange={(e) => setConfig((prev) => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) =>
+                    setConfig((prev) => ({ ...prev, title: e.target.value }))
+                  }
                   className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div
-                  onClick={() => setConfig((prev) => ({ ...prev, enableVoiceAI: !prev.enableVoiceAI }))}
+                  onClick={() =>
+                    setConfig((prev) => ({
+                      ...prev,
+                      enableVoiceAI: !prev.enableVoiceAI,
+                    }))
+                  }
                   className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
                     config.enableVoiceAI
                       ? "border-primary bg-primary/5"
@@ -225,10 +257,16 @@ export function CreateSessionModal({
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                       <Mic className="w-6 h-6 text-primary" />
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      config.enableVoiceAI ? "border-primary bg-primary" : "border-border"
-                    }`}>
-                      {config.enableVoiceAI && <Check className="w-4 h-4 text-primary-foreground" />}
+                    <div
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        config.enableVoiceAI
+                          ? "border-primary bg-primary"
+                          : "border-border"
+                      }`}
+                    >
+                      {config.enableVoiceAI && (
+                        <Check className="w-4 h-4 text-primary-foreground" />
+                      )}
                     </div>
                   </div>
                   <h3 className="font-bold text-foreground mb-1">Voice AI</h3>
@@ -246,7 +284,9 @@ export function CreateSessionModal({
                       <Target className="w-6 h-6 text-muted-foreground" />
                     </div>
                   </div>
-                  <h3 className="font-bold text-foreground mb-1 opacity-50">Live Polling</h3>
+                  <h3 className="font-bold text-foreground mb-1 opacity-50">
+                    Live Polling
+                  </h3>
                   <p className="text-sm text-muted-foreground opacity-50">
                     Tao khao sat va quiz thoi gian thuc
                   </p>
@@ -256,9 +296,13 @@ export function CreateSessionModal({
               <div className="p-4 rounded-xl bg-accent/10 border border-accent/30 flex items-start gap-3">
                 <Info className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm text-foreground font-medium">Tinh nang Voice AI</p>
+                  <p className="text-sm text-foreground font-medium">
+                    Tinh nang Voice AI
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Khi bat Voice AI, he thong se tu dong nhan dien giong noi cua dien gia va khan gia, phan loai noi dung thanh cau hoi hoac cau tra loi.
+                    Khi bat Voice AI, he thong se tu dong nhan dien giong noi
+                    cua dien gia va khan gia, phan loai noi dung thanh cau hoi
+                    hoac cau tra loi.
                   </p>
                 </div>
               </div>
@@ -267,11 +311,14 @@ export function CreateSessionModal({
 
           {/* Step 2: Upload Presentation */}
           {step === 2 && (
-            <div className="space-y-6">
+            <div className="space-y-6 py-2">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-bold text-foreground mb-2">Upload ban thuyet trinh</h3>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Upload ban thuyet trinh
+                </h3>
                 <p className="text-sm text-muted-foreground">
-                  AI se trich xuat keyword va tao cau hoi goi y tu noi dung slide cua ban
+                  AI se trich xuat keyword va tao cau hoi goi y tu noi dung
+                  slide cua ban
                 </p>
               </div>
 
@@ -289,7 +336,9 @@ export function CreateSessionModal({
                   <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
                     <Upload className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <p className="font-medium text-foreground mb-2">Keo tha file vao day</p>
+                  <p className="font-medium text-foreground mb-2">
+                    Keo tha file vao day
+                  </p>
                   <p className="text-sm text-muted-foreground mb-4">hoac</p>
                   <label className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full cursor-pointer transition-all">
                     <FileText className="w-5 h-5" />
@@ -313,7 +362,9 @@ export function CreateSessionModal({
                       <FileText className="w-6 h-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-foreground">{config.uploadedFile.name}</p>
+                      <p className="font-medium text-foreground">
+                        {config.uploadedFile.name}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {(config.uploadedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
@@ -321,7 +372,9 @@ export function CreateSessionModal({
                     {isProcessing ? (
                       <div className="flex items-center gap-2">
                         <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                        <span className="text-sm text-primary font-medium">{uploadProgress}%</span>
+                        <span className="text-sm text-primary font-medium">
+                          {uploadProgress}%
+                        </span>
                       </div>
                     ) : (
                       <span className="px-3 py-1 rounded-full bg-accent/20 text-xs font-bold text-foreground">
@@ -334,7 +387,9 @@ export function CreateSessionModal({
                     <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20">
                       <div className="flex items-center gap-3 mb-4">
                         <Brain className="w-6 h-6 text-primary animate-pulse" />
-                        <span className="font-bold text-foreground">AI dang phan tich...</span>
+                        <span className="font-bold text-foreground">
+                          AI dang phan tich...
+                        </span>
                       </div>
                       <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
                         <div
@@ -354,7 +409,9 @@ export function CreateSessionModal({
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <Sparkles className="w-5 h-5 text-accent" />
-                          <span className="font-bold text-foreground">Keyword da trich xuat</span>
+                          <span className="font-bold text-foreground">
+                            Keyword da trich xuat
+                          </span>
                           <span className="px-2 py-0.5 rounded-full bg-accent/20 text-xs font-bold text-foreground">
                             {config.extractedKeywords.length}
                           </span>
@@ -370,7 +427,8 @@ export function CreateSessionModal({
                           ))}
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">
-                          Cac keyword nay se giup Voice AI nhan dien chinh xac hon
+                          Cac keyword nay se giup Voice AI nhan dien chinh xac
+                          hon
                         </p>
                       </div>
 
@@ -378,7 +436,9 @@ export function CreateSessionModal({
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <MessageCircle className="w-5 h-5 text-primary" />
-                          <span className="font-bold text-foreground">Cau hoi goi y</span>
+                          <span className="font-bold text-foreground">
+                            Cau hoi goi y
+                          </span>
                           <span className="px-2 py-0.5 rounded-full bg-primary/20 text-xs font-bold text-foreground">
                             {config.suggestedQuestions?.length}
                           </span>
@@ -425,14 +485,21 @@ export function CreateSessionModal({
                   ].map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => setConfig((prev) => ({ ...prev, voiceLanguage: lang.code }))}
+                      onClick={() =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          voiceLanguage: lang.code,
+                        }))
+                      }
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         config.voiceLanguage === lang.code
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/30"
                       }`}
                     >
-                      <span className="font-medium text-foreground">{lang.label}</span>
+                      <span className="font-medium text-foreground">
+                        {lang.label}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -462,7 +529,12 @@ export function CreateSessionModal({
                   ].map((item) => (
                     <button
                       key={item.level}
-                      onClick={() => setConfig((prev) => ({ ...prev, moderationLevel: item.level }))}
+                      onClick={() =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          moderationLevel: item.level,
+                        }))
+                      }
                       className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center justify-between ${
                         config.moderationLevel === item.level
                           ? "border-primary bg-primary/5"
@@ -470,8 +542,12 @@ export function CreateSessionModal({
                       }`}
                     >
                       <div>
-                        <span className="font-medium text-foreground">{item.label}</span>
-                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                        <span className="font-medium text-foreground">
+                          {item.label}
+                        </span>
+                        <p className="text-sm text-muted-foreground">
+                          {item.desc}
+                        </p>
                       </div>
                       <div
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -491,30 +567,43 @@ export function CreateSessionModal({
 
               {/* Summary */}
               <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                <h4 className="font-bold text-foreground mb-3">Tom tat cau hinh</h4>
+                <h4 className="font-bold text-foreground mb-3">
+                  Tom tat cau hinh
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Ten phien</span>
                     <span className="text-foreground font-medium">
-                      {config.title || `Phien ${new Date().toLocaleDateString("vi-VN")}`}
+                      {config.title ||
+                        `Phien ${new Date().toLocaleDateString("vi-VN")}`}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Voice AI</span>
-                    <span className={`font-medium ${config.enableVoiceAI ? "text-accent" : "text-muted-foreground"}`}>
+                    <span
+                      className={`font-medium ${config.enableVoiceAI ? "text-accent" : "text-muted-foreground"}`}
+                    >
                       {config.enableVoiceAI ? "Bat" : "Tat"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">File thuyet trinh</span>
+                    <span className="text-muted-foreground">
+                      File thuyet trinh
+                    </span>
                     <span className="text-foreground font-medium">
-                      {config.uploadedFile ? config.uploadedFile.name : "Khong co"}
+                      {config.uploadedFile
+                        ? config.uploadedFile.name
+                        : "Khong co"}
                     </span>
                   </div>
                   {config.extractedKeywords && (
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Keyword trich xuat</span>
-                      <span className="text-accent font-medium">{config.extractedKeywords.length}</span>
+                      <span className="text-muted-foreground">
+                        Keyword trich xuat
+                      </span>
+                      <span className="text-accent font-medium">
+                        {config.extractedKeywords.length}
+                      </span>
                     </div>
                   )}
                 </div>
