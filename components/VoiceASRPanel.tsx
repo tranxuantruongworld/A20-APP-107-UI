@@ -2,6 +2,7 @@
 
 import { Mic, MicOff } from "lucide-react";
 import { VoiceVisualizer } from "@/components/VoiceVisualizer";
+import { useTranslations } from "next-intl";
 
 interface VoiceASRPanelProps {
   isMicOn: boolean;
@@ -18,6 +19,7 @@ export function VoiceASRPanel({
   realtimeTranscript,
   isSpeaking,
 }: VoiceASRPanelProps) {
+  const t = useTranslations();
   return (
     <>
       {/* AI Voice Button */}
@@ -31,11 +33,11 @@ export function VoiceASRPanel({
       >
         {isMicOn ? (
           <>
-            <MicOff className="w-5 h-5" /> Stop AI Voice
+            <MicOff className="w-5 h-5" /> {t("voice.stopAIVoice")}
           </>
         ) : (
           <>
-            <Mic className="w-5 h-5" /> Start AI Voice
+            <Mic className="w-5 h-5" /> {t("voice.startAIVoice")}
           </>
         )}
       </button>
@@ -58,7 +60,9 @@ export function VoiceASRPanel({
                 />
               </span>
             )}
-            <h3 className="font-bold text-foreground">Live Transcript</h3>
+            <h3 className="font-bold text-foreground">
+              {t("voice.liveTranscript")}
+            </h3>
           </div>
 
           {/* Badge trạng thái Voice Activity */}
@@ -70,7 +74,7 @@ export function VoiceASRPanel({
                   : "bg-secondary text-muted-foreground"
               }`}
             >
-              {isSpeaking ? "SPEAKING" : "SILENT"}
+              {isSpeaking ? t("voice.speaking") : t("voice.silent")}
             </span>
           )}
         </div>
@@ -98,7 +102,7 @@ export function VoiceASRPanel({
                     <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  Listening for speech...
+                  {t("voice.listening")}
                 </p>
               )}
             </div>
@@ -106,7 +110,7 @@ export function VoiceASRPanel({
             <div className="flex flex-col items-center justify-center h-[160px] text-center">
               <MicOff className="w-8 h-8 text-muted-foreground/30 mb-2" />
               <p className="text-muted-foreground italic">
-                Enable AI Voice to see transcript
+                {t("voice.enableToSee")}
               </p>
             </div>
           )}
