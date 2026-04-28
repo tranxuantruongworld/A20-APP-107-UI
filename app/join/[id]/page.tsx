@@ -16,6 +16,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Toast } from "@/components/Toast";
+import { QuestionClassificationBadge } from "@/components/QuestionClassificationBadge";
+import { ActiveInteractionDisplay } from "@/components/ActiveInteractionDisplay";
+import { classifyQuestion } from "@/lib/classification";
+import { Interaction } from "@/lib/types/interactions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -31,6 +36,8 @@ export default function JoinRoom({ params }: PageProps) {
   const [seminar, setSeminar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSentConfirmation, setShowSentConfirmation] = useState(false);
+  const [activeInteraction, setActiveInteraction] = useState<Interaction | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
 
@@ -92,12 +99,19 @@ export default function JoinRoom({ params }: PageProps) {
     if (!content.trim() || isSubmitting) return;
     setIsSubmitting(true);
 
+    // Clear input field immediately (optimistic UI)
+    const questionText = content.trim();
+    setContent("");
+    
+    // Show confirmation toast
+    setShowSentConfirmation(true);
+
     try {
       const { data, error } = await supabase.functions.invoke(
         "ai-question-optimizer",
         {
           body: {
-            content: content.trim(),
+            content: questionText,
             author_name: name.trim() || "Anonymous",
             seminar_id: id,
           },
@@ -105,8 +119,6 @@ export default function JoinRoom({ params }: PageProps) {
       );
 
       if (error) throw error;
-
-      setContent("");
     } catch (error: any) {
       console.error("Error submitting question:", error.message);
       alert("Error: " + error.message);
@@ -197,6 +209,16 @@ export default function JoinRoom({ params }: PageProps) {
           className="flex-1 overflow-y-auto px-6 py-8 scroll-smooth"
         >
           <div className="max-w-3xl mx-auto space-y-6 pb-48">
+            {/* Active Interaction Display */}
+            {activeInteraction && (
+              <ActiveInteractionDisplay
+                seminarId={id}
+                respondentId={name}
+                respondentName={name}
+                onInteractionChange={setActiveInteraction}
+              />
+            )}
+
             {visibleQuestions.length === 0 ? (
               <div className="h-[50vh] flex flex-col items-center justify-center">
                 <div className="w-24 h-24 rounded-2xl bg-secondary border-2 border-border flex items-center justify-center mb-6">
@@ -229,6 +251,11 @@ export default function JoinRoom({ params }: PageProps) {
                           minute: "2-digit",
                         })}
                       </span>
+                      {seminar?.enable_question_classification && (
+                        <QuestionClassificationBadge
+                          type={classifyQuestion(q.content)}
+                        />
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       {/* INTERESTED BADGE */}
@@ -321,14 +348,34 @@ export default function JoinRoom({ params }: PageProps) {
               </form>
             </div>
             <div className="flex items-center justify-center gap-2 mt-4">
-              <Sparkles size={14} className="text-accent" />
-              <p className="text-xs text-muted-foreground">
-                {t("join.aiModerated")}
-              </p>
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={14} className="text-primary animate-spin" />
+                  <p className="text-xs text-primary font-medium">
+                    {t("join.questionProcessing")}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={14} className="text-accent" />
+                  <p className="text-xs text-muted-foreground">
+                    {t("join.aiModerated")}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
       </main>
+
+      {/* Toast Notification */}
+      <Toast
+        message={t("join.questionSent")}
+        isVisible={showSentConfirmation}
+        onClose={() => setShowSentConfirmation(false)}
+        duration={3500}
+        type="success"
+      />
     </div>
   );
 }

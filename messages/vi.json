@@ -30,7 +30,7 @@
     "reviewsTitle": "Nguoi dung noi gi",
     "reviewsSubtitle": "Duoc tin dung boi hang ngan nguoi to chuc su kien tren toan the gioi",
     "feedbackTitle": "Chia se phan hoi cua ban",
-    "feedbackSubtitle": "Chung toi muon nghe tu ban. Hay giup chung toi cai thien Conference Hub.",
+    "feedbackSubtitle": "Chung toi muon nghe tu ban. Hay giup chung toi cai thien hoi thao.",
     "feedbackName": "Ten cua ban",
     "feedbackEmail": "Email cua ban",
     "feedbackMessage": "Phan hoi hoac gop y cua ban...",
@@ -108,7 +108,9 @@
     "questions": "cau hoi",
     "interested": "quan tam",
     "answered": "Da tra loi",
-    "aiModerated": "Cau hoi duoc kiem duyet boi AI truoc khi hien thi"
+    "aiModerated": "Cau hoi duoc kiem duyet boi AI truoc khi hien thi",
+    "questionSent": "Cau hoi da duoc gui!",
+    "questionProcessing": "Cau hoi cua ban da duoc gui va dang duoc xu ly..."
   },
   "session": {
     "questions": "Cau hoi",
@@ -149,6 +151,13 @@
     "audienceDesc": "AI nhan dien cau hoi tu nguoi tham du va tu dong tao cau hoi moi tren dashboard",
     "speakerDesc": "AI nhan dien cau tra loi va tu dong khop voi cau hoi tuong ung",
     "aiDesc": "Tu dong phan loai, gom nhom cau hoi tuong tu va danh dau da tra loi"
+  },
+  "classification": {
+    "greeting": "Loi chao",
+    "professional": "Cau hoi",
+    "unknown": "Khac",
+    "enableLabel": "Bat phan loai cau hoi",
+    "enableDesc": "Hien thi badge phan loai tren cau hoi de giup nguoi tham du hieu ro tinh chat cua cau hoi"
   },
   "createSession": {
     "title": "Tao phien moi",

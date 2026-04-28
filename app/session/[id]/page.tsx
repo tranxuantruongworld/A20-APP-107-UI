@@ -22,6 +22,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { VoiceASRPanel } from "@/components/VoiceASRPanel";
+import { SessionAdminPanel } from "@/components/SessionAdminPanel";
 import { useTranslations } from "next-intl";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
@@ -360,7 +361,7 @@ export default function LiveSession() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
               <Star className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-foreground text-lg tracking-tight">Conference Hub</span>
+            <span className="font-bold text-foreground text-lg tracking-tight">hoi thao</span>
           </div>
         </div>
 
@@ -611,6 +612,14 @@ export default function LiveSession() {
               {t("session.shareCode")}
             </p>
           </div>
+
+          {/* Admin Control Panel */}
+          {seminar && (
+            <SessionAdminPanel
+              seminarId={seminar.id}
+              seminarTitle={seminar.title}
+            />
+          )}
         </aside>
       </div>
     </div>

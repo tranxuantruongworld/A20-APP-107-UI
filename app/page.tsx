@@ -220,12 +220,10 @@ export default function Home() {
             <div className="flex items-center justify-between">
               {/* Logo */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
-                  <Star className="w-5 h-5 text-primary-foreground" />
+                <div className="rounded-xl bg-primary p-2.5 shadow-lg shadow-primary/25">
+                  <Star className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <span className="font-bold text-xl text-foreground tracking-tight">
-                  Conference Hub
-                </span>
+                <h1 className="text-xl md:text-2xl font-bold text-foreground">hoi thao</h1>
               </div>
 
               {/* Desktop Menu */}
