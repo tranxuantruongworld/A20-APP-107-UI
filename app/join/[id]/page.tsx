@@ -18,7 +18,9 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Toast } from "@/components/Toast";
 import { QuestionClassificationBadge } from "@/components/QuestionClassificationBadge";
+import { ActiveInteractionDisplay } from "@/components/ActiveInteractionDisplay";
 import { classifyQuestion } from "@/lib/classification";
+import { Interaction } from "@/lib/types/interactions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -35,6 +37,7 @@ export default function JoinRoom({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSentConfirmation, setShowSentConfirmation] = useState(false);
+  const [activeInteraction, setActiveInteraction] = useState<Interaction | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
 
@@ -206,6 +209,16 @@ export default function JoinRoom({ params }: PageProps) {
           className="flex-1 overflow-y-auto px-6 py-8 scroll-smooth"
         >
           <div className="max-w-3xl mx-auto space-y-6 pb-48">
+            {/* Active Interaction Display */}
+            {activeInteraction && (
+              <ActiveInteractionDisplay
+                seminarId={id}
+                respondentId={name}
+                respondentName={name}
+                onInteractionChange={setActiveInteraction}
+              />
+            )}
+
             {visibleQuestions.length === 0 ? (
               <div className="h-[50vh] flex flex-col items-center justify-center">
                 <div className="w-24 h-24 rounded-2xl bg-secondary border-2 border-border flex items-center justify-center mb-6">

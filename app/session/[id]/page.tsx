@@ -22,7 +22,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { VoiceASRPanel } from "@/components/VoiceASRPanel";
-import { QuestionClassificationSettings } from "@/components/QuestionClassificationSettings";
+import { SessionAdminPanel } from "@/components/SessionAdminPanel";
 import { useTranslations } from "next-intl";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
@@ -613,17 +613,11 @@ export default function LiveSession() {
             </p>
           </div>
 
-          {/* Question Classification Settings */}
+          {/* Admin Control Panel */}
           {seminar && (
-            <QuestionClassificationSettings
+            <SessionAdminPanel
               seminarId={seminar.id}
-              onSettingChange={(enabled) => {
-                // Update local state if needed
-                setSeminar((prev: any) => ({
-                  ...prev,
-                  enable_question_classification: enabled,
-                }));
-              }}
+              seminarTitle={seminar.title}
             />
           )}
         </aside>
