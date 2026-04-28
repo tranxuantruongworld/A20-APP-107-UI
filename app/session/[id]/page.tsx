@@ -42,7 +42,6 @@ export default function LiveSession() {
 
   const [filter, setFilter] = useState<FilterType>("pending");
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
-  // Ref để giữ instance của Speech Recognition
   const fullTranscriptRef = useRef("");
 
   const filteredQuestions = questions
@@ -60,7 +59,8 @@ export default function LiveSession() {
     });
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    (typeof window !== "undefined" ? window.location.origin : "") ||
+    "http://localhost:3000";
   const joinUrl = `${baseUrl}/join/${seminar?.id}`;
 
   useEffect(() => {
@@ -140,7 +140,6 @@ export default function LiveSession() {
     };
   }, [id]);
 
-  // 4. Hàm lưu trữ lên Supabase
   const saveAsrLog = async (
     transcript: string,
     audioBlob: Blob,
@@ -151,11 +150,8 @@ export default function LiveSession() {
       const datePart = now.toLocaleDateString("vi-VN").replace(/\//g, "-"); // "28-04-2026"
       const timePart = now
         .toLocaleTimeString("vi-VN", { hour12: false })
-        .replace(/:/g, "-"); // "10-15-30"
-      // Kết quả: "user123/10-15-30_28-04-2026.wav"
+        .replace(/:/g, "-");
       const fileName = `${id}/${timePart}_${datePart}.wav`;
-
-      // Upload Audio lên Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("asr-recordings")
         .upload(fileName, audioBlob, { contentType: "audio/wav" });
@@ -270,15 +266,15 @@ export default function LiveSession() {
       setRealtimeTranscript("");
       try {
         recognitionRef.current?.start();
-      } catch (_) {}
+      } catch (_) { }
       try {
         vad.start();
-      } catch (_) {}
+      } catch (_) { }
     } else {
       recognitionRef.current?.stop();
       try {
         vad.pause();
-      } catch (_) {}
+      } catch (_) { }
     }
   }, [isMicOn]);
 
@@ -313,11 +309,12 @@ export default function LiveSession() {
     { key: "all", label: "All", count: questions.length },
   ];
 
-  const [isPlayingTTS, setIsPlayingTTS] = useState(false);
-  const handleSpeak = async (text: string) => {
-    if (isPlayingTTS) return;
-    setIsPlayingTTS(true);
-    
+  const [playingTTSId, setPlayingTTSId] = useState<string | null>(null);
+
+  const handleSpeak = async (questionId: string, text: string) => {
+    if (playingTTSId) return;
+    setPlayingTTSId(questionId);
+
     try {
       const formData = new FormData();
       formData.append("text", text);
@@ -329,20 +326,23 @@ export default function LiveSession() {
         method: "POST",
         body: formData,
       });
-      
+
       if (res.ok) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
-        audio.onended = () => setIsPlayingTTS(false);
-        audio.play();
+        audio.onended = () => setPlayingTTSId(null);
+        audio.play().catch(e => {
+          console.error("Audio playback error:", e);
+          setPlayingTTSId(null);
+        });
       } else {
         console.error("TTS generation failed");
-        setIsPlayingTTS(false);
+        setPlayingTTSId(null);
       }
     } catch (err) {
       console.error("Error calling TTS backend:", err);
-      setIsPlayingTTS(false);
+      setPlayingTTSId(null);
     }
   };
   if (loading)
@@ -416,19 +416,17 @@ export default function LiveSession() {
                 <button
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${
-                    filter === tab.key
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-secondary hover:bg-secondary/80 text-muted-foreground border-border"
-                  }`}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${filter === tab.key
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    : "bg-secondary hover:bg-secondary/80 text-muted-foreground border-border"
+                    }`}
                 >
                   {tab.label}
                   <span
-                    className={`ml-2 px-2 py-0.5 rounded-md text-xs ${
-                      filter === tab.key
-                        ? "bg-primary-foreground/20"
-                        : "bg-background"
-                    }`}
+                    className={`ml-2 px-2 py-0.5 rounded-md text-xs ${filter === tab.key
+                      ? "bg-primary-foreground/20"
+                      : "bg-background"
+                      }`}
                   >
                     {tab.count}
                   </span>
@@ -453,11 +451,10 @@ export default function LiveSession() {
                 {filteredQuestions.map((q) => (
                   <div
                     key={q.id}
-                    className={`bg-background border rounded-xl p-3 transition-colors shadow-sm ${
-                      animatingIds.has(q.id)
-                        ? "animate-ai-match border-green-400"
-                        : "border-border hover:border-primary/40"
-                    }`}
+                    className={`bg-background border rounded-xl p-3 transition-colors shadow-sm ${animatingIds.has(q.id)
+                      ? "animate-ai-match border-green-400"
+                      : "border-border hover:border-primary/40"
+                      }`}
                   >
                     {/* Header: Tên và Thời gian */}
                     <div className="flex items-center justify-between mb-1">
@@ -514,11 +511,21 @@ export default function LiveSession() {
                     <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/50">
                       {/* Nút Loa (Voice) - Luôn hiển thị */}
                       <button
-                        onClick={() => handleSpeak(q.content)}
-                        className="p-1.5 rounded-lg bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-transparent hover:border-primary/20"
+                        onClick={() => handleSpeak(q.id, q.content)}
+                        disabled={!!playingTTSId}
+                        className={`p-1.5 rounded-lg transition-colors border ${playingTTSId === q.id
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : playingTTSId
+                            ? "bg-secondary text-muted-foreground/50 border-transparent cursor-not-allowed"
+                            : "bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground border-transparent hover:border-primary/20"
+                          }`}
                         title="Đọc câu hỏi"
                       >
-                        <Mic className="w-3.5 h-3.5" />
+                        {playingTTSId === q.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Mic className="w-3.5 h-3.5" />
+                        )}
                       </button>
 
                       {/* Trạng thái đã trả lời */}
