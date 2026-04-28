@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Q&A Conference Hub - AI-Powered Conference Platform",
+  title: "hoi thao - AI-Powered Q&A Platform for Conferences",
   description:
-    "Experience the future of conference interaction with our AI-powered Q&A platform. Real-time engagement, intelligent moderation, seamless collaboration.",
+    "Experience the future of conference interaction with hoi thao's AI-powered Q&A platform. Real-time interaction, intelligent moderation, and seamless connection.",
 };
 
 export default async function RootLayout({

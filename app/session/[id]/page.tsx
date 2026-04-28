@@ -10,17 +10,19 @@ import {
   CheckCircle2,
   Loader2,
   MessageSquareOff,
-  Sparkles,
+  Star,
   Copy,
   Check,
   Users,
   Clock,
   Zap,
   Heart,
+  Sparkles,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { VoiceASRPanel } from "@/components/VoiceASRPanel";
+import { SessionAdminPanel } from "@/components/SessionAdminPanel";
 import { useTranslations } from "next-intl";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
@@ -347,25 +349,25 @@ export default function LiveSession() {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Bar */}
-      <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-border bg-card/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push("/dashboard")}
-            className="w-10 h-10 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center text-foreground transition-colors border border-border"
+            className="w-10 h-10 rounded-xl bg-secondary hover:bg-primary/10 hover:text-primary flex items-center justify-center text-foreground transition-all border border-border"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
+              <Star className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-foreground">Conference Hub</span>
+            <span className="font-bold text-foreground text-lg tracking-tight">hoi thao</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs font-bold">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             LIVE
           </div>
           <span className="font-semibold text-foreground">
@@ -389,36 +391,38 @@ export default function LiveSession() {
 
         {/* MAIN — Questions with filter tabs */}
         <main className="col-span-12 lg:col-span-6">
-          <div className="bg-card border border-border rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Users className="w-4 h-4 text-primary" />
+          <div className="bg-card border border-border rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground">
-                  {t("session.questions")}
-                </h2>
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">
+                    {t("session.questions")}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {filteredQuestions.length} {t("session.shown")}
+                  </p>
+                </div>
               </div>
-              <span className="text-sm text-muted-foreground">
-                {filteredQuestions.length} {t("session.shown")}
-              </span>
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex gap-2 mb-5 border-b border-border pb-3 overflow-x-auto">
+            <div className="flex gap-2 mb-6 pb-4 border-b border-border overflow-x-auto">
               {filterTabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setFilter(tab.key)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
                     filter === tab.key
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-secondary hover:bg-secondary/80 text-muted-foreground border-border"
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "bg-secondary hover:bg-secondary/80 text-muted-foreground border border-border"
                   }`}
                 >
                   {tab.label}
                   <span
-                    className={`ml-2 px-2 py-0.5 rounded-md text-xs ${
+                    className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
                       filter === tab.key
                         ? "bg-primary-foreground/20"
                         : "bg-background"
@@ -431,14 +435,14 @@ export default function LiveSession() {
             </div>
 
             {filteredQuestions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
-                  <MessageSquareOff className="w-8 h-8 text-muted-foreground" />
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-6">
+                  <MessageSquareOff className="w-10 h-10 text-muted-foreground" />
                 </div>
-                <h3 className="font-bold text-foreground mb-1">
+                <h3 className="font-bold text-foreground text-lg mb-2">
                   {t("session.noQuestionsToShow")}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground max-w-xs">
                   {t("session.noQuestionsHint")}
                 </p>
               </div>
@@ -608,6 +612,14 @@ export default function LiveSession() {
               {t("session.shareCode")}
             </p>
           </div>
+
+          {/* Admin Control Panel */}
+          {seminar && (
+            <SessionAdminPanel
+              seminarId={seminar.id}
+              seminarTitle={seminar.title}
+            />
+          )}
         </aside>
       </div>
     </div>
