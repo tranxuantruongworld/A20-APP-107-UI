@@ -113,12 +113,9 @@ CREATE VIEW q_and_a_stats AS
 SELECT 
   q.seminar_id,
   COUNT(*) as total_questions,
-  COUNT(CASE WHEN q.question_type = 'greeting' THEN 1 END) as greeting_count,
-  COUNT(CASE WHEN q.question_type = 'professional' THEN 1 END) as professional_count,
-  COUNT(CASE WHEN q.is_answered = true THEN 1 END) as answered_count,
-  COUNT(CASE WHEN q.is_answered = false THEN 1 END) as pending_count,
-  COUNT(DISTINCT q.author_id) as unique_participants,
-  AVG(CASE WHEN q.author_id IS NOT NULL THEN 1 ELSE 0 END) as engagement_rate
+  COUNT(CASE WHEN q.status = 'answered' THEN 1 END) as answered_count,
+  COUNT(CASE WHEN q.status = 'pending' THEN 1 END) as pending_count,
+  COUNT(DISTINCT q.author_name) as unique_participants
 FROM questions q
 GROUP BY q.seminar_id;
 

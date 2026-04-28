@@ -91,66 +91,82 @@ export default function Home() {
   if (!isLoaded) return null;
 
   const navItems = [
-    { label: "Tinh nang", href: "#features" },
-    { label: "Giai phap", href: "#solutions" },
-    { label: "Cach hoat dong", href: "#how-it-works" },
-    { label: "Lien he", href: "#contact" },
+    { label: t("page.navFeatures"), href: "#features" },
+    { label: t("page.navSolutions"), href: "#solutions" },
+    { label: t("page.navHowItWorks"), href: "#how-it-works" },
+    { label: t("page.navContact"), href: "#contact" },
   ];
 
   const interactiveFeatures = [
     {
       id: "qa",
       icon: MessageCircle,
-      title: "Q&A Thong minh",
-      description: "Thu thap va quan ly cau hoi voi AI tu dong phan loai, gom nhom cau hoi tuong tu va uu tien theo muc do quan tam.",
-      benefits: ["AI tu dong phan loai", "Gom nhom cau hoi tuong tu", "Binh chon va uu tien"],
+      title: t("page.featureQATitle"),
+      description: t("page.featureQADesc"),
+      benefits: [
+        t("page.featureQABenefit1"),
+        t("page.featureQABenefit2"),
+        t("page.featureQABenefit3"),
+      ],
     },
     {
       id: "voice",
       icon: Mic,
-      title: "Voice Hoi thao",
-      description: "AI tu dong nhan dien giong noi, phan biet cau hoi cua khan gia va cau tra loi cua dien gia trong thoi gian thuc.",
-      benefits: ["Nhan dien giong noi realtime", "Phan loai Speaker/Audience", "Tu dong tong hop Q&A"],
+      title: t("page.featureVoiceTitle"),
+      description: t("page.featureVoiceDesc"),
+      benefits: [
+        t("page.featureVoiceBenefit1"),
+        t("page.featureVoiceBenefit2"),
+        t("page.featureVoiceBenefit3"),
+      ],
     },
     {
       id: "upload",
       icon: Upload,
-      title: "Upload Thuyet trinh",
-      description: "Upload slide thuyet trinh de AI trích xuat keyword, tao cau hoi mau va cai thien do chinh xac nhan dien giong noi.",
-      benefits: ["Trích xuat keyword tu dong", "Tao cau hoi goi y", "Cai thien do chinh xac ASR"],
+      title: t("page.featureUploadTitle"),
+      description: t("page.featureUploadDesc"),
+      benefits: [
+        t("page.featureUploadBenefit1"),
+        t("page.featureUploadBenefit2"),
+        t("page.featureUploadBenefit3"),
+      ],
     },
     {
       id: "analytics",
       icon: PieChart,
-      title: "Phan tich & Bao cao",
-      description: "Theo doi muc do tuong tac, chu de hot, va xuat bao cao chi tiet sau moi phien hoi thao.",
-      benefits: ["Thong ke realtime", "Bao cao sau phien", "Insight ve khan gia"],
+      title: t("page.featureAnalyticsTitle"),
+      description: t("page.featureAnalyticsDesc"),
+      benefits: [
+        t("page.featureAnalyticsBenefit1"),
+        t("page.featureAnalyticsBenefit2"),
+        t("page.featureAnalyticsBenefit3"),
+      ],
     },
   ];
 
   const solutions = [
     {
       icon: Users,
-      title: "Hoi nghi & Su kien",
-      description: "Q&A cho hang ngan nguoi tham du voi QR code va kiem duyet AI",
+      title: t("page.sol1Title"),
+      description: t("page.sol1Desc"),
       image: "events",
     },
     {
       icon: Video,
-      title: "Webinar & Hybrid",
-      description: "Ket noi khan gia online va offline trong cung mot phien",
+      title: t("page.sol2Title"),
+      description: t("page.sol2Desc"),
       image: "webinar",
     },
     {
       icon: Briefcase,
-      title: "Dao tao Doanh nghiep",
-      description: "Thu thap phan hoi va cau hoi tu nhan vien mot cach an danh",
+      title: t("page.sol3Title"),
+      description: t("page.sol3Desc"),
       image: "training",
     },
     {
       icon: Award,
-      title: "Giao duc & Hoc tap",
-      description: "Tang tuong tac lop hoc voi Q&A va quiz thoi gian thuc",
+      title: t("page.sol4Title"),
+      description: t("page.sol4Desc"),
       image: "education",
     },
   ];
@@ -158,41 +174,53 @@ export default function Home() {
   const howItWorks = [
     {
       step: "01",
-      title: "Tao phien moi",
-      description: "Upload slide thuyet trinh va cau hinh phien hoi thao cua ban",
+      title: t("page.step1Title"),
+      description: t("page.step1Desc"),
       icon: Settings,
     },
     {
       step: "02",
-      title: "Chia se QR Code",
-      description: "Khan gia quet QR hoac nhap ma phong de tham gia",
+      title: t("page.step2Title"),
+      description: t("page.step2Desc"),
       icon: QrCode,
     },
     {
       step: "03",
-      title: "Bat Voice AI",
-      description: "AI tu dong nhan dien va phan loai cau hoi/tra loi",
+      title: t("page.step3Title"),
+      description: t("page.step3Desc"),
       icon: Mic,
     },
     {
       step: "04",
-      title: "Quan ly & Tra loi",
-      description: "Xem cau hoi duoc AI gom nhom va tra loi tren dashboard",
+      title: t("page.step4Title"),
+      description: t("page.step4Desc"),
       icon: Monitor,
     },
   ];
 
   const stats = [
-    { value: "10K+", label: "Phien Q&A" },
-    { value: "500K+", label: "Cau hoi xu ly" },
-    { value: "99.9%", label: "Uptime" },
-    { value: "50+", label: "Quoc gia" },
+    { value: "10K+", label: t("home.statSessions") },
+    { value: "500K+", label: t("home.statQuestions") },
+    { value: "99.9%", label: t("home.statUptime") },
+    { value: "50+", label: t("page.statCountries") },
   ];
 
   const displayViews = [
-    { icon: Monitor, label: "Projector View", desc: "Hien thi cau hoi len man hinh lon" },
-    { icon: Tablet, label: "Moderator View", desc: "Quan ly va kiem duyet cau hoi" },
-    { icon: Smartphone, label: "Attendee View", desc: "Gui cau hoi va binh chon" },
+    {
+      icon: Monitor,
+      label: t("page.projectorView"),
+      desc: t("page.projectorDesc"),
+    },
+    {
+      icon: Tablet,
+      label: t("page.moderatorView"),
+      desc: t("page.moderatorDesc"),
+    },
+    {
+      icon: Smartphone,
+      label: t("page.attendeeView"),
+      desc: t("page.attendeeDesc"),
+    },
   ];
 
   return (
@@ -223,7 +251,9 @@ export default function Home() {
                 <div className="rounded-xl bg-primary p-2.5 shadow-lg shadow-primary/25">
                   <Star className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h1 className="text-xl md:text-2xl font-bold text-foreground">hoi thao</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-foreground">
+                  hoi thao
+                </h1>
               </div>
 
               {/* Desktop Menu */}
@@ -249,7 +279,7 @@ export default function Home() {
                 </SignInButton>
                 <SignInButton mode="modal">
                   <button className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-full transition-all shadow-lg shadow-primary/25 flex items-center gap-2">
-                    Bat dau mien phi
+                    {t("page.startFree")}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </SignInButton>
@@ -260,7 +290,11 @@ export default function Home() {
                 className="md:hidden p-2 text-foreground"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
               </button>
             </div>
 
@@ -281,7 +315,7 @@ export default function Home() {
                   <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border/50">
                     <SignInButton mode="modal">
                       <button className="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-full transition-all flex items-center justify-center gap-2">
-                        Bat dau mien phi
+                        {t("page.startFree")}
                         <ArrowRight className="w-4 h-4" />
                       </button>
                     </SignInButton>
@@ -299,26 +333,26 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 mb-8">
               <Star className="w-4 h-4 text-accent" />
               <span className="text-sm font-medium text-foreground">
-                Nen tang Q&A #1 cho Hoi nghi & Su kien
+                {t("home.badge")}
               </span>
             </div>
 
             {/* Main Title */}
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-balance">
-              <span className="text-gradient-gold">Tuong tac Q&A</span>
+              <span className="text-gradient-gold">{t("home.heroTitle")}</span>
               <br />
-              <span className="text-foreground">cho moi su kien</span>
+              <span className="text-foreground">{t("home.heroTitleSub")}</span>
             </h1>
 
             <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed text-balance">
-              Tang cuong su tham gia, thu thap phan hoi va ket noi khan gia - du la truc tiep, online hay hybrid - voi nen tang Q&A thong minh duoc ho tro boi AI.
+              {t("home.heroDesc")}
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <SignInButton mode="modal">
                 <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full transition-all shadow-xl shadow-primary/30 flex items-center gap-3 text-lg group">
-                  Dung thu mien phi
+                  {t("page.tryFree")}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </SignInButton>
@@ -327,7 +361,7 @@ export default function Home() {
                 className="px-8 py-4 bg-secondary hover:bg-secondary/80 text-foreground font-semibold rounded-full transition-all flex items-center gap-3 text-lg border border-border"
               >
                 <Play className="w-5 h-5" />
-                Xem cach hoat dong
+                {t("page.seeHowItWorks")}
               </Link>
             </div>
 
@@ -338,7 +372,9 @@ export default function Home() {
                   <div className="text-3xl md:text-4xl font-bold text-gradient-gold">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {stat.label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -351,13 +387,18 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <Layers className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Tinh nang</span>
+                <span className="text-sm font-medium text-primary">
+                  {t("page.featuresBadge")}
+                </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                Cong cu tuong tac <span className="text-gradient-gold">da dang</span>
+                {t("page.featuresHeading")}{" "}
+                <span className="text-gradient-gold">
+                  {t("page.featuresHeadingHighlight")}
+                </span>
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Lua chon nhieu dinh dang tuong tac phu hop voi noi dung phien, hinh thuc va phong cach cua dien gia.
+                {t("home.featuresSubtitle")}
               </p>
             </div>
 
@@ -375,18 +416,29 @@ export default function Home() {
                     }`}
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                        activeFeature === feature.id ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"
-                      }`}>
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                          activeFeature === feature.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-muted-foreground"
+                        }`}
+                      >
                         <feature.icon className="w-6 h-6" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-foreground text-lg mb-2">{feature.title}</h3>
-                        <p className="text-muted-foreground text-sm mb-3">{feature.description}</p>
+                        <h3 className="font-bold text-foreground text-lg mb-2">
+                          {feature.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm mb-3">
+                          {feature.description}
+                        </p>
                         {activeFeature === feature.id && (
                           <div className="flex flex-wrap gap-2">
                             {feature.benefits.map((benefit) => (
-                              <span key={benefit} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/20 text-xs font-medium text-foreground">
+                              <span
+                                key={benefit}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/20 text-xs font-medium text-foreground"
+                              >
                                 <Check className="w-3 h-3 text-accent" />
                                 {benefit}
                               </span>
@@ -408,8 +460,12 @@ export default function Home() {
                         <MessageCircle className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-foreground">Q&A Dashboard</h4>
-                        <p className="text-xs text-muted-foreground">Quan ly cau hoi thoi gian thuc</p>
+                        <h4 className="font-bold text-foreground">
+                          {t("page.qaDemo")}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.qaDemoDesc")}
+                        </p>
                       </div>
                     </div>
                     {/* Mock Q&A Cards */}
@@ -419,16 +475,26 @@ export default function Home() {
                           <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
                             <Users className="w-3 h-3 text-primary" />
                           </div>
-                          <span className="text-xs font-bold text-foreground">Nguyen Van A</span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-foreground">+5 tuong tu</span>
+                          <span className="text-xs font-bold text-foreground">
+                            Nguyen Van A
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-foreground">
+                            {t("page.qaDemoSimilar")}
+                          </span>
                         </div>
-                        <p className="text-sm text-foreground">Lam the nao de bat dau su dung tinh nang Voice AI?</p>
+                        <p className="text-sm text-foreground">
+                          {t("page.qaDemoQuestion")}
+                        </p>
                       </div>
                       <div className="p-4 rounded-xl bg-accent/10 border border-accent/30">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/30 text-foreground font-bold">AI Matched</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/30 text-foreground font-bold">
+                            {t("page.qaDemoMatched")}
+                          </span>
                         </div>
-                        <p className="text-sm text-foreground">Cau hoi nay da duoc AI tu dong ghep voi cau tra loi cua dien gia.</p>
+                        <p className="text-sm text-foreground">
+                          {t("page.qaDemoMatchedDesc")}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -441,15 +507,21 @@ export default function Home() {
                         <Mic className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-foreground">Voice Hoi thao</h4>
-                        <p className="text-xs text-muted-foreground">AI nhan dien realtime</p>
+                        <h4 className="font-bold text-foreground">
+                          {t("page.featureVoiceTitle")}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          AI nhận diện realtime
+                        </p>
                       </div>
                     </div>
                     {/* Voice Demo */}
                     <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
                       <div className="flex items-center gap-2 mb-3">
                         <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        <span className="text-xs font-bold text-primary">DANG NGHE...</span>
+                        <span className="text-xs font-bold text-primary">
+                          {t("page.voiceDemoListening")}
+                        </span>
                       </div>
                       <div className="h-12 flex items-center justify-center gap-1">
                         {[...Array(20)].map((_, i) => (
@@ -468,16 +540,24 @@ export default function Home() {
                       <div className="p-3 rounded-xl bg-accent/10 border border-accent/30">
                         <div className="flex items-center gap-2 mb-2">
                           <Users className="w-4 h-4 text-accent" />
-                          <span className="text-xs font-bold text-foreground">Khan gia</span>
+                          <span className="text-xs font-bold text-foreground">
+                            {t("page.voiceDemoAudience")}
+                          </span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Cau hoi tu nguoi tham du</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.voiceDemoAudienceDesc")}
+                        </p>
                       </div>
                       <div className="p-3 rounded-xl bg-primary/10 border border-primary/30">
                         <div className="flex items-center gap-2 mb-2">
                           <Mic className="w-4 h-4 text-primary" />
-                          <span className="text-xs font-bold text-foreground">Dien gia</span>
+                          <span className="text-xs font-bold text-foreground">
+                            {t("page.voiceDemoSpeaker")}
+                          </span>
                         </div>
-                        <p className="text-xs text-muted-foreground">Cau tra loi tu speaker</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.voiceDemoSpeakerDesc")}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -490,28 +570,42 @@ export default function Home() {
                         <Upload className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-foreground">Upload Thuyet trinh</h4>
-                        <p className="text-xs text-muted-foreground">AI trich xuat tu dong</p>
+                        <h4 className="font-bold text-foreground">
+                          {t("page.uploadDemoTitle")}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.uploadDemoSubtitle")}
+                        </p>
                       </div>
                     </div>
                     {/* Upload Demo */}
                     <div className="border-2 border-dashed border-border rounded-2xl p-6 text-center hover:border-primary/30 transition-colors">
                       <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-sm font-medium text-foreground mb-1">Keo tha file vao day</p>
-                      <p className="text-xs text-muted-foreground">PDF, PPT, PPTX (toi da 50MB)</p>
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        {t("page.uploadDemoDropzone")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("page.uploadDemoFormats")}
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="w-4 h-4 text-accent" />
-                        <span className="text-foreground">Trich xuat 24 keyword</span>
+                        <span className="text-foreground">
+                          {t("page.uploadDemoKeywords")}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="w-4 h-4 text-accent" />
-                        <span className="text-foreground">Tao 12 cau hoi goi y</span>
+                        <span className="text-foreground">
+                          {t("page.uploadDemoQuestions")}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Check className="w-4 h-4 text-accent" />
-                        <span className="text-foreground">Cai thien ASR +15%</span>
+                        <span className="text-foreground">
+                          {t("page.uploadDemoASR")}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -524,27 +618,47 @@ export default function Home() {
                         <PieChart className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-foreground">Phan tich & Bao cao</h4>
-                        <p className="text-xs text-muted-foreground">Insights chi tiet</p>
+                        <h4 className="font-bold text-foreground">
+                          {t("page.analyticsDemoTitle")}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.analyticsDemoSubtitle")}
+                        </p>
                       </div>
                     </div>
                     {/* Analytics Demo */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                        <p className="text-2xl font-bold text-foreground">247</p>
-                        <p className="text-xs text-muted-foreground">Cau hoi</p>
+                        <p className="text-2xl font-bold text-foreground">
+                          247
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.analyticsDemoQuestions")}
+                        </p>
                       </div>
                       <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                        <p className="text-2xl font-bold text-foreground">89%</p>
-                        <p className="text-xs text-muted-foreground">Da tra loi</p>
+                        <p className="text-2xl font-bold text-foreground">
+                          89%
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.analyticsDemoAnswered")}
+                        </p>
                       </div>
                       <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                        <p className="text-2xl font-bold text-foreground">1.2K</p>
-                        <p className="text-xs text-muted-foreground">Tuong tac</p>
+                        <p className="text-2xl font-bold text-foreground">
+                          1.2K
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.analyticsDemoInteractions")}
+                        </p>
                       </div>
                       <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                        <p className="text-2xl font-bold text-foreground">45m</p>
-                        <p className="text-xs text-muted-foreground">Thoi luong</p>
+                        <p className="text-2xl font-bold text-foreground">
+                          45m
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("page.analyticsDemoDuration")}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -561,23 +675,33 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/30 mb-4">
                   <QrCode className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">De dang tham gia</span>
+                  <span className="text-sm font-medium text-foreground">
+                    {t("page.qrBadge")}
+                  </span>
                 </div>
                 <h2 className="text-4xl font-bold text-foreground mb-6">
-                  Dang nhap nhanh voi <span className="text-gradient-gold">QR Code</span>
+                  {t("page.qrHeading")}{" "}
+                  <span className="text-gradient-gold">QR Code</span>
                 </h2>
                 <p className="text-muted-foreground text-lg mb-8">
-                  Hien thi QR code tren man hinh chinh hoac tai dia diem su kien de khan gia de dang tham gia dung phien. Khan gia co the duoc xac minh qua ma tham du rieng de theo doi lien mach.
+                  {t("page.qrDesc")}
                 </p>
                 <div className="space-y-4">
                   {displayViews.map((view) => (
-                    <div key={view.label} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors">
+                    <div
+                      key={view.label}
+                      className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
+                    >
                       <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                         <view.icon className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-foreground">{view.label}</h4>
-                        <p className="text-sm text-muted-foreground">{view.desc}</p>
+                        <h4 className="font-bold text-foreground">
+                          {view.label}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {view.desc}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -590,8 +714,12 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground mb-2">MA PHONG</p>
-                  <p className="text-3xl font-mono font-bold text-primary tracking-widest">CONF2026</p>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {t("page.qrRoomCode")}
+                  </p>
+                  <p className="text-3xl font-mono font-bold text-primary tracking-widest">
+                    CONF2026
+                  </p>
                 </div>
               </div>
             </div>
@@ -604,13 +732,18 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
                 <Target className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Cach hoat dong</span>
+                <span className="text-sm font-medium text-primary">
+                  {t("page.howItWorksBadge")}
+                </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                Bat dau trong <span className="text-gradient-gold">4 buoc</span>
+                {t("page.howItWorksHeading")}{" "}
+                <span className="text-gradient-gold">
+                  {t("page.howItWorksHeadingHighlight")}
+                </span>
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Thiet lap phien Q&A chua bao gio de dang den the. Chi mat vai phut de bat dau.
+                {t("page.howItWorksDesc")}
               </p>
             </div>
 
@@ -623,12 +756,18 @@ export default function Home() {
                     </div>
                   )}
                   <div className="bg-card rounded-2xl border border-border p-6 relative z-10 h-full hover:border-primary/30 hover:shadow-lg transition-all">
-                    <div className="text-5xl font-bold text-primary/20 mb-4">{step.step}</div>
+                    <div className="text-5xl font-bold text-primary/20 mb-4">
+                      {step.step}
+                    </div>
                     <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                       <step.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="font-bold text-foreground text-lg mb-2">{step.title}</h3>
-                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                    <h3 className="font-bold text-foreground text-lg mb-2">
+                      {step.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      {step.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -642,13 +781,18 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/30 mb-4">
                 <Briefcase className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium text-foreground">Giai phap</span>
+                <span className="text-sm font-medium text-foreground">
+                  {t("page.solutionsBadge")}
+                </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                Phu hop cho <span className="text-gradient-gold">moi loai hinh</span>
+                {t("page.solutionsHeading")}{" "}
+                <span className="text-gradient-gold">
+                  {t("page.solutionsHeadingHighlight")}
+                </span>
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Tu hoi nghi lon den lop hoc nho, Conference Hub linh hoat dap ung moi nhu cau.
+                {t("page.solutionsDesc")}
               </p>
             </div>
 
@@ -661,8 +805,12 @@ export default function Home() {
                   <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                     <solution.icon className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
                   </div>
-                  <h3 className="font-bold text-foreground text-lg mb-2">{solution.title}</h3>
-                  <p className="text-muted-foreground text-sm">{solution.description}</p>
+                  <h3 className="font-bold text-foreground text-lg mb-2">
+                    {solution.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {solution.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -678,24 +826,27 @@ export default function Home() {
                   <Users className="w-8 h-8 text-primary" />
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                  <span className="text-gradient-gold">Tham gia</span> phien ngay
+                  <span className="text-gradient-gold">
+                    {t("home.joinTitleHighlight")}
+                  </span>{" "}
+                  {t("page.joinHeading")}
                 </h2>
-                <p className="text-muted-foreground">
-                  Co ma phong? Nhap ben duoi de tham gia va tuong tac ngay trong phien.
-                </p>
+                <p className="text-muted-foreground">{t("home.joinDesc")}</p>
               </div>
 
               <form onSubmit={handleJoinRoom} className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground mb-3 text-center uppercase tracking-wider">
-                    Ma phong
+                    {t("home.roomCodeLabel")}
                   </label>
                   <div className="relative">
                     <input
                       type="text"
-                      placeholder="vd: CONF2026"
+                      placeholder={t("home.roomCodePlaceholder")}
                       value={roomCode}
-                      onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        setRoomCode(e.target.value.toUpperCase())
+                      }
                       className={`w-full px-6 py-5 rounded-2xl bg-secondary/50 border-2 focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground font-mono text-xl tracking-widest text-center ${
                         error
                           ? "border-destructive focus:ring-destructive/20"
@@ -703,7 +854,9 @@ export default function Home() {
                       }`}
                     />
                     {error && (
-                      <p className="text-destructive text-sm mt-3 text-center">{error}</p>
+                      <p className="text-destructive text-sm mt-3 text-center">
+                        {error}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -715,11 +868,11 @@ export default function Home() {
                   {loading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Dang tim phong...
+                      {t("page.searchingRoom")}
                     </>
                   ) : (
                     <>
-                      Tham gia phien
+                      {t("home.joinButton")}
                       <ArrowRight className="w-5 h-5" />
                     </>
                   )}
@@ -733,15 +886,19 @@ export default function Home() {
         <section className="px-6 py-24">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              San sang nang cap <span className="text-gradient-gold">hoi nghi</span> cua ban?
+              {t("page.ctaHeading")}{" "}
+              <span className="text-gradient-gold">
+                {t("page.ctaHeadingHighlight")}
+              </span>{" "}
+              {t("page.ctaHeadingEnd")}
             </h2>
             <p className="text-muted-foreground text-lg mb-10 max-w-2xl mx-auto">
-              Bat dau mien phi ngay hom nay. Khong can the tin dung, khong gioi han thoi gian dung thu.
+              {t("page.ctaDesc")}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <SignInButton mode="modal">
                 <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full transition-all shadow-xl shadow-primary/30 flex items-center gap-3 text-lg group">
-                  Bat dau mien phi
+                  {t("page.startFree")}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
               </SignInButton>
@@ -749,7 +906,7 @@ export default function Home() {
                 href="#contact"
                 className="px-8 py-4 bg-secondary hover:bg-secondary/80 text-foreground font-semibold rounded-full transition-all flex items-center gap-3 text-lg border border-border"
               >
-                Lien he ban hang
+                {t("page.ctaSales")}
               </Link>
             </div>
           </div>
@@ -764,26 +921,60 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                     <Star className="w-5 h-5 text-primary-foreground" />
                   </div>
-                  <span className="font-bold text-xl text-foreground">Conference Hub</span>
+                  <span className="font-bold text-xl text-foreground">
+                    hoi thao
+                  </span>
                 </div>
                 <p className="text-muted-foreground mb-6 max-w-sm">
-                  Nen tang Q&A thong minh duoc ho tro boi AI, giup tang cuong tuong tac va ket noi khan gia tai moi su kien.
+                  {t("home.heroDesc")}
                 </p>
                 <div className="flex items-center gap-4">
                   <LanguageSwitcher currentLocale={locale} />
                 </div>
               </div>
               <div>
-                <h4 className="font-bold text-foreground mb-4">San pham</h4>
+                <h4 className="font-bold text-foreground mb-4">
+                  {t("page.footerProduct")}
+                </h4>
                 <ul className="space-y-3 text-muted-foreground">
-                  <li><Link href="#features" className="hover:text-foreground transition-colors">Tinh nang</Link></li>
-                  <li><Link href="#solutions" className="hover:text-foreground transition-colors">Giai phap</Link></li>
-                  <li><Link href="#" className="hover:text-foreground transition-colors">Bang gia</Link></li>
-                  <li><Link href="#" className="hover:text-foreground transition-colors">API</Link></li>
+                  <li>
+                    <Link
+                      href="#features"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      {t("page.navFeatures")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="#solutions"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      {t("page.navSolutions")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="#"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      {t("page.footerPricing")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="#"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      API
+                    </Link>
+                  </li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-bold text-foreground mb-4">Lien he</h4>
+                <h4 className="font-bold text-foreground mb-4">
+                  {t("page.footerContact")}
+                </h4>
                 <ul className="space-y-3 text-muted-foreground">
                   <li>hello@conferencehub.vn</li>
                   <li>+84 123 456 789</li>
@@ -796,9 +987,24 @@ export default function Home() {
                 2026 Conference Hub. {t("home.footerRights")}
               </p>
               <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <Link href="#" className="hover:text-foreground transition-colors">Dieu khoan</Link>
-                <Link href="#" className="hover:text-foreground transition-colors">Bao mat</Link>
-                <Link href="#" className="hover:text-foreground transition-colors">Cookie</Link>
+                <Link
+                  href="#"
+                  className="hover:text-foreground transition-colors"
+                >
+                  {t("page.footerTerms")}
+                </Link>
+                <Link
+                  href="#"
+                  className="hover:text-foreground transition-colors"
+                >
+                  {t("page.footerPrivacy")}
+                </Link>
+                <Link
+                  href="#"
+                  className="hover:text-foreground transition-colors"
+                >
+                  {t("page.footerCookie")}
+                </Link>
               </div>
             </div>
           </div>

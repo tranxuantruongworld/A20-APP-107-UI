@@ -3,16 +3,8 @@
 import { useState, useEffect, useRef, use } from "react";
 import { supabase } from "@/lib/supabase";
 import {
-  Send,
-  CheckCircle2,
-  MessageCircle,
-  Loader2,
-  Star,
-  Users,
-  ArrowLeft,
-  User,
-  Heart,
-  Sparkles,
+  Send, CheckCircle2, MessageCircle,
+  Loader2, Sparkles, Users, ArrowLeft, User, Heart, Mic, MicOff
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -38,8 +30,17 @@ export default function JoinRoom({ params }: PageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSentConfirmation, setShowSentConfirmation] = useState(false);
   const [activeInteraction, setActiveInteraction] = useState<Interaction | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const contentRef = useRef(content);
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,25 +64,17 @@ export default function JoinRoom({ params }: PageProps) {
 
     const channel = supabase
       .channel(`public_chat_${id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "questions",
-          filter: `seminar_id=eq.${id}`,
-        },
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "questions",
+        filter: `seminar_id=eq.${id}`
+      },
         (payload) => {
-          if (payload.eventType === "INSERT")
-            setQuestions((prev) => [...prev, payload.new]);
-          if (payload.eventType === "UPDATE")
-            setQuestions((prev) =>
-              prev.map((q) => (q.id === payload.new.id ? payload.new : q)),
-            );
-          if (payload.eventType === "DELETE")
-            setQuestions((prev) => prev.filter((q) => q.id === payload.old.id));
-        },
-      )
+          if (payload.eventType === 'INSERT') setQuestions(prev => [...prev, payload.new]);
+          if (payload.eventType === 'UPDATE') setQuestions(prev => prev.map(q => q.id === payload.new.id ? payload.new : q));
+          if (payload.eventType === 'DELETE') setQuestions(prev => prev.filter(q => q.id === payload.old.id));
+        })
       .subscribe();
 
     return () => {
@@ -93,6 +86,85 @@ export default function JoinRoom({ params }: PageProps) {
     if (scrollRef.current)
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [questions]);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    if (!SpeechRecognition) {
+      setSpeechSupported(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "vi-VN";
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      recognition.baseContent = contentRef.current;
+
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+      silenceTimeoutRef.current = setTimeout(() => {
+        if (recognitionRef.current) recognitionRef.current.stop();
+      }, 4000);
+    };
+
+    recognition.onresult = (event: any) => {
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+      silenceTimeoutRef.current = setTimeout(() => {
+        if (recognitionRef.current) recognitionRef.current.stop();
+      }, 4000);
+
+      let currentTranscript = "";
+      for (let i = 0; i < event.results.length; ++i) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      
+      const base = recognition.baseContent;
+      setContent(base ? base + " " + currentTranscript : currentTranscript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
+
+  const toggleMicrophone = () => {
+    if (!recognitionRef.current) return;
+    
+    try {
+      if (isListening) {
+        recognitionRef.current.stop();
+        setIsListening(false);
+      } else {
+        recognitionRef.current.stop();
+        setTimeout(() => {
+          if (recognitionRef.current) {
+            recognitionRef.current.start();
+            setIsListening(true);
+          }
+        }, 100);
+      }
+    } catch (error) {
+      console.error("Microphone toggle error:", error);
+      setIsListening(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +191,8 @@ export default function JoinRoom({ params }: PageProps) {
       );
 
       if (error) throw error;
+
+      setContent("");
     } catch (error: any) {
       console.error("Error submitting question:", error.message);
       alert("Error: " + error.message);
@@ -326,18 +400,37 @@ export default function JoinRoom({ params }: PageProps) {
                     onChange={(e) => setName(e.target.value)}
                     className="bg-transparent text-xs font-bold text-primary outline-none placeholder:text-muted-foreground mb-2 tracking-wide"
                   />
-                  <input
-                    required
-                    placeholder={t("join.questionPlaceholder")}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="bg-transparent py-1 text-base outline-none font-semibold text-foreground placeholder:text-muted-foreground"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      required
+                      placeholder={isListening ? "(Listening...) Đang nghe..." : "Ask a question..."}
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="bg-transparent py-1 text-base outline-none font-semibold text-foreground placeholder:text-muted-foreground w-full"
+                    />
+                  </div>
                 </div>
+
+                {/* Microphone Button */}
+                {speechSupported && (
+                  <button
+                    type="button"
+                    onClick={toggleMicrophone}
+                    disabled={isSubmitting}
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-md flex-shrink-0 ${
+                      isListening
+                        ? "bg-secondary text-primary animate-pulse shadow-inner border border-primary/20"
+                        : "bg-secondary hover:bg-secondary/80 text-foreground"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    title={isListening ? "Click to stop listening" : "Click to start voice input"}
+                  >
+                    {isListening ? <MicOff size={22} className="opacity-70" /> : <Mic size={22} />}
+                  </button>
+                )}
                 <button
                   type="submit"
                   disabled={isSubmitting || !content.trim()}
-                  className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed text-primary-foreground w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-lg shadow-primary/25"
+                  className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed text-primary-foreground w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-md"
                 >
                   {isSubmitting ? (
                     <Loader2 className="animate-spin" size={22} />

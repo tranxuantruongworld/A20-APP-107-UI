@@ -37,7 +37,10 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { CreateSessionModal, SessionConfig } from "@/components/CreateSessionModal";
+import {
+  CreateSessionModal,
+  SessionConfig,
+} from "@/components/CreateSessionModal";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -72,7 +75,9 @@ export default function Dashboard() {
     setIsCreating(true);
 
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const title = config.title || `Phien ${new Date().toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" })}`;
+    const title =
+      config.title ||
+      `Phien ${new Date().toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" })}`;
 
     const { data, error } = await supabase
       .from("seminars")
@@ -82,14 +87,12 @@ export default function Dashboard() {
           code: roomCode,
           user_id: user.id,
           status: "live",
-          // Store config metadata (in real app, would be in separate config table)
-          metadata: {
-            enableVoiceAI: config.enableVoiceAI,
-            voiceLanguage: config.voiceLanguage,
-            moderationLevel: config.moderationLevel,
-            extractedKeywords: config.extractedKeywords,
-            suggestedQuestions: config.suggestedQuestions,
-          },
+          enable_voice_ai: config.enableVoiceAI,
+          enable_upload: config.enableUpload,
+          voice_language: config.voiceLanguage,
+          moderation_level: config.moderationLevel,
+          extracted_keywords: config.extractedKeywords || null,
+          suggested_questions: config.suggestedQuestions || null,
         },
       ])
       .select()
@@ -117,29 +120,37 @@ export default function Dashboard() {
       step: 1,
       icon: Settings,
       title: "Tao phien & Upload slide",
-      description: "Tao phien moi, upload ban thuyet trinh de AI trich xuat keyword va cau hoi goi y",
-      detail: "AI se phan tich noi dung slide va trich xuat cac tu khoa quan trong, dong thoi tao ra cac cau hoi mau giup khan gia co dinh huong dat cau hoi.",
+      description:
+        "Tao phien moi, upload ban thuyet trinh de AI trich xuat keyword va cau hoi goi y",
+      detail:
+        "AI se phan tich noi dung slide va trich xuat cac tu khoa quan trong, dong thoi tao ra cac cau hoi mau giup khan gia co dinh huong dat cau hoi.",
     },
     {
       step: 2,
       icon: QrCode,
       title: "Chia se QR Code",
-      description: "Hien thi QR code hoac chia se ma phong de khan gia tham gia",
-      detail: "Khan gia quet QR hoac nhap ma phong tren dien thoai de gui cau hoi. Co the gui an danh hoac dang ky ten.",
+      description:
+        "Hien thi QR code hoac chia se ma phong de khan gia tham gia",
+      detail:
+        "Khan gia quet QR hoac nhap ma phong tren dien thoai de gui cau hoi. Co the gui an danh hoac dang ky ten.",
     },
     {
       step: 3,
       icon: Mic,
       title: "Bat Voice AI",
-      description: "Bat mic de AI nhan dien giong noi dien gia va khan gia trong thoi gian thuc",
-      detail: "He thong se tu dong phan biet giong noi cua dien gia (nguoi dang trinh bay) va khan gia (nguoi dat cau hoi). Cau hoi se duoc ghi nhan va cau tra loi se duoc ghep tu dong.",
+      description:
+        "Bat mic de AI nhan dien giong noi dien gia va khan gia trong thoi gian thuc",
+      detail:
+        "He thong se tu dong phan biet giong noi cua dien gia (nguoi dang trinh bay) va khan gia (nguoi dat cau hoi). Cau hoi se duoc ghi nhan va cau tra loi se duoc ghep tu dong.",
     },
     {
       step: 4,
       icon: Brain,
       title: "AI tu dong xu ly",
-      description: "AI phan loai, gom nhom cau hoi tuong tu va ghep cau tra loi tu dong",
-      detail: "Cac cau hoi giong nhau se duoc gom lai, cau hoi duoc nhieu nguoi quan tam se duoc uu tien. Khi dien gia tra loi, AI se tu dong khop cau tra loi voi cau hoi tuong ung.",
+      description:
+        "AI phan loai, gom nhom cau hoi tuong tu va ghep cau tra loi tu dong",
+      detail:
+        "Cac cau hoi giong nhau se duoc gom lai, cau hoi duoc nhieu nguoi quan tam se duoc uu tien. Khi dien gia tra loi, AI se tu dong khop cau tra loi voi cau hoi tuong ung.",
     },
   ];
 
@@ -214,8 +225,12 @@ export default function Dashboard() {
               <Info className="w-5 h-5 text-primary" />
             </div>
             <div className="text-left">
-              <h3 className="font-bold text-foreground">Huong dan su dung Voice Hoi thao</h3>
-              <p className="text-sm text-muted-foreground">Xem cach Voice AI hoat dong trong phien hoi thao</p>
+              <h3 className="font-bold text-foreground">
+                Huong dan su dung Voice Hoi thao
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Xem cach Voice AI hoat dong trong phien hoi thao
+              </p>
             </div>
             {showDemoFlow ? (
               <ChevronUp className="w-5 h-5 text-muted-foreground ml-auto" />
@@ -240,10 +255,16 @@ export default function Dashboard() {
                         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                           <item.icon className="w-5 h-5 text-primary" />
                         </div>
-                        <span className="text-xs font-bold text-primary">Buoc {item.step}</span>
+                        <span className="text-xs font-bold text-primary">
+                          Buoc {item.step}
+                        </span>
                       </div>
-                      <h4 className="font-bold text-foreground text-sm mb-2">{item.title}</h4>
-                      <p className="text-xs text-muted-foreground">{item.description}</p>
+                      <h4 className="font-bold text-foreground text-sm mb-2">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -263,18 +284,27 @@ export default function Dashboard() {
                         <Mic className="w-6 h-6 text-primary-foreground" />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-primary uppercase tracking-wider">Dien gia</span>
-                        <p className="text-sm text-foreground font-medium">Nguoi dang trinh bay</p>
+                        <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                          Dien gia
+                        </span>
+                        <p className="text-sm text-foreground font-medium">
+                          Nguoi dang trinh bay
+                        </p>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="p-3 rounded-xl bg-card border border-border">
-                        <p className="text-sm text-foreground italic">&quot;Cam on cau hoi cua ban. Ve van de bao mat, chung toi su dung ma hoa AES-256...&quot;</p>
+                        <p className="text-sm text-foreground italic">
+                          &quot;Cam on cau hoi cua ban. Ve van de bao mat, chung
+                          toi su dung ma hoa AES-256...&quot;
+                        </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-foreground font-bold">
                             Cau tra loi
                           </span>
-                          <span className="text-xs text-muted-foreground">Tu dong ghep voi cau hoi ve bao mat</span>
+                          <span className="text-xs text-muted-foreground">
+                            Tu dong ghep voi cau hoi ve bao mat
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -287,18 +317,27 @@ export default function Dashboard() {
                         <Users className="w-6 h-6 text-foreground" />
                       </div>
                       <div>
-                        <span className="text-xs font-bold text-accent uppercase tracking-wider">Khan gia</span>
-                        <p className="text-sm text-foreground font-medium">Nguoi tham du</p>
+                        <span className="text-xs font-bold text-accent uppercase tracking-wider">
+                          Khan gia
+                        </span>
+                        <p className="text-sm text-foreground font-medium">
+                          Nguoi tham du
+                        </p>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="p-3 rounded-xl bg-card border border-border">
-                        <p className="text-sm text-foreground italic">&quot;Toi muon hoi ve van de bao mat du lieu nguoi dung?&quot;</p>
+                        <p className="text-sm text-foreground italic">
+                          &quot;Toi muon hoi ve van de bao mat du lieu nguoi
+                          dung?&quot;
+                        </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-foreground font-bold">
                             Cau hoi moi
                           </span>
-                          <span className="text-xs text-muted-foreground">+3 nguoi cung hoi tuong tu</span>
+                          <span className="text-xs text-muted-foreground">
+                            +3 nguoi cung hoi tuong tu
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -309,15 +348,21 @@ export default function Dashboard() {
                 <div className="mt-6 p-5 rounded-2xl bg-secondary/50 border border-border">
                   <div className="flex items-center gap-3 mb-4">
                     <Brain className="w-6 h-6 text-primary" />
-                    <span className="font-bold text-foreground">AI tu dong khop cau tra loi</span>
+                    <span className="font-bold text-foreground">
+                      AI tu dong khop cau tra loi
+                    </span>
                   </div>
                   <div className="flex flex-col md:flex-row items-center gap-4">
                     <div className="flex-1 p-4 rounded-xl bg-card border border-border">
                       <div className="flex items-center gap-2 mb-2">
                         <Users className="w-4 h-4 text-accent" />
-                        <span className="text-xs font-bold text-muted-foreground">CAU HOI</span>
+                        <span className="text-xs font-bold text-muted-foreground">
+                          CAU HOI
+                        </span>
                       </div>
-                      <p className="text-sm text-foreground">&quot;Lam sao de dam bao du lieu khong bi ro ri?&quot;</p>
+                      <p className="text-sm text-foreground">
+                        &quot;Lam sao de dam bao du lieu khong bi ro ri?&quot;
+                      </p>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0">
                       <ArrowRight className="w-4 h-4 text-foreground" />
@@ -325,9 +370,14 @@ export default function Dashboard() {
                     <div className="flex-1 p-4 rounded-xl bg-accent/10 border border-accent/30">
                       <div className="flex items-center gap-2 mb-2">
                         <Check className="w-4 h-4 text-accent" />
-                        <span className="text-xs font-bold text-accent">AI MATCHED</span>
+                        <span className="text-xs font-bold text-accent">
+                          AI MATCHED
+                        </span>
                       </div>
-                      <p className="text-sm text-foreground">&quot;...chung toi su dung ma hoa AES-256 va audit log cho moi truy cap...&quot;</p>
+                      <p className="text-sm text-foreground">
+                        &quot;...chung toi su dung ma hoa AES-256 va audit log
+                        cho moi truy cap...&quot;
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -407,9 +457,12 @@ export default function Dashboard() {
                 <Upload className="w-7 h-7 text-primary" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-foreground text-lg mb-2">Upload ban thuyet trinh</h3>
+                <h3 className="font-bold text-foreground text-lg mb-2">
+                  Upload ban thuyet trinh
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  AI se trich xuat keyword tu slide de cai thien do chinh xac nhan dien giong noi va tao cau hoi goi y cho khan gia.
+                  AI se trich xuat keyword tu slide de cai thien do chinh xac
+                  nhan dien giong noi va tao cau hoi goi y cho khan gia.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground border border-border">
@@ -443,9 +496,12 @@ export default function Dashboard() {
                 <Mic className="w-7 h-7 text-accent" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-foreground text-lg mb-2">Voice Hoi thao</h3>
+                <h3 className="font-bold text-foreground text-lg mb-2">
+                  Voice Hoi thao
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Tu dong nhan dien giong noi, phan biet dien gia va khan gia. AI se ghep cau tra loi voi cau hoi tuong ung.
+                  Tu dong nhan dien giong noi, phan biet dien gia va khan gia.
+                  AI se ghep cau tra loi voi cau hoi tuong ung.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground border border-border">
