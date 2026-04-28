@@ -60,8 +60,7 @@ export default function LiveSession() {
     });
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    window.location.origin ||
-    "http://localhost:3000";
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
   const joinUrl = `${baseUrl}/join/${seminar?.id}`;
 
   useEffect(() => {
@@ -314,14 +313,37 @@ export default function LiveSession() {
     { key: "all", label: "All", count: questions.length },
   ];
 
-  const handleSpeak = (text: string) => {
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "vi-VN"; // Set to Vietnamese
-
-    window.speechSynthesis.speak(utterance);
+  const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const handleSpeak = async (text: string) => {
+    if (isPlayingTTS) return;
+    setIsPlayingTTS(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append("text", text);
+      let backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "";
+      if (!backendUrl && typeof window !== "undefined" && ["3000", "3001"].includes(window.location.port)) {
+        backendUrl = window.location.origin.replace(window.location.port, "8000");
+      }
+      const res = await fetch(`${backendUrl}/api/tts/generate`, {
+        method: "POST",
+        body: formData,
+      });
+      
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => setIsPlayingTTS(false);
+        audio.play();
+      } else {
+        console.error("TTS generation failed");
+        setIsPlayingTTS(false);
+      }
+    } catch (err) {
+      console.error("Error calling TTS backend:", err);
+      setIsPlayingTTS(false);
+    }
   };
   if (loading)
     return (
