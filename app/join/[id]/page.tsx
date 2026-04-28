@@ -3,8 +3,18 @@
 import { useState, useEffect, useRef, use } from "react";
 import { supabase } from "@/lib/supabase";
 import {
-  Send, CheckCircle2, MessageCircle,
-  Loader2, Sparkles, Users, ArrowLeft, User, Heart, Mic, MicOff
+  Send,
+  CheckCircle2,
+  MessageCircle,
+  Loader2,
+  Sparkles,
+  Users,
+  ArrowLeft,
+  User,
+  Heart,
+  Mic,
+  MicOff,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -29,7 +39,8 @@ export default function JoinRoom({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSentConfirmation, setShowSentConfirmation] = useState(false);
-  const [activeInteraction, setActiveInteraction] = useState<Interaction | null>(null);
+  const [activeInteraction, setActiveInteraction] =
+    useState<Interaction | null>(null);
   const t = useTranslations();
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
@@ -64,17 +75,25 @@ export default function JoinRoom({ params }: PageProps) {
 
     const channel = supabase
       .channel(`public_chat_${id}`)
-      .on("postgres_changes", {
-        event: "*",
-        schema: "public",
-        table: "questions",
-        filter: `seminar_id=eq.${id}`
-      },
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "questions",
+          filter: `seminar_id=eq.${id}`,
+        },
         (payload) => {
-          if (payload.eventType === 'INSERT') setQuestions(prev => [...prev, payload.new]);
-          if (payload.eventType === 'UPDATE') setQuestions(prev => prev.map(q => q.id === payload.new.id ? payload.new : q));
-          if (payload.eventType === 'DELETE') setQuestions(prev => prev.filter(q => q.id === payload.old.id));
-        })
+          if (payload.eventType === "INSERT")
+            setQuestions((prev) => [...prev, payload.new]);
+          if (payload.eventType === "UPDATE")
+            setQuestions((prev) =>
+              prev.map((q) => (q.id === payload.new.id ? payload.new : q)),
+            );
+          if (payload.eventType === "DELETE")
+            setQuestions((prev) => prev.filter((q) => q.id === payload.old.id));
+        },
+      )
       .subscribe();
 
     return () => {
@@ -88,7 +107,9 @@ export default function JoinRoom({ params }: PageProps) {
   }, [questions]);
 
   useEffect(() => {
-    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    const SpeechRecognition =
+      (window as any).webkitSpeechRecognition ||
+      (window as any).SpeechRecognition;
     if (!SpeechRecognition) {
       setSpeechSupported(false);
       return;
@@ -119,7 +140,7 @@ export default function JoinRoom({ params }: PageProps) {
       for (let i = 0; i < event.results.length; ++i) {
         currentTranscript += event.results[i][0].transcript;
       }
-      
+
       const base = recognition.baseContent;
       setContent(base ? base + " " + currentTranscript : currentTranscript);
     };
@@ -146,7 +167,7 @@ export default function JoinRoom({ params }: PageProps) {
 
   const toggleMicrophone = () => {
     if (!recognitionRef.current) return;
-    
+
     try {
       if (isListening) {
         recognitionRef.current.stop();
@@ -174,7 +195,7 @@ export default function JoinRoom({ params }: PageProps) {
     // Clear input field immediately (optimistic UI)
     const questionText = content.trim();
     setContent("");
-    
+
     // Show confirmation toast
     setShowSentConfirmation(true);
 
@@ -403,7 +424,11 @@ export default function JoinRoom({ params }: PageProps) {
                   <div className="relative w-full">
                     <input
                       required
-                      placeholder={isListening ? "(Listening...) Đang nghe..." : "Ask a question..."}
+                      placeholder={
+                        isListening
+                          ? "(Listening...) Đang nghe..."
+                          : "Ask a question..."
+                      }
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       className="bg-transparent py-1 text-base outline-none font-semibold text-foreground placeholder:text-muted-foreground w-full"
@@ -422,9 +447,17 @@ export default function JoinRoom({ params }: PageProps) {
                         ? "bg-secondary text-primary animate-pulse shadow-inner border border-primary/20"
                         : "bg-secondary hover:bg-secondary/80 text-foreground"
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    title={isListening ? "Click to stop listening" : "Click to start voice input"}
+                    title={
+                      isListening
+                        ? "Click to stop listening"
+                        : "Click to start voice input"
+                    }
                   >
-                    {isListening ? <MicOff size={22} className="opacity-70" /> : <Mic size={22} />}
+                    {isListening ? (
+                      <MicOff size={22} className="opacity-70" />
+                    ) : (
+                      <Mic size={22} />
+                    )}
                   </button>
                 )}
                 <button
