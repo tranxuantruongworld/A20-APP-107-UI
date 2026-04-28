@@ -39,9 +39,6 @@ export default function LiveSession() {
   const interimTextRef = useRef("");
   const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
   const [aiMatchedIds, setAiMatchedIds] = useState<Set<string>>(new Set());
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const segmentStartRef = useRef<number>(0);
 
   const [filter, setFilter] = useState<FilterType>("pending");
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
@@ -151,7 +148,13 @@ export default function LiveSession() {
     durationMs: number,
   ) => {
     try {
-      const fileName = `${id}/${Date.now()}.wav`;
+      const now = new Date();
+      const datePart = now.toLocaleDateString("vi-VN").replace(/\//g, "-"); // "28-04-2026"
+      const timePart = now
+        .toLocaleTimeString("vi-VN", { hour12: false })
+        .replace(/:/g, "-"); // "10-15-30"
+      // Kết quả: "user123/10-15-30_28-04-2026.wav"
+      const fileName = `${id}/${timePart}_${datePart}.wav`;
 
       // Upload Audio lên Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -172,6 +175,7 @@ export default function LiveSession() {
         transcript: transcript,
         audio_url: audio_url,
         duration_ms: Math.round(durationMs),
+        asr_model: "web-speech",
       });
 
       console.log("Đã lưu log thành công:", transcript);
@@ -249,10 +253,8 @@ export default function LiveSession() {
       const wavBuffer = utils.encodeWAV(audio);
       const audioBlob = new Blob([wavBuffer], { type: "audio/wav" });
 
-      if (finalSTT.length > 2) {
-        const durationMs = (audio.length / 16000) * 1000;
-        await saveAsrLog(finalSTT, audioBlob, durationMs);
-      }
+      const durationMs = (audio.length / 16000) * 1000;
+      await saveAsrLog(finalSTT, audioBlob, durationMs);
     },
 
     positiveSpeechThreshold: 0.5,
@@ -260,6 +262,7 @@ export default function LiveSession() {
     redemptionMs: 200,
     minSpeechMs: 150,
   });
+
   // 3. Đồng bộ Switch Mic với VAD
   useEffect(() => {
     if (isMicOn) {
