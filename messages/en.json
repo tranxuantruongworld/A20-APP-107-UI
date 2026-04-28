@@ -30,7 +30,7 @@
     "reviewsTitle": "What Our Users Say",
     "reviewsSubtitle": "Trusted by thousands of event organizers worldwide",
     "feedbackTitle": "Share Your Feedback",
-    "feedbackSubtitle": "We'd love to hear from you. Help us improve Conference Hub.",
+    "feedbackSubtitle": "We'd love to hear from you. Help us improve hoi thao.",
     "feedbackName": "Your Name",
     "feedbackEmail": "Your Email",
     "feedbackMessage": "Your feedback or suggestions...",
@@ -108,7 +108,9 @@
     "questions": "questions",
     "interested": "interested",
     "answered": "Answered",
-    "aiModerated": "Questions are moderated by AI before appearing"
+    "aiModerated": "Questions are moderated by AI before appearing",
+    "questionSent": "Question sent!",
+    "questionProcessing": "Your question has been sent and is being processed..."
   },
   "session": {
     "questions": "Questions",
@@ -149,6 +151,13 @@
     "audienceDesc": "AI recognizes questions from attendees and auto-creates new questions on dashboard",
     "speakerDesc": "AI recognizes answers and auto-matches with corresponding questions",
     "aiDesc": "Auto-classify, group similar questions and mark as answered"
+  },
+  "classification": {
+    "greeting": "Greeting",
+    "professional": "Question",
+    "unknown": "Other",
+    "enableLabel": "Enable Question Classification",
+    "enableDesc": "Show classification badges on questions to help attendees understand the nature of questions"
   },
   "createSession": {
     "title": "Create New Session",

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Toast } from "@/components/Toast";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -31,6 +32,7 @@ export default function JoinRoom({ params }: PageProps) {
   const [seminar, setSeminar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSentConfirmation, setShowSentConfirmation] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
 
@@ -92,12 +94,19 @@ export default function JoinRoom({ params }: PageProps) {
     if (!content.trim() || isSubmitting) return;
     setIsSubmitting(true);
 
+    // Clear input field immediately (optimistic UI)
+    const questionText = content.trim();
+    setContent("");
+    
+    // Show confirmation toast
+    setShowSentConfirmation(true);
+
     try {
       const { data, error } = await supabase.functions.invoke(
         "ai-question-optimizer",
         {
           body: {
-            content: content.trim(),
+            content: questionText,
             author_name: name.trim() || "Anonymous",
             seminar_id: id,
           },
@@ -105,8 +114,6 @@ export default function JoinRoom({ params }: PageProps) {
       );
 
       if (error) throw error;
-
-      setContent("");
     } catch (error: any) {
       console.error("Error submitting question:", error.message);
       alert("Error: " + error.message);
@@ -321,14 +328,34 @@ export default function JoinRoom({ params }: PageProps) {
               </form>
             </div>
             <div className="flex items-center justify-center gap-2 mt-4">
-              <Sparkles size={14} className="text-accent" />
-              <p className="text-xs text-muted-foreground">
-                {t("join.aiModerated")}
-              </p>
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={14} className="text-primary animate-spin" />
+                  <p className="text-xs text-primary font-medium">
+                    {t("join.questionProcessing")}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={14} className="text-accent" />
+                  <p className="text-xs text-muted-foreground">
+                    {t("join.aiModerated")}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
       </main>
+
+      {/* Toast Notification */}
+      <Toast
+        message={t("join.questionSent")}
+        isVisible={showSentConfirmation}
+        onClose={() => setShowSentConfirmation(false)}
+        duration={3500}
+        type="success"
+      />
     </div>
   );
 }
