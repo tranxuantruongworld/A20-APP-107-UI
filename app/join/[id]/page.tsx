@@ -17,6 +17,8 @@ import {
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Toast } from "@/components/Toast";
+import { QuestionClassificationBadge } from "@/components/QuestionClassificationBadge";
+import { classifyQuestion } from "@/lib/classification";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -236,6 +238,11 @@ export default function JoinRoom({ params }: PageProps) {
                           minute: "2-digit",
                         })}
                       </span>
+                      {seminar?.enable_question_classification && (
+                        <QuestionClassificationBadge
+                          type={classifyQuestion(q.content)}
+                        />
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       {/* INTERESTED BADGE */}
