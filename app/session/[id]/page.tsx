@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { VoiceASRPanel } from "@/components/VoiceASRPanel";
+import { useTranslations } from "next-intl";
 type FilterType = "pending" | "answered" | "ignored" | "all";
 import { QRCodeSVG } from "qrcode.react";
 import { useMicVAD, utils } from "@ricky0123/vad-react";
@@ -44,6 +45,7 @@ export default function LiveSession() {
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   // Ref để giữ instance của Speech Recognition
   const fullTranscriptRef = useRef("");
+  const t = useTranslations();
 
   const filteredQuestions = questions
     .filter((q) => {
@@ -308,10 +310,22 @@ export default function LiveSession() {
   const ignoredQuestions = questions.filter((q) => q.status === "ignored");
 
   const filterTabs: { key: FilterType; label: string; count: number }[] = [
-    { key: "pending", label: "Pending", count: pendingQuestions.length },
-    { key: "answered", label: "Answered", count: answeredQuestions.length },
-    { key: "ignored", label: "Skipped", count: ignoredQuestions.length },
-    { key: "all", label: "All", count: questions.length },
+    {
+      key: "pending",
+      label: t("session.pending"),
+      count: pendingQuestions.length,
+    },
+    {
+      key: "answered",
+      label: t("session.answered"),
+      count: answeredQuestions.length,
+    },
+    {
+      key: "ignored",
+      label: t("session.ignored"),
+      count: ignoredQuestions.length,
+    },
+    { key: "all", label: t("session.all"), count: questions.length },
   ];
 
   const handleSpeak = (text: string) => {
@@ -381,10 +395,12 @@ export default function LiveSession() {
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                   <Users className="w-4 h-4 text-primary" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground">Questions</h2>
+                <h2 className="text-xl font-bold text-foreground">
+                  {t("session.questions")}
+                </h2>
               </div>
               <span className="text-sm text-muted-foreground">
-                {filteredQuestions.length} shown
+                {filteredQuestions.length} {t("session.shown")}
               </span>
             </div>
 
@@ -420,10 +436,10 @@ export default function LiveSession() {
                   <MessageSquareOff className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <h3 className="font-bold text-foreground mb-1">
-                  No questions to show
+                  {t("session.noQuestionsToShow")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Try a different filter or share the room code
+                  {t("session.noQuestionsHint")}
                 </p>
               </div>
             ) : (
@@ -449,7 +465,9 @@ export default function LiveSession() {
                         {animatingIds.has(q.id) && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-green-50 text-green-700 font-bold flex items-center gap-1 border border-green-200 animate-pulse">
                             <Sparkles className="w-2.5 h-2.5" />
-                            {aiMatchedIds.has(q.id) ? "AI matched" : "Answered"}
+                            {aiMatchedIds.has(q.id)
+                              ? t("session.aiMatched")
+                              : t("session.answeredLabel")}
                           </span>
                         )}
                         {/* Row for engagement badges */}
@@ -469,7 +487,7 @@ export default function LiveSession() {
                           {q.group_count > 1 && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 font-bold flex items-center gap-1 border border-blue-100">
                               <Users className="w-2.5 h-2.5" />+
-                              {q.group_count - 1} similar
+                              {q.group_count - 1} {t("session.similar")}
                             </span>
                           )}
                         </div>
@@ -494,7 +512,7 @@ export default function LiveSession() {
                       <button
                         onClick={() => handleSpeak(q.content)}
                         className="p-1.5 rounded-lg bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground transition-colors border border-transparent hover:border-primary/20"
-                        title="Đọc câu hỏi"
+                        title={t("session.readQuestion")}
                       >
                         <Mic className="w-3.5 h-3.5" />
                       </button>
@@ -502,14 +520,15 @@ export default function LiveSession() {
                       {/* Trạng thái đã trả lời */}
                       {q.status === "answered" && (
                         <span className="flex items-center gap-1 text-green-600 text-[11px] font-bold">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Answered
+                          <CheckCircle2 className="w-3.5 h-3.5" />{" "}
+                          {t("session.answeredLabel")}
                         </span>
                       )}
 
                       {/* Trạng thái đã bỏ qua */}
                       {q.status === "ignored" && (
                         <span className="text-[11px] font-bold text-muted-foreground">
-                          Skipped
+                          {t("session.skippedLabel")}
                         </span>
                       )}
 
@@ -522,7 +541,7 @@ export default function LiveSession() {
                             }
                             className="px-3 py-1 rounded-lg text-[11px] font-bold text-muted-foreground bg-secondary hover:bg-secondary/80 transition-colors"
                           >
-                            Skip
+                            {t("session.skip")}
                           </button>
                           <button
                             onClick={() =>
@@ -530,7 +549,7 @@ export default function LiveSession() {
                             }
                             className="px-3 py-1 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
                           >
-                            Answer
+                            {t("session.answer")}
                           </button>
                         </div>
                       )}
@@ -561,14 +580,14 @@ export default function LiveSession() {
               )}
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Scan to join the session
+              {t("session.scanToJoin")}
             </p>
           </div>
 
           {/* Room Code */}
           <div className="bg-card border border-border rounded-2xl p-5">
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold mb-2">
-              Room Code
+              {t("session.roomCode")}
             </p>
             <div className="flex items-center justify-between gap-2 mb-2">
               <p className="text-3xl font-black text-foreground tracking-wider">
@@ -586,7 +605,7 @@ export default function LiveSession() {
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Share this code with your audience
+              {t("session.shareCode")}
             </p>
           </div>
         </aside>
