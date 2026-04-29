@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import MicrosoftClarity from "@/components/Clarity";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +40,7 @@ export default async function RootLayout({
         <body className="min-h-full flex flex-col">
           <MicrosoftClarity />
           <NextIntlClientProvider locale={locale} messages={messages}>
-            {children}
+            <ThemeProvider>{children}</ThemeProvider>
           </NextIntlClientProvider>
         </body>
       </html>
