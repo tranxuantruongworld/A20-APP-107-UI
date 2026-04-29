@@ -47,82 +47,130 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Vietnamese Flag Colors - Red & Yellow Gold */
-  --color-vietnam-red: oklch(0.55 0.24 25);
-  --color-vietnam-gold: oklch(0.78 0.18 85);
-  --color-vietnam-red-light: oklch(0.65 0.20 25);
-  --color-vietnam-gold-light: oklch(0.85 0.14 85);
+  --color-theme-primary: var(--theme-primary);
+  --color-theme-primary-light: var(--theme-primary-light);
+  --color-theme-accent: var(--theme-accent);
+  --color-theme-accent-light: var(--theme-accent-light);
 }
 
-:root {
-  /* Vietnamese Professional Theme - Light Mode */
-  --background: oklch(0.99 0.002 85);
-  --foreground: oklch(0.15 0.02 25);
+/* ============================================
+   BLUE / WHITE THEME (default)
+   ============================================ */
+:root,
+[data-theme="blue"] {
+  --background: oklch(0.99 0.003 250);
+  --foreground: oklch(0.15 0.02 250);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 25);
+  --card-foreground: oklch(0.15 0.02 250);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 25);
-  --primary: oklch(0.52 0.24 25);
-  --primary-foreground: oklch(0.99 0.005 85);
-  --secondary: oklch(0.97 0.01 85);
-  --secondary-foreground: oklch(0.2 0.02 25);
-  --muted: oklch(0.96 0.008 85);
-  --muted-foreground: oklch(0.45 0.02 25);
-  --accent: oklch(0.78 0.18 85);
-  --accent-foreground: oklch(0.15 0.02 25);
+  --popover-foreground: oklch(0.15 0.02 250);
+  --primary: oklch(0.55 0.18 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --secondary: oklch(0.97 0.01 250);
+  --secondary-foreground: oklch(0.2 0.02 250);
+  --muted: oklch(0.96 0.008 250);
+  --muted-foreground: oklch(0.45 0.02 250);
+  --accent: oklch(0.68 0.12 250);
+  --accent-foreground: oklch(0.15 0.02 250);
   --destructive: oklch(0.55 0.22 25);
-  --border: oklch(0.92 0.01 85);
-  --input: oklch(0.96 0.008 85);
-  --ring: oklch(0.52 0.24 25);
-  --chart-1: oklch(0.52 0.24 25);
-  --chart-2: oklch(0.78 0.18 85);
+  --border: oklch(0.92 0.01 250);
+  --input: oklch(0.96 0.008 250);
+  --ring: oklch(0.55 0.18 250);
+  --chart-1: oklch(0.55 0.18 250);
+  --chart-2: oklch(0.68 0.12 250);
   --chart-3: oklch(0.65 0.15 150);
   --chart-4: oklch(0.55 0.18 320);
   --chart-5: oklch(0.6 0.16 200);
   --radius: 0.75rem;
-  --sidebar: oklch(0.99 0.002 85);
-  --sidebar-foreground: oklch(0.15 0.02 25);
-  --sidebar-primary: oklch(0.52 0.24 25);
-  --sidebar-primary-foreground: oklch(0.99 0.005 85);
-  --sidebar-accent: oklch(0.97 0.015 85);
-  --sidebar-accent-foreground: oklch(0.15 0.02 25);
-  --sidebar-border: oklch(0.92 0.01 85);
-  --sidebar-ring: oklch(0.52 0.24 25);
+  --sidebar: oklch(0.99 0.003 250);
+  --sidebar-foreground: oklch(0.15 0.02 250);
+  --sidebar-primary: oklch(0.55 0.18 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.97 0.015 250);
+  --sidebar-accent-foreground: oklch(0.15 0.02 250);
+  --sidebar-border: oklch(0.92 0.01 250);
+  --sidebar-ring: oklch(0.55 0.18 250);
+
+  --theme-primary: oklch(0.55 0.18 250);
+  --theme-primary-light: oklch(0.68 0.12 250);
+  --theme-accent: oklch(0.75 0.10 250);
+  --theme-accent-light: oklch(0.85 0.06 250);
+}
+
+/* ============================================
+   RED THEME (subtle / soft rose)
+   ============================================ */
+[data-theme="red"] {
+  --background: oklch(0.99 0.003 15);
+  --foreground: oklch(0.15 0.02 15);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 15);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 15);
+  --primary: oklch(0.58 0.16 15);
+  --primary-foreground: oklch(0.99 0.005 15);
+  --secondary: oklch(0.97 0.01 15);
+  --secondary-foreground: oklch(0.2 0.02 15);
+  --muted: oklch(0.96 0.008 15);
+  --muted-foreground: oklch(0.45 0.02 15);
+  --accent: oklch(0.72 0.10 15);
+  --accent-foreground: oklch(0.15 0.02 15);
+  --destructive: oklch(0.50 0.24 25);
+  --border: oklch(0.92 0.01 15);
+  --input: oklch(0.96 0.008 15);
+  --ring: oklch(0.58 0.16 15);
+  --chart-1: oklch(0.58 0.16 15);
+  --chart-2: oklch(0.72 0.10 15);
+  --chart-3: oklch(0.65 0.15 150);
+  --chart-4: oklch(0.55 0.18 320);
+  --chart-5: oklch(0.6 0.16 200);
+  --sidebar: oklch(0.99 0.003 15);
+  --sidebar-foreground: oklch(0.15 0.02 15);
+  --sidebar-primary: oklch(0.58 0.16 15);
+  --sidebar-primary-foreground: oklch(0.99 0.005 15);
+  --sidebar-accent: oklch(0.97 0.015 15);
+  --sidebar-accent-foreground: oklch(0.15 0.02 15);
+  --sidebar-border: oklch(0.92 0.01 15);
+  --sidebar-ring: oklch(0.58 0.16 15);
+
+  --theme-primary: oklch(0.58 0.16 15);
+  --theme-primary-light: oklch(0.72 0.10 15);
+  --theme-accent: oklch(0.78 0.08 15);
+  --theme-accent-light: oklch(0.88 0.05 15);
 }
 
 .dark {
-  /* Vietnamese Professional Theme - Dark Mode */
-  --background: oklch(0.12 0.015 25);
-  --foreground: oklch(0.98 0.005 85);
-  --card: oklch(0.16 0.018 25);
-  --card-foreground: oklch(0.98 0.005 85);
-  --popover: oklch(0.14 0.016 25);
-  --popover-foreground: oklch(0.98 0.005 85);
-  --primary: oklch(0.6 0.22 25);
-  --primary-foreground: oklch(0.99 0.005 85);
-  --secondary: oklch(0.2 0.02 25);
-  --secondary-foreground: oklch(0.95 0.005 85);
-  --muted: oklch(0.18 0.018 25);
-  --muted-foreground: oklch(0.65 0.015 85);
-  --accent: oklch(0.72 0.16 85);
-  --accent-foreground: oklch(0.12 0.02 25);
+  --background: oklch(0.12 0.015 250);
+  --foreground: oklch(0.98 0.005 250);
+  --card: oklch(0.16 0.018 250);
+  --card-foreground: oklch(0.98 0.005 250);
+  --popover: oklch(0.14 0.016 250);
+  --popover-foreground: oklch(0.98 0.005 250);
+  --primary: oklch(0.6 0.18 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --secondary: oklch(0.2 0.02 250);
+  --secondary-foreground: oklch(0.95 0.005 250);
+  --muted: oklch(0.18 0.018 250);
+  --muted-foreground: oklch(0.65 0.015 250);
+  --accent: oklch(0.65 0.12 250);
+  --accent-foreground: oklch(0.12 0.02 250);
   --destructive: oklch(0.6 0.24 25);
-  --border: oklch(0.25 0.025 25);
-  --input: oklch(0.18 0.018 25);
-  --ring: oklch(0.6 0.22 25);
-  --chart-1: oklch(0.6 0.22 25);
-  --chart-2: oklch(0.72 0.16 85);
+  --border: oklch(0.25 0.025 250);
+  --input: oklch(0.18 0.018 250);
+  --ring: oklch(0.6 0.18 250);
+  --chart-1: oklch(0.6 0.18 250);
+  --chart-2: oklch(0.65 0.12 250);
   --chart-3: oklch(0.7 0.14 150);
   --chart-4: oklch(0.6 0.16 320);
   --chart-5: oklch(0.65 0.14 200);
-  --sidebar: oklch(0.1 0.012 25);
-  --sidebar-foreground: oklch(0.98 0.005 85);
-  --sidebar-primary: oklch(0.6 0.22 25);
-  --sidebar-primary-foreground: oklch(0.99 0.005 85);
-  --sidebar-accent: oklch(0.16 0.02 25);
-  --sidebar-accent-foreground: oklch(0.98 0.005 85);
-  --sidebar-border: oklch(0.22 0.022 25);
-  --sidebar-ring: oklch(0.6 0.22 25);
+  --sidebar: oklch(0.1 0.012 250);
+  --sidebar-foreground: oklch(0.98 0.005 250);
+  --sidebar-primary: oklch(0.6 0.18 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.16 0.02 250);
+  --sidebar-accent-foreground: oklch(0.98 0.005 250);
+  --sidebar-border: oklch(0.22 0.022 250);
+  --sidebar-ring: oklch(0.6 0.18 250);
 }
 
 @layer base {
@@ -137,7 +185,7 @@
   }
 }
 
-/* Vietnamese Modern Animations */
+/* Modern Animations */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -160,20 +208,20 @@
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 20px oklch(0.52 0.24 25 / 0.3);
+    box-shadow: 0 0 20px oklch(from var(--primary) l c h / 0.3);
   }
   50% {
-    box-shadow: 0 0 40px oklch(0.52 0.24 25 / 0.5);
+    box-shadow: 0 0 40px oklch(from var(--primary) l c h / 0.5);
   }
 }
 
 @keyframes gold-pulse {
   0%,
   100% {
-    box-shadow: 0 0 20px oklch(0.78 0.18 85 / 0.3);
+    box-shadow: 0 0 20px oklch(from var(--accent) l c h / 0.3);
   }
   50% {
-    box-shadow: 0 0 40px oklch(0.78 0.18 85 / 0.5);
+    box-shadow: 0 0 40px oklch(from var(--accent) l c h / 0.5);
   }
 }
 
@@ -221,22 +269,22 @@
   background-color: oklch(0.55 0.22 140 / 0.04);
 }
 
-/* Glass Effect - Vietnamese Theme */
+/* Glass Effect */
 .glass {
   background: oklch(1 0 0 / 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid oklch(0.92 0.01 85);
-  box-shadow: 0 4px 32px oklch(0.52 0.24 25 / 0.08);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 32px oklch(from var(--primary) l c h / 0.08);
 }
 
-/* Vietnamese Red & Gold Gradient Text */
+/* Gradient Text */
 .text-gradient-gold {
   background: linear-gradient(
     135deg,
-    oklch(0.52 0.24 25),
-    oklch(0.78 0.18 85),
-    oklch(0.52 0.24 25)
+    var(--primary),
+    var(--accent),
+    var(--primary)
   );
   background-clip: text;
   -webkit-background-clip: text;
@@ -245,24 +293,24 @@
   animation: shimmer 4s ease-in-out infinite;
 }
 
-/* Vietnamese Star Accent */
+/* Star Accent */
 .vietnam-star {
-  color: oklch(0.78 0.18 85);
-  filter: drop-shadow(0 0 8px oklch(0.78 0.18 85 / 0.5));
+  color: var(--accent);
+  filter: drop-shadow(0 0 8px oklch(from var(--accent) l c h / 0.5));
 }
 
 /* Hero gradient background */
 .hero-gradient {
   background: linear-gradient(
     135deg,
-    oklch(0.52 0.24 25 / 0.05) 0%,
-    oklch(0.78 0.18 85 / 0.08) 50%,
-    oklch(0.52 0.24 25 / 0.03) 100%
+    oklch(from var(--primary) l c h / 0.05) 0%,
+    oklch(from var(--accent) l c h / 0.08) 50%,
+    oklch(from var(--primary) l c h / 0.03) 100%
   );
 }
 
-/* Card hover effect with Vietnamese colors */
+/* Card hover effect */
 .card-vietnam:hover {
-  border-color: oklch(0.52 0.24 25 / 0.3);
-  box-shadow: 0 8px 32px oklch(0.52 0.24 25 / 0.12);
+  border-color: oklch(from var(--primary) l c h / 0.3);
+  box-shadow: 0 8px 32px oklch(from var(--primary) l c h / 0.12);
 }

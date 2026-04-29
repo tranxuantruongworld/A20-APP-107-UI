@@ -37,6 +37,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import {
   CreateSessionModal,
   SessionConfig,
@@ -176,6 +177,7 @@ export default function Dashboard() {
               <LayoutDashboard className="w-4 h-4" />
               {t("nav.dashboard")}
             </Link>
+            <ThemeSwitcher />
             <LanguageSwitcher currentLocale={locale} />
             <UserButton
               appearance={{

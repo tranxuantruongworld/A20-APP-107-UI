@@ -44,6 +44,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function Home() {
   const router = useRouter();
@@ -236,7 +237,7 @@ export default function Home() {
       <div
         className="absolute inset-0 pointer-events-none opacity-20"
         style={{
-          backgroundImage: `radial-gradient(oklch(0.52 0.24 25 / 0.08) 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(oklch(from var(--primary) l c h / 0.08) 1px, transparent 1px)`,
           backgroundSize: "32px 32px",
         }}
       />
@@ -271,6 +272,7 @@ export default function Home() {
 
               {/* Auth Buttons */}
               <div className="hidden md:flex items-center gap-4">
+                <ThemeSwitcher />
                 <LanguageSwitcher currentLocale={locale} />
                 <SignInButton mode="modal">
                   <button className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -312,7 +314,11 @@ export default function Home() {
                       {item.label}
                     </Link>
                   ))}
-                  <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border/50">
+                  <div className="flex items-center gap-3 mt-4 pt-4 border-t border-border/50">
+                    <ThemeSwitcher />
+                    <LanguageSwitcher currentLocale={locale} />
+                  </div>
+                  <div className="flex flex-col gap-3 mt-3">
                     <SignInButton mode="modal">
                       <button className="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-full transition-all flex items-center justify-center gap-2">
                         {t("page.startFree")}
@@ -929,6 +935,7 @@ export default function Home() {
                   {t("home.heroDesc")}
                 </p>
                 <div className="flex items-center gap-4">
+                  <ThemeSwitcher />
                   <LanguageSwitcher currentLocale={locale} />
                 </div>
               </div>
