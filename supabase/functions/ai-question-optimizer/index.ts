@@ -16,7 +16,7 @@ serve(async (req) => {
     
     // Khởi tạo Supabase Client với Service Role để có quyền update/insert
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('NEXT_PUBLIC_SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { BarChart3, TrendingUp, Users, MessageCircle, Loader2, Download } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 interface AnalyticsData {
   total_questions: number;
@@ -13,6 +12,7 @@ interface AnalyticsData {
   unique_participants: number;
   engagement_rate: number;
   questions_per_minute: number;
+  session_duration_minutes: number;
   avg_response_time?: number;
 }
 
@@ -23,82 +23,36 @@ interface QAAnalyticsDashboardProps {
 export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sessionDuration, setSessionDuration] = useState(0);
 
-  useEffect(() => {
-    fetchAnalytics();
-    const timer = setInterval(fetchAnalytics, 5000); // Update every 5 seconds
-    return () => clearInterval(timer);
-  }, [seminarId]);
-
-  async function fetchAnalytics() {
+  const fetchAnalytics = async () => {
     try {
-      // Get seminar info for timing
-      const { data: seminarData } = await supabase
-        .from('seminars')
-        .select('created_at')
-        .eq('id', seminarId)
-        .single();
+      const response = await fetch(`/api/seminars/${seminarId}/analytics`);
+      const data = await response.json();
 
-      if (seminarData?.created_at) {
-        const duration = Math.floor(
-          (Date.now() - new Date(seminarData.created_at).getTime()) / 1000 / 60
-        );
-        setSessionDuration(Math.max(duration, 1));
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to fetch analytics.');
       }
 
-      // Get questions stats
-      const { data: questions } = await supabase
-        .from('questions')
-        .select('id, question_type, is_answered, author_id, created_at')
-        .eq('seminar_id', seminarId);
-
-      if (questions && questions.length > 0) {
-        const uniqueParticipants = new Set(
-          questions.map((q) => q.author_id).filter(Boolean)
-        ).size;
-
-        const greetingCount = questions.filter(
-          (q) => q.question_type === 'greeting'
-        ).length;
-        const professionalCount = questions.filter(
-          (q) => q.question_type === 'professional'
-        ).length;
-        const answeredCount = questions.filter(
-          (q) => q.is_answered === true
-        ).length;
-        const pendingCount = questions.length - answeredCount;
-
-        const qpm = sessionDuration > 0 ? questions.length / sessionDuration : 0;
-
-        setAnalytics({
-          total_questions: questions.length,
-          greeting_count: greetingCount,
-          professional_count: professionalCount,
-          answered_count: answeredCount,
-          pending_count: pendingCount,
-          unique_participants: uniqueParticipants,
-          engagement_rate: uniqueParticipants > 0 ? (uniqueParticipants / 100) * 100 : 0,
-          questions_per_minute: qpm,
-        });
-      } else {
-        setAnalytics({
-          total_questions: 0,
-          greeting_count: 0,
-          professional_count: 0,
-          answered_count: 0,
-          pending_count: 0,
-          unique_participants: 0,
-          engagement_rate: 0,
-          questions_per_minute: 0,
-        });
-      }
+      setAnalytics(data as AnalyticsData);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    const initialTimer = setTimeout(() => {
+      void fetchAnalytics();
+    }, 0);
+    const timer = setInterval(() => {
+      void fetchAnalytics();
+    }, 5000);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(timer);
+    };
+  }, [seminarId]);
 
   if (loading || !analytics) {
     return (
@@ -245,7 +199,7 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Session Duration</span>
             <span className="font-semibold text-foreground">
-              {sessionDuration} min
+              {analytics.session_duration_minutes} min
             </span>
           </div>
         </div>

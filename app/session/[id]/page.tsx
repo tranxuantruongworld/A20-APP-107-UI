@@ -270,15 +270,15 @@ export default function LiveSession() {
       setRealtimeTranscript("");
       try {
         recognitionRef.current?.start();
-      } catch (_) { }
+      } catch (_) {}
       try {
         vad.start();
-      } catch (_) { }
+      } catch (_) {}
     } else {
       recognitionRef.current?.stop();
       try {
         vad.pause();
-      } catch (_) { }
+      } catch (_) {}
     }
   }, [isMicOn]);
 
@@ -334,9 +334,19 @@ export default function LiveSession() {
     try {
       const formData = new FormData();
       formData.append("text", text);
-      let backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "";
-      if (!backendUrl && typeof window !== "undefined" && ["3000", "3001"].includes(window.location.port)) {
-        backendUrl = window.location.origin.replace(window.location.port, "8000");
+      let backendUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        process.env.NEXT_PUBLIC_BACKEND_URL ||
+        "";
+      if (
+        !backendUrl &&
+        typeof window !== "undefined" &&
+        ["3000", "3001"].includes(window.location.port)
+      ) {
+        backendUrl = window.location.origin.replace(
+          window.location.port,
+          "8000",
+        );
       }
       const res = await fetch(`${backendUrl}/api/tts/generate`, {
         method: "POST",
@@ -348,7 +358,7 @@ export default function LiveSession() {
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
         audio.onended = () => setPlayingTTSId(null);
-        audio.play().catch(e => {
+        audio.play().catch((e) => {
           console.error("Audio playback error:", e);
           setPlayingTTSId(null);
         });
@@ -385,7 +395,7 @@ export default function LiveSession() {
               <Star className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-foreground text-lg tracking-tight">
-              hoi thao
+              HoiThao
             </span>
           </div>
         </div>
@@ -476,10 +486,11 @@ export default function LiveSession() {
                 {filteredQuestions.map((q) => (
                   <div
                     key={q.id}
-                    className={`bg-background border rounded-xl p-3 transition-colors shadow-sm ${animatingIds.has(q.id)
-                      ? "animate-ai-match border-green-400"
-                      : "border-border hover:border-primary/40"
-                      }`}
+                    className={`bg-background border rounded-xl p-3 transition-colors shadow-sm ${
+                      animatingIds.has(q.id)
+                        ? "animate-ai-match border-green-400"
+                        : "border-border hover:border-primary/40"
+                    }`}
                   >
                     {/* Header: Tên và Thời gian */}
                     <div className="flex items-center justify-between mb-1">
@@ -540,12 +551,13 @@ export default function LiveSession() {
                       <button
                         onClick={() => handleSpeak(q.id, q.content)}
                         disabled={!!playingTTSId}
-                        className={`p-1.5 rounded-lg transition-colors border ${playingTTSId === q.id
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : playingTTSId
-                            ? "bg-secondary text-muted-foreground/50 border-transparent cursor-not-allowed"
-                            : "bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground border-transparent hover:border-primary/20"
-                          }`}
+                        className={`p-1.5 rounded-lg transition-colors border ${
+                          playingTTSId === q.id
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : playingTTSId
+                              ? "bg-secondary text-muted-foreground/50 border-transparent cursor-not-allowed"
+                              : "bg-secondary hover:bg-primary/10 hover:text-primary text-muted-foreground border-transparent hover:border-primary/20"
+                        }`}
                         title={t("session.readQuestion")}
                       >
                         {playingTTSId === q.id ? (

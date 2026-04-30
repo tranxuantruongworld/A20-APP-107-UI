@@ -47,7 +47,7 @@ serve(async (req) => {
     console.log(`[process-asr-log] START | asr_log_id=${asrLogId} seminar_id=${seminarId}`);
     console.log(`[process-asr-log] web-speech transcript: "${webSpeechTranscript}"`);
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseUrl = Deno.env.get("NEXT_PUBLIC_SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const geminiKey = Deno.env.get("GEMINI_API_KEY")!;
     const openaiKey = Deno.env.get("OPENAI_API_KEY")!;

@@ -88,6 +88,7 @@ export default function Dashboard() {
           code: roomCode,
           user_id: user.id,
           status: "live",
+          end_time: config.endTime ? new Date(config.endTime).toISOString() : null,
           enable_voice_ai: config.enableVoiceAI,
           enable_upload: config.enableUpload,
           voice_language: config.voiceLanguage,
@@ -228,10 +229,10 @@ export default function Dashboard() {
             </div>
             <div className="text-left">
               <h3 className="font-bold text-foreground">
-                Huong dan su dung Voice Hoi thao
+                Huong dan su dung Voice HoiThao
               </h3>
               <p className="text-sm text-muted-foreground">
-                Xem cach Voice AI hoat dong trong phien hoi thao
+                Xem cach Voice AI hoat dong trong phien HoiThao
               </p>
             </div>
             {showDemoFlow ? (
@@ -499,7 +500,7 @@ export default function Dashboard() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-foreground text-lg mb-2">
-                  Voice Hoi thao
+                  Voice HoiThao
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Tu dong nhan dien giong noi, phan biet dien gia va khan gia.

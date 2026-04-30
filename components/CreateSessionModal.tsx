@@ -30,6 +30,7 @@ interface CreateSessionModalProps {
 
 export interface SessionConfig {
   title: string;
+  endTime?: string;
   enableVoiceAI: boolean;
   enableUpload: boolean;
   uploadedFile?: File;
@@ -49,6 +50,7 @@ export function CreateSessionModal({
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState<SessionConfig>({
     title: "",
+    endTime: "",
     enableVoiceAI: true,
     enableUpload: false,
     voiceLanguage: "vi-VN",
@@ -226,7 +228,7 @@ export function CreateSessionModal({
             <div className="space-y-6 py-2">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Ten phien hoi thao
+                  Ten phien HoiThao
                 </label>
                 <input
                   type="text"
@@ -237,6 +239,24 @@ export function CreateSessionModal({
                   }
                   className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Thoi gian ket thuc (tuy chon)
+                </label>
+                <input
+                  type="datetime-local"
+                  value={config.endTime || ""}
+                  onChange={(e) =>
+                    setConfig((prev) => ({ ...prev, endTime: e.target.value }))
+                  }
+                  className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Khi den moc nay, nguoi tham gia van xem duoc seminar nhung se
+                  khong gui them cau hoi/voice.
+                </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
@@ -584,6 +604,16 @@ export function CreateSessionModal({
                       className={`font-medium ${config.enableVoiceAI ? "text-accent" : "text-muted-foreground"}`}
                     >
                       {config.enableVoiceAI ? "Bat" : "Tat"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">
+                      Thoi gian ket thuc
+                    </span>
+                    <span className="text-foreground font-medium">
+                      {config.endTime
+                        ? new Date(config.endTime).toLocaleString("vi-VN")
+                        : "Khong gioi han"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
