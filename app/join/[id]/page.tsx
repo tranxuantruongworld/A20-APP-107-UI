@@ -15,6 +15,7 @@ import {
   Mic,
   MicOff,
   Star,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -39,11 +40,17 @@ export default function JoinRoom({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSentConfirmation, setShowSentConfirmation] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "success",
+  );
   const [activeInteraction, setActiveInteraction] =
     useState<Interaction | null>(null);
   const t = useTranslations();
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
+  const [isSeminarEnded, setIsSeminarEnded] = useState(false);
+  const [endNoticeShown, setEndNoticeShown] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const contentRef = useRef(content);
@@ -100,6 +107,36 @@ export default function JoinRoom({ params }: PageProps) {
       supabase.removeChannel(channel);
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!seminar?.end_time) {
+      setIsSeminarEnded(false);
+      return;
+    }
+    const endMs = new Date(seminar.end_time).getTime();
+    const syncEndedState = () => {
+      const ended = Date.now() >= endMs;
+      setIsSeminarEnded(ended);
+      if (ended && isListening) {
+        recognitionRef.current?.stop();
+        setIsListening(false);
+      }
+    };
+    syncEndedState();
+    const timer = setInterval(syncEndedState, 1000);
+    return () => clearInterval(timer);
+  }, [seminar?.end_time, isListening]);
+
+  useEffect(() => {
+    if (isSeminarEnded && !endNoticeShown) {
+      setToastType("info");
+      setToastMessage(
+        "Seminar da ket thuc. Ban van xem duoc noi dung, nhung khong the gui cau hoi hoac voice.",
+      );
+      setShowSentConfirmation(true);
+      setEndNoticeShown(true);
+    }
+  }, [isSeminarEnded, endNoticeShown]);
 
   useEffect(() => {
     if (scrollRef.current)
@@ -166,6 +203,12 @@ export default function JoinRoom({ params }: PageProps) {
   }, []);
 
   const toggleMicrophone = () => {
+    if (isSeminarEnded) {
+      setToastType("error");
+      setToastMessage("Seminar da ket thuc, khong the su dung voice input.");
+      setShowSentConfirmation(true);
+      return;
+    }
     if (!recognitionRef.current) return;
 
     try {
@@ -189,6 +232,12 @@ export default function JoinRoom({ params }: PageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSeminarEnded) {
+      setToastType("error");
+      setToastMessage("Seminar da ket thuc, khong the gui cau hoi moi.");
+      setShowSentConfirmation(true);
+      return;
+    }
     if (!content.trim() || isSubmitting) return;
     setIsSubmitting(true);
 
@@ -197,6 +246,8 @@ export default function JoinRoom({ params }: PageProps) {
     setContent("");
 
     // Show confirmation toast
+    setToastType("success");
+    setToastMessage(t("join.questionSent"));
     setShowSentConfirmation(true);
 
     try {
@@ -277,10 +328,17 @@ export default function JoinRoom({ params }: PageProps) {
                 <span className="text-xs font-mono bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-bold border border-primary/20">
                   {seminar?.code}
                 </span>
-                <span className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5 bg-accent/20 px-3 py-1.5 rounded-lg border border-accent/30">
-                  <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
-                  Live
-                </span>
+                {isSeminarEnded ? (
+                  <span className="text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-300">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    Ended
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5 bg-accent/20 px-3 py-1.5 rounded-lg border border-accent/30">
+                    <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+                    Live
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -304,6 +362,13 @@ export default function JoinRoom({ params }: PageProps) {
           className="flex-1 overflow-y-auto px-6 py-8 scroll-smooth"
         >
           <div className="max-w-3xl mx-auto space-y-6 pb-48">
+            {isSeminarEnded && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900 text-sm font-medium flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                Seminar da ket thuc. Ban van theo doi duoc noi dung va cau hoi da
+                co, nhung khong the gui cau hoi moi hoac su dung voice.
+              </div>
+            )}
             {/* Active Interaction Display */}
             {activeInteraction && (
               <ActiveInteractionDisplay
@@ -441,7 +506,7 @@ export default function JoinRoom({ params }: PageProps) {
                   <button
                     type="button"
                     onClick={toggleMicrophone}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isSeminarEnded}
                     className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-md flex-shrink-0 ${
                       isListening
                         ? "bg-secondary text-primary animate-pulse shadow-inner border border-primary/20"
@@ -462,7 +527,7 @@ export default function JoinRoom({ params }: PageProps) {
                 )}
                 <button
                   type="submit"
-                  disabled={isSubmitting || !content.trim()}
+                  disabled={isSubmitting || !content.trim() || isSeminarEnded}
                   className="bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed text-primary-foreground w-14 h-14 rounded-xl flex items-center justify-center transition-all shadow-md"
                 >
                   {isSubmitting ? (
@@ -496,11 +561,11 @@ export default function JoinRoom({ params }: PageProps) {
 
       {/* Toast Notification */}
       <Toast
-        message={t("join.questionSent")}
+        message={toastMessage || t("join.questionSent")}
         isVisible={showSentConfirmation}
         onClose={() => setShowSentConfirmation(false)}
         duration={3500}
-        type="success"
+        type={toastType}
       />
     </div>
   );

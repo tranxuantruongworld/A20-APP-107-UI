@@ -88,6 +88,7 @@ export default function Dashboard() {
           code: roomCode,
           user_id: user.id,
           status: "live",
+          end_time: config.endTime ? new Date(config.endTime).toISOString() : null,
           enable_voice_ai: config.enableVoiceAI,
           enable_upload: config.enableUpload,
           voice_language: config.voiceLanguage,
