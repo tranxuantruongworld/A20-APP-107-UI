@@ -983,7 +983,7 @@ export default function Home() {
                   {t("page.footerContact")}
                 </h4>
                 <ul className="space-y-3 text-muted-foreground">
-                  <li>hello@conferencehub.vn</li>
+                  <li>hello@hoithao.vn</li>
                   <li>+84 123 456 789</li>
                   <li>Ha Noi, Viet Nam</li>
                 </ul>
@@ -991,7 +991,7 @@ export default function Home() {
             </div>
             <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                2026 Conference Hub. {t("home.footerRights")}
+                2026 HoiThao. {t("home.footerRights")}
               </p>
               <div className="flex items-center gap-6 text-sm text-muted-foreground">
                 <Link

@@ -95,7 +95,9 @@ export default function Dashboard() {
           code: roomCode,
           user_id: user.id,
           status: "live",
-          end_time: config.endTime ? new Date(config.endTime).toISOString() : null,
+          end_time: config.endTime
+            ? new Date(config.endTime).toISOString()
+            : null,
           enable_voice_ai: config.enableVoiceAI,
           enable_upload: config.enableUpload,
           voice_language: config.voiceLanguage,
@@ -165,7 +167,7 @@ export default function Dashboard() {
               <Star className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground tracking-tight">
-              Conference Hub
+              Hoi Thao
             </span>
           </Link>
 
@@ -450,7 +452,7 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Upload Presentation Feature */}
           <div className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group hover:border-primary/30 transition-colors">
-              <div className="absolute top-4 right-4 px-2 py-1 rounded-full bg-primary/10 text-xs font-bold text-primary">
+            <div className="absolute top-4 right-4 px-2 py-1 rounded-full bg-primary/10 text-xs font-bold text-primary">
               {t("dashboard.newBadge")}
             </div>
             <div className="flex items-start gap-4">
@@ -534,7 +536,7 @@ export default function Dashboard() {
             </h2>
             {seminars.length > 0 && (
               <span className="text-sm text-muted-foreground">
-                {t("dashboard.sessionCount", {count: seminars.length})}
+                {t("dashboard.sessionCount", { count: seminars.length })}
               </span>
             )}
           </div>

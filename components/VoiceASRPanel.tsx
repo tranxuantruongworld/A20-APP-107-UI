@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, MicOff, Users, Volume2, Brain, Info, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Users,
+  Volume2,
+  Brain,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+} from "lucide-react";
 import { VoiceVisualizer } from "@/components/VoiceVisualizer";
 import { useTranslations } from "next-intl";
 
@@ -31,23 +41,6 @@ export function VoiceASRPanel({
 }: VoiceASRPanelProps) {
   const t = useTranslations();
   const [showInfo, setShowInfo] = useState(false);
-  const [transcriptHistory, setTranscriptHistory] = useState<TranscriptEntry[]>([
-    // Demo entries
-    {
-      id: "1",
-      text: "Xin hoi ve van de bao mat du lieu nguoi dung?",
-      speaker: "audience",
-      timestamp: new Date(Date.now() - 120000),
-      isQuestion: true,
-    },
-    {
-      id: "2",
-      text: "Chung toi su dung ma hoa AES-256 va tuan thu chuan GDPR de bao ve du lieu.",
-      speaker: "speaker",
-      timestamp: new Date(Date.now() - 60000),
-      matchedAnswer: "1",
-    },
-  ]);
 
   return (
     <div className="space-y-4">
@@ -78,7 +71,9 @@ export function VoiceASRPanel({
       >
         <div className="flex items-center gap-2">
           <Info className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Cach Voice AI hoat dong</span>
+          <span className="text-sm text-muted-foreground">
+            Cách Voice AI hoạt động
+          </span>
         </div>
         {showInfo ? (
           <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -94,8 +89,11 @@ export function VoiceASRPanel({
               <Users className="w-4 h-4 text-accent" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Khan gia</p>
-              <p className="text-muted-foreground text-xs">AI nhan dien cau hoi tu nguoi tham du va tu dong tao cau hoi moi tren dashboard</p>
+              <p className="font-medium text-foreground">Khán giả</p>
+              <p className="text-muted-foreground text-xs">
+                AI nhận diện câu hỏi từ người tham dự và tự động tạo câu hỏi mới
+                trên dashboard
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -103,8 +101,10 @@ export function VoiceASRPanel({
               <Volume2 className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <p className="font-medium text-foreground">Dien gia</p>
-              <p className="text-muted-foreground text-xs">AI nhan dien cau tra loi va tu dong khop voi cau hoi tuong ung</p>
+              <p className="font-medium text-foreground">Diễn giả</p>
+              <p className="text-muted-foreground text-xs">
+                AI nhận diện câu trả lời và tự động khớp với câu hỏi tương ứng
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -112,8 +112,11 @@ export function VoiceASRPanel({
               <Brain className="w-4 h-4 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-medium text-foreground">AI xu ly</p>
-              <p className="text-muted-foreground text-xs">Tu dong phan loai, gom nhom cau hoi tuong tu va danh dau da tra loi</p>
+              <p className="font-medium text-foreground">AI xử lý</p>
+              <p className="text-muted-foreground text-xs">
+                Tự động phân loại, gom nhóm, ranking câu hỏi và đánh dấu đã trả
+                lời
+              </p>
             </div>
           </div>
         </div>
@@ -122,23 +125,35 @@ export function VoiceASRPanel({
       {/* Speaker Classification Indicator */}
       {isMicOn && (
         <div className="grid grid-cols-2 gap-3">
-          <div className={`p-3 rounded-xl border transition-all ${
-            isSpeaking ? "bg-accent/10 border-accent/30" : "bg-secondary/30 border-border"
-          }`}>
+          <div
+            className={`p-3 rounded-xl border transition-all ${
+              isSpeaking
+                ? "bg-accent/10 border-accent/30"
+                : "bg-secondary/30 border-border"
+            }`}
+          >
             <div className="flex items-center gap-2 mb-1">
               <Users className="w-4 h-4 text-accent" />
-              <span className="text-xs font-bold text-foreground">Khan gia</span>
+              <span className="text-xs font-bold text-foreground">
+                Khán giả
+              </span>
             </div>
-            <p className="text-[10px] text-muted-foreground">Cau hoi moi</p>
+            <p className="text-[10px] text-muted-foreground">Câu hỏi mới</p>
           </div>
-          <div className={`p-3 rounded-xl border transition-all ${
-            !isSpeaking && isMicOn ? "bg-primary/10 border-primary/30" : "bg-secondary/30 border-border"
-          }`}>
+          <div
+            className={`p-3 rounded-xl border transition-all ${
+              !isSpeaking && isMicOn
+                ? "bg-primary/10 border-primary/30"
+                : "bg-secondary/30 border-border"
+            }`}
+          >
             <div className="flex items-center gap-2 mb-1">
               <Volume2 className="w-4 h-4 text-primary" />
-              <span className="text-xs font-bold text-foreground">Dien gia</span>
+              <span className="text-xs font-bold text-foreground">
+                Diễn giả
+              </span>
             </div>
-            <p className="text-[10px] text-muted-foreground">Cau tra loi</p>
+            <p className="text-[10px] text-muted-foreground">Câu trả lời</p>
           </div>
         </div>
       )}
@@ -188,53 +203,14 @@ export function VoiceASRPanel({
         <div className="min-h-[200px] max-h-[400px] overflow-y-auto rounded-xl bg-secondary/50 p-4 text-sm text-foreground leading-relaxed border border-border/50">
           {isMicOn ? (
             <div className="space-y-3">
-              {/* Transcript History */}
-              {transcriptHistory.map((entry) => (
-                <div
-                  key={entry.id}
-                  className={`p-3 rounded-xl border ${
-                    entry.speaker === "audience"
-                      ? "bg-accent/5 border-accent/20"
-                      : "bg-primary/5 border-primary/20"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    {entry.speaker === "audience" ? (
-                      <>
-                        <Users className="w-3 h-3 text-accent" />
-                        <span className="text-[10px] font-bold text-accent uppercase">Khan gia</span>
-                        {entry.isQuestion && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/20 text-foreground font-medium">
-                            Cau hoi
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <Volume2 className="w-3 h-3 text-primary" />
-                        <span className="text-[10px] font-bold text-primary uppercase">Dien gia</span>
-                        {entry.matchedAnswer && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-foreground font-medium flex items-center gap-1">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            AI Matched
-                          </span>
-                        )}
-                      </>
-                    )}
-                    <span className="text-[10px] text-muted-foreground ml-auto">
-                      {entry.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                  </div>
-                  <p className="text-sm text-foreground">{entry.text}</p>
-                </div>
-              ))}
-
               {/* Current Transcript */}
               {realtimeTranscript ? (
                 <div className="p-3 rounded-xl bg-card border-2 border-primary/30">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[10px] font-bold text-primary uppercase">Dang xu ly...</span>
+                    <span className="text-[10px] font-bold text-primary uppercase">
+                      Dang xu ly...
+                    </span>
                   </div>
                   <p className="text-sm text-foreground">
                     {realtimeTranscript}
@@ -266,24 +242,6 @@ export function VoiceASRPanel({
           )}
         </div>
       </div>
-
-      {/* Quick Stats */}
-      {isMicOn && (
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-bold text-foreground">2</p>
-            <p className="text-[10px] text-muted-foreground">Cau hoi</p>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-bold text-foreground">1</p>
-            <p className="text-[10px] text-muted-foreground">Da tra loi</p>
-          </div>
-          <div className="bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-bold text-accent">1</p>
-            <p className="text-[10px] text-muted-foreground">AI Match</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
