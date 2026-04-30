@@ -56,6 +56,22 @@ export default function JoinRoom({ params }: PageProps) {
   const contentRef = useRef(content);
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const logClientEvent = async (
+    level: "debug" | "info" | "warn" | "error",
+    event: string,
+    payload: Record<string, unknown> = {},
+  ) => {
+    try {
+      await fetch("/api/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level, event, payload }),
+      });
+    } catch {
+      // Avoid blocking UX when logging fails.
+    }
+  };
+
   useEffect(() => {
     contentRef.current = content;
   }, [content]);
@@ -233,6 +249,9 @@ export default function JoinRoom({ params }: PageProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSeminarEnded) {
+      void logClientEvent("warn", "join_submit_blocked_seminar_ended", {
+        seminar_id: id,
+      });
       setToastType("error");
       setToastMessage("Seminar da ket thuc, khong the gui cau hoi moi.");
       setShowSentConfirmation(true);
@@ -269,10 +288,17 @@ export default function JoinRoom({ params }: PageProps) {
         throw new Error(result?.error || "Failed to submit question.");
       }
 
+      void logClientEvent("info", "join_submit_question_success", {
+        seminar_id: id,
+      });
       setContent("");
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Unknown error occurred.";
+      void logClientEvent("error", "join_submit_question_failed", {
+        seminar_id: id,
+        message,
+      });
       console.error("Error submitting question:", message);
       alert("Error: " + message);
     } finally {
@@ -288,7 +314,16 @@ export default function JoinRoom({ params }: PageProps) {
         .eq("id", questionId);
 
       if (error) throw error;
+      void logClientEvent("info", "join_like_question_success", {
+        seminar_id: id,
+        question_id: questionId,
+      });
     } catch (error: any) {
+      void logClientEvent("error", "join_like_question_failed", {
+        seminar_id: id,
+        question_id: questionId,
+        message: error?.message ?? "Unknown like error",
+      });
       console.error("Error liking question:", error.message);
     }
   };

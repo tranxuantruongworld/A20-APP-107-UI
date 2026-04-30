@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { logServerEvent } from "@/lib/logger";
 
 type OptimizeRequestBody = {
   content?: string;
@@ -13,8 +14,11 @@ type ExistingQuestion = {
 
 export async function POST(req: Request) {
   try {
+    await logServerEvent("info", "question_optimize_request_received");
+
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
+      await logServerEvent("error", "question_optimize_missing_gemini_key");
       return Response.json(
         { error: "Missing GEMINI_API_KEY on server." },
         { status: 500 },
@@ -27,6 +31,10 @@ export async function POST(req: Request) {
     const seminarId = body.seminar_id;
 
     if (!content || !seminarId) {
+      await logServerEvent("warn", "question_optimize_invalid_payload", {
+        has_content: Boolean(content),
+        has_seminar_id: Boolean(seminarId),
+      });
       return Response.json(
         { error: "content and seminar_id are required." },
         { status: 400 },
@@ -42,6 +50,9 @@ export async function POST(req: Request) {
         .limit(20);
 
     if (existingQuestionsError) {
+      await logServerEvent("error", "question_optimize_query_failed", {
+        message: existingQuestionsError.message,
+      });
       throw existingQuestionsError;
     }
 
@@ -83,6 +94,11 @@ ${JSON.stringify(oldQuestions)}
 
       const result = await aiResponse.json();
       if (!aiResponse.ok || result?.error) {
+        await logServerEvent("error", "question_optimize_ai_failed", {
+          status: aiResponse.status,
+          message:
+            result?.error?.message ?? "Failed to get AI optimization result.",
+        });
         throw new Error(
           result?.error?.message ?? "Failed to get AI optimization result.",
         );
@@ -103,6 +119,11 @@ ${JSON.stringify(oldQuestions)}
         row_id: matchedId,
       });
       if (rpcError) {
+        await logServerEvent("error", "question_optimize_increment_failed", {
+          message: rpcError.message,
+          matched_id: matchedId,
+          seminar_id: seminarId,
+        });
         throw rpcError;
       }
 
@@ -121,9 +142,17 @@ ${JSON.stringify(oldQuestions)}
         .single();
 
       if (insertError) {
+        await logServerEvent("error", "question_optimize_group_insert_failed", {
+          message: insertError.message,
+          seminar_id: seminarId,
+        });
         throw insertError;
       }
 
+      await logServerEvent("info", "question_optimize_grouped_success", {
+        seminar_id: seminarId,
+        parent_id: matchedId,
+      });
       return Response.json({ grouped: true, parent_id: matchedId, data });
     }
 
@@ -142,13 +171,24 @@ ${JSON.stringify(oldQuestions)}
       .single();
 
     if (insertError) {
+      await logServerEvent("error", "question_optimize_insert_failed", {
+        message: insertError.message,
+        seminar_id: seminarId,
+      });
       throw insertError;
     }
 
+    await logServerEvent("info", "question_optimize_created_success", {
+      seminar_id: seminarId,
+      grouped: false,
+    });
     return Response.json({ grouped: false, data });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unexpected server error.";
+    await logServerEvent("error", "question_optimize_unhandled_error", {
+      message,
+    });
     return Response.json({ error: message }, { status: 500 });
   }
 }

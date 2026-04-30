@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@axiomhq/js": "^1.6.0",
     "@clerk/nextjs": "^7.2.3",
     "@microsoft/clarity": "^1.0.2",
     "@ricky0123/vad-react": "^0.0.36",
