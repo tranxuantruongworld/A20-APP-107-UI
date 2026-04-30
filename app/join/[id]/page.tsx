@@ -251,23 +251,30 @@ export default function JoinRoom({ params }: PageProps) {
     setShowSentConfirmation(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "ai-question-optimizer",
-        {
-          body: {
-            content: questionText,
-            author_name: name.trim() || "Anonymous",
-            seminar_id: id,
-          },
+      const apiUrl = `${window.location.origin}/api/questions/optimize`;
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          content: questionText,
+          author_name: name.trim() || "Anonymous",
+          seminar_id: id,
+        }),
+      });
 
-      if (error) throw error;
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to submit question.");
+      }
 
       setContent("");
-    } catch (error: any) {
-      console.error("Error submitting question:", error.message);
-      alert("Error: " + error.message);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Unknown error occurred.";
+      console.error("Error submitting question:", message);
+      alert("Error: " + message);
     } finally {
       setIsSubmitting(false);
     }
