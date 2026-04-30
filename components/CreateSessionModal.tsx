@@ -226,7 +226,7 @@ export function CreateSessionModal({
             <div className="space-y-6 py-2">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Ten phien hoi thao
+                  Ten phien HoiThao
                 </label>
                 <input
                   type="text"

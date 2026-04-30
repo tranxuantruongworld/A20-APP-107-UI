@@ -253,7 +253,7 @@ export default function Home() {
                   <Star className="w-6 h-6 text-primary-foreground" />
                 </div>
                 <h1 className="text-xl md:text-2xl font-bold text-foreground">
-                  hoi thao
+                  HoiThao
                 </h1>
               </div>
 
@@ -928,7 +928,7 @@ export default function Home() {
                     <Star className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <span className="font-bold text-xl text-foreground">
-                    hoi thao
+                    HoiThao
                   </span>
                 </div>
                 <p className="text-muted-foreground mb-6 max-w-sm">

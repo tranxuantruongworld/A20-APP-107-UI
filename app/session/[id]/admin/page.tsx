@@ -1,36 +1,20 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import {
-  Settings,
   BarChart3,
   MessageCircle,
-  FileText,
-  HelpCircle,
-  Plus,
   ArrowLeft,
   Star,
+  Sparkles,
+  CheckCircle2,
 } from "lucide-react";
-import { InteractionSelector } from "@/components/InteractionSelector";
-import { PollConfigurator } from "@/components/PollConfigurator";
-import { InteractionsList } from "@/components/InteractionsList";
 import { QAAnalyticsDashboard } from "@/components/QAAnalyticsDashboard";
-import { MaterialsUpload } from "@/components/MaterialsUpload";
-import { OnboardingGuide } from "@/components/OnboardingGuide";
-import { QuestionClassificationSettings } from "@/components/QuestionClassificationSettings";
-import { createInteraction, INTERACTION_TEMPLATES } from "@/lib/interactions";
-import { InteractionType, PollConfig } from "@/lib/types/interactions";
-import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-type TabType =
-  | "interactions"
-  | "analytics"
-  | "settings"
-  | "materials"
-  | "guide";
+type TabType = "interactions" | "analytics";
 
 interface TabDef {
   id: TabType;
@@ -40,31 +24,9 @@ interface TabDef {
 
 export default function SessionAdminPage() {
   const { id } = useParams();
-  const router = useRouter();
   const t = useTranslations("adminPage");
   const [activeTab, setActiveTab] = useState<TabType>("interactions");
-  const [showSelector, setShowSelector] = useState(false);
-  const [creatingType, setCreatingType] = useState<InteractionType | null>(
-    null,
-  );
-  const [seminar, setSeminar] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchSeminar = async () => {
-      const { data } = await supabase
-        .from("seminars")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (data) setSeminar(data);
-      setLoading(false);
-    };
-
-    fetchSeminar();
-  }, [id]);
+  const seminarId = Array.isArray(id) ? id[0] : id;
 
   const tabs: TabDef[] = [
     {
@@ -77,50 +39,7 @@ export default function SessionAdminPage() {
       label: t("tabAnalytics"),
       icon: <BarChart3 className="w-4 h-4" />,
     },
-    {
-      id: "settings",
-      label: t("tabSettings"),
-      icon: <Settings className="w-4 h-4" />,
-    },
-    {
-      id: "materials",
-      label: t("tabMaterials"),
-      icon: <FileText className="w-4 h-4" />,
-    },
-    {
-      id: "guide",
-      label: t("tabGuide"),
-      icon: <HelpCircle className="w-4 h-4" />,
-    },
   ];
-
-  async function handleSelectInteractionType(type: InteractionType) {
-    setCreatingType(type);
-    setShowSelector(false);
-  }
-
-  async function handleCreatePoll(config: PollConfig) {
-    const success = await createInteraction(
-      id as string,
-      "poll",
-      "New Poll",
-      undefined,
-      config,
-    );
-    if (success) {
-      setCreatingType(null);
-    } else {
-      alert(t("failedToCreatePoll"));
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,7 +47,7 @@ export default function SessionAdminPage() {
       <div className="border-b border-border bg-card/80 backdrop-blur-xl px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
-            href={`/session/${id}`}
+            href={`/session/${seminarId}`}
             className="w-10 h-10 rounded-xl bg-secondary hover:bg-primary/10 hover:text-primary flex items-center justify-center text-foreground transition-all border border-border"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -139,7 +58,7 @@ export default function SessionAdminPage() {
             </div>
             <div>
               <span className="font-bold text-foreground text-lg tracking-tight">
-                hoi thao
+                HoiThao
               </span>
               <p className="text-xs text-muted-foreground">{t("adminPanel")}</p>
             </div>
@@ -151,9 +70,7 @@ export default function SessionAdminPage() {
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             LIVE
           </div>
-          <span className="font-semibold text-foreground">
-            {seminar?.title}
-          </span>
+          <span className="font-semibold text-foreground">{seminarId}</span>
         </div>
       </div>
 
@@ -162,7 +79,7 @@ export default function SessionAdminPage() {
           {/* Header */}
           <div className="px-5 py-4 border-b border-border bg-card">
             <h2 className="text-lg font-bold text-foreground">
-              {seminar?.title ? `${seminar.title} - Admin` : t("sessionAdmin")}
+              {t("sessionAdmin")}
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
               {t("manageDesc")}
@@ -192,35 +109,71 @@ export default function SessionAdminPage() {
             {/* Interactions Tab */}
             {activeTab === "interactions" && (
               <div className="space-y-4 max-w-4xl">
-                {!showSelector && !creatingType && (
-                  <button
-                    onClick={() => setShowSelector(true)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium text-sm"
-                  >
-                    <Plus className="w-4 h-4" />
-                    {t("addNewInteraction")}
-                  </button>
-                )}
-                {showSelector && (
-                  <div className="rounded-lg border border-border bg-card p-4">
-                    <InteractionSelector
-                      onSelect={handleSelectInteractionType}
-                    />
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-foreground">
+                        Upcoming Interactions Feature
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        This page currently shows an introduction and preview
+                        only. No interaction data is saved to Supabase yet.
+                      </p>
+                    </div>
                   </div>
-                )}
-                {creatingType === "poll" && (
-                  <div className="rounded-lg border border-border bg-card p-4">
-                    <PollConfigurator
-                      initialConfig={
-                        INTERACTION_TEMPLATES.poll.config as PollConfig
-                      }
-                      onSave={handleCreatePoll}
-                      onCancel={() => setCreatingType(null)}
-                    />
+                </div>
+
+                <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+                  <h4 className="font-semibold text-foreground">
+                    What it will include
+                  </h4>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {[
+                      "Live Poll creation",
+                      "Survey collection",
+                      "Word cloud responses",
+                      "Question classification controls",
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-foreground"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                        {item}
+                      </div>
+                    ))}
                   </div>
-                )}
-                <div>
-                  <InteractionsList seminarId={id as string} />
+                </div>
+
+                <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+                  <h4 className="font-semibold text-foreground">
+                    Example UI preview
+                  </h4>
+                  <div className="rounded-lg border border-dashed border-border p-4 bg-secondary/20">
+                    <p className="text-sm font-medium text-foreground">
+                      Example Poll: "Which topic should we cover next?"
+                    </p>
+                    <div className="mt-3 space-y-2">
+                      {[
+                        "AI in education",
+                        "Data analytics",
+                        "Cloud deployment",
+                      ].map((option, idx) => (
+                        <div
+                          key={option}
+                          className="h-8 rounded-md bg-muted flex items-center justify-between px-3 text-xs text-foreground"
+                        >
+                          <span>
+                            {idx + 1}. {option}
+                          </span>
+                          <span className="text-muted-foreground">demo</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -228,75 +181,7 @@ export default function SessionAdminPage() {
             {/* Analytics Tab */}
             {activeTab === "analytics" && (
               <div className="max-w-4xl">
-                <QAAnalyticsDashboard seminarId={id as string} />
-              </div>
-            )}
-
-            {/* Settings Tab */}
-            {activeTab === "settings" && (
-              <div className="space-y-4 max-w-4xl">
-                <QuestionClassificationSettings
-                  seminarId={id as string}
-                  onSettingChange={() => {}}
-                />
-                <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-                  <h3 className="font-semibold text-foreground">
-                    {t("advancedSettings")}
-                  </h3>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="rounded border-border"
-                      />
-                      <span className="text-sm text-foreground">
-                        {t("enablePolls")}
-                      </span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="rounded border-border"
-                      />
-                      <span className="text-sm text-foreground">
-                        {t("enableSurveys")}
-                      </span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="rounded border-border"
-                      />
-                      <span className="text-sm text-foreground">
-                        {t("enableWordCloud")}
-                      </span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="rounded border-border"
-                      />
-                      <span className="text-sm text-foreground">
-                        {t("allowAnonymousQuestions")}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Materials Tab */}
-            {activeTab === "materials" && (
-              <div className="max-w-4xl">
-                <MaterialsUpload seminarId={id as string} />
-              </div>
-            )}
-
-            {/* Guide Tab */}
-            {activeTab === "guide" && (
-              <div className="max-w-4xl">
-                <OnboardingGuide onClose={() => setActiveTab("interactions")} />
+                <QAAnalyticsDashboard seminarId={seminarId as string} />
               </div>
             )}
           </div>

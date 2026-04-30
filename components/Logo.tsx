@@ -1,11 +1,11 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 interface LogoProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   className?: string;
 }
 
-export function Logo({ size = 'medium', className = '' }: LogoProps) {
+export function Logo({ size = "medium", className = "" }: LogoProps) {
   const sizeMap = {
     small: { width: 32, height: 32 },
     medium: { width: 48, height: 48 },
@@ -18,13 +18,13 @@ export function Logo({ size = 'medium', className = '' }: LogoProps) {
     <div className={`flex items-center gap-2 ${className}`}>
       <Image
         src="/logo.png"
-        alt="hoi thao"
+        alt="HoiThao"
         width={dimensions.width}
         height={dimensions.height}
         className="object-contain"
         priority
       />
-      <span className="font-bold text-lg text-foreground">hoi thao</span>
+      <span className="font-bold text-lg text-foreground">HoiThao</span>
     </div>
   );
 }
