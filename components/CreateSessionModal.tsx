@@ -30,6 +30,7 @@ interface CreateSessionModalProps {
 
 export interface SessionConfig {
   title: string;
+  description: string;
   enableVoiceAI: boolean;
   enableUpload: boolean;
   uploadedFile?: File;
@@ -49,6 +50,7 @@ export function CreateSessionModal({
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState<SessionConfig>({
     title: "",
+    description: "",
     enableVoiceAI: true,
     enableUpload: false,
     voiceLanguage: "vi-VN",
@@ -238,7 +240,17 @@ export function CreateSessionModal({
                   className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                 />
               </div>
-
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Mo ta (Description)
+                </label>
+                <textarea
+                  placeholder="Noi dung chinh cua phien hoi thao nay la gi? (De AI cham diem lien quan chinh xac hon)"
+                  value={config.description}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground min-h-[100px] resize-y"
+                />
+              </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div
                   onClick={() =>
