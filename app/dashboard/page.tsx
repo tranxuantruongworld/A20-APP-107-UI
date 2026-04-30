@@ -85,6 +85,7 @@ export default function Dashboard() {
       .insert([
         {
           title,
+          description: config.description,
           code: roomCode,
           user_id: user.id,
           status: "live",
