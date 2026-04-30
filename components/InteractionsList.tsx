@@ -5,6 +5,7 @@ import { Play, X, BarChart3, Loader2 } from 'lucide-react';
 import { Interaction, InteractionType } from '@/lib/types/interactions';
 import { supabase } from '@/lib/supabase';
 import { activateInteraction, closeInteraction } from '@/lib/interactions';
+import { useTranslations } from 'next-intl';
 
 interface InteractionsListProps {
   seminarId: string;
@@ -19,18 +20,11 @@ const TYPE_COLORS: Record<InteractionType, string> = {
   wordcloud: 'bg-pink-500/10 text-pink-600 border-pink-500/20',
 };
 
-const TYPE_NAMES: Record<InteractionType, string> = {
-  qa: 'Q&A',
-  poll: 'Poll',
-  survey: 'Survey',
-  assessment: 'Quiz',
-  wordcloud: 'Word Cloud',
-};
-
 export function InteractionsList({
   seminarId,
   currentInteractionId,
 }: InteractionsListProps) {
+  const t = useTranslations();
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [activatingId, setActivatingId] = useState<string | null>(null);
@@ -89,7 +83,7 @@ export function InteractionsList({
     setActivatingId(id);
     const success = await activateInteraction(id, seminarId);
     if (!success) {
-      alert('Failed to activate interaction');
+      alert(t('interactions.activateFailed'));
     }
     setActivatingId(null);
   }
@@ -97,7 +91,7 @@ export function InteractionsList({
   async function handleClose(id: string) {
     const success = await closeInteraction(id);
     if (!success) {
-      alert('Failed to close interaction');
+      alert(t('interactions.closeFailed'));
     }
   }
 
@@ -113,7 +107,7 @@ export function InteractionsList({
     return (
       <div className="text-center py-8">
         <p className="text-sm text-muted-foreground">
-          No interactions created yet
+          {t('interactions.empty')}
         </p>
       </div>
     );
@@ -138,11 +132,11 @@ export function InteractionsList({
                     TYPE_COLORS[interaction.type]
                   }`}
                 >
-                  {TYPE_NAMES[interaction.type]}
+                  {t(`interactions.labels.${interaction.type}`)}
                 </span>
                 {interaction.is_active && (
                   <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-green-500/10 text-green-600 border border-green-500/20">
-                    Active
+                    {t('interactions.active')}
                   </span>
                 )}
               </div>
@@ -162,7 +156,7 @@ export function InteractionsList({
                   onClick={() => handleActivate(interaction.id)}
                   disabled={activatingId === interaction.id}
                   className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors disabled:opacity-50"
-                  title="Activate this interaction"
+                  title={t('interactions.activate')}
                 >
                   {activatingId === interaction.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -175,7 +169,7 @@ export function InteractionsList({
                 <button
                   onClick={() => handleClose(interaction.id)}
                   className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
-                  title="Close this interaction"
+                  title={t('interactions.close')}
                 >
                   <X className="w-4 h-4" />
                 </button>

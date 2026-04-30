@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { Interaction } from '@/lib/types/interactions';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from 'next-intl';
 
 interface WordCloudSubmissionProps {
   interaction: Interaction;
@@ -14,6 +15,7 @@ export function WordCloudSubmission({
   interaction,
   respondentId,
 }: WordCloudSubmissionProps) {
+  const t = useTranslations();
   const [word, setWord] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ export function WordCloudSubmission({
       setTimeout(() => setSubmitted(false), 3000);
     } catch (error) {
       console.error('Error submitting word:', error);
-      alert('Failed to submit word');
+      alert(t('wordCloud.submitFailed'));
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ export function WordCloudSubmission({
           type="text"
           value={word}
           onChange={(e) => setWord(e.target.value)}
-          placeholder="Type a word or phrase..."
+          placeholder={t('wordCloud.placeholder')}
           maxLength={50}
           disabled={loading}
           className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none disabled:opacity-50"
@@ -78,12 +80,12 @@ export function WordCloudSubmission({
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Submitting...
+              {t('wordCloud.submitting')}
             </>
           ) : (
             <>
               <Send className="w-4 h-4" />
-              Submit
+              {t('wordCloud.submit')}
             </>
           )}
         </button>
@@ -91,7 +93,7 @@ export function WordCloudSubmission({
 
       {submitted && (
         <p className="text-center text-sm text-green-600 font-medium">
-          Word submitted! It will appear in the cloud shortly.
+          {t('wordCloud.success')}
         </p>
       )}
     </div>

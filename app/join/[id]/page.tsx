@@ -146,13 +146,11 @@ export default function JoinRoom({ params }: PageProps) {
   useEffect(() => {
     if (isSeminarEnded && !endNoticeShown) {
       setToastType("info");
-      setToastMessage(
-        "Seminar da ket thuc. Ban van xem duoc noi dung, nhung khong the gui cau hoi hoac voice.",
-      );
+      setToastMessage(t("join.endNotice"));
       setShowSentConfirmation(true);
       setEndNoticeShown(true);
     }
-  }, [isSeminarEnded, endNoticeShown]);
+  }, [isSeminarEnded, endNoticeShown, t]);
 
   useEffect(() => {
     if (scrollRef.current)
@@ -221,7 +219,7 @@ export default function JoinRoom({ params }: PageProps) {
   const toggleMicrophone = () => {
     if (isSeminarEnded) {
       setToastType("error");
-      setToastMessage("Seminar da ket thuc, khong the su dung voice input.");
+      setToastMessage(t("join.voiceEnded"));
       setShowSentConfirmation(true);
       return;
     }
@@ -253,18 +251,16 @@ export default function JoinRoom({ params }: PageProps) {
         seminar_id: id,
       });
       setToastType("error");
-      setToastMessage("Seminar da ket thuc, khong the gui cau hoi moi.");
+      setToastMessage(t("join.submitEnded"));
       setShowSentConfirmation(true);
       return;
     }
     if (!content.trim() || isSubmitting) return;
     setIsSubmitting(true);
 
-    // Clear input field immediately (optimistic UI)
     const questionText = content.trim();
     setContent("");
 
-    // Show confirmation toast
     setToastType("success");
     setToastMessage(t("join.questionSent"));
     setShowSentConfirmation(true);
@@ -278,14 +274,14 @@ export default function JoinRoom({ params }: PageProps) {
         },
         body: JSON.stringify({
           content: questionText,
-          author_name: name.trim() || "Anonymous",
+          author_name: name.trim() || t("join.anonymous"),
           seminar_id: id,
         }),
       });
 
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result?.error || "Failed to submit question.");
+        throw new Error(result?.error || t("join.submitFailed"));
       }
 
       void logClientEvent("info", "join_submit_question_success", {
@@ -294,20 +290,22 @@ export default function JoinRoom({ params }: PageProps) {
       setContent("");
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Unknown error occurred.";
+        error instanceof Error ? error.message : t("join.unknownError");
       void logClientEvent("error", "join_submit_question_failed", {
         seminar_id: id,
         message,
       });
       console.error("Error submitting question:", message);
-      alert("Error: " + message);
+      setToastType("error");
+      setToastMessage(message);
+      setShowSentConfirmation(true);
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const handleLike = async (questionId: string, currentLikes: number) => {
     try {
-      // We target the new 'likes' column specifically
       const { error } = await supabase
         .from("questions")
         .update({ likes: (currentLikes || 0) + 1 })
@@ -327,6 +325,7 @@ export default function JoinRoom({ params }: PageProps) {
       console.error("Error liking question:", error.message);
     }
   };
+
   if (loading)
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-background">
@@ -349,7 +348,6 @@ export default function JoinRoom({ params }: PageProps) {
 
   return (
     <div className="h-[100dvh] w-screen overflow-hidden bg-background flex flex-col">
-      {/* Header */}
       <header className="bg-card/80 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shrink-0">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -373,12 +371,12 @@ export default function JoinRoom({ params }: PageProps) {
                 {isSeminarEnded ? (
                   <span className="text-xs font-bold text-amber-700 uppercase tracking-wider flex items-center gap-1.5 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-300">
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    Ended
+                    {t("join.ended")}
                   </span>
                 ) : (
                   <span className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5 bg-accent/20 px-3 py-1.5 rounded-lg border border-accent/30">
                     <span className="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
-                    Live
+                    {t("join.live")}
                   </span>
                 )}
               </div>
@@ -397,7 +395,6 @@ export default function JoinRoom({ params }: PageProps) {
         </div>
       </header>
 
-      {/* Questions Area */}
       <main className="flex-1 overflow-hidden relative flex flex-col">
         <div
           ref={scrollRef}
@@ -407,11 +404,10 @@ export default function JoinRoom({ params }: PageProps) {
             {isSeminarEnded && (
               <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900 text-sm font-medium flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-                Seminar da ket thuc. Ban van theo doi duoc noi dung va cau hoi da
-                co, nhung khong the gui cau hoi moi hoac su dung voice.
+                {t("join.endedBanner")}
               </div>
             )}
-            {/* Active Interaction Display */}
+
             {activeInteraction && (
               <ActiveInteractionDisplay
                 seminarId={id}
@@ -460,7 +456,6 @@ export default function JoinRoom({ params }: PageProps) {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      {/* INTERESTED BADGE */}
                       {q.group_count > 1 && (
                         <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-bold border border-primary/20 shadow-sm">
                           <Users size={14} />
@@ -469,7 +464,6 @@ export default function JoinRoom({ params }: PageProps) {
                           </span>
                         </div>
                       )}
-                      {/* LIKE BUTTON - Now on the right with a recognizable Heart icon */}
                       <button
                         onClick={() => handleLike(q.id, q.likes)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-pink-200 bg-pink-50 text-pink-600 transition-all active:scale-90 hover:bg-pink-100"
@@ -515,7 +509,6 @@ export default function JoinRoom({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Input Area */}
         <div className="absolute bottom-0 left-0 right-0 z-50 p-6 bg-gradient-to-t from-background via-background to-transparent pt-20">
           <div className="max-w-2xl mx-auto">
             <div className="bg-card rounded-2xl border-2 border-primary/30 p-4 shadow-xl shadow-primary/10">
@@ -531,11 +524,11 @@ export default function JoinRoom({ params }: PageProps) {
                   <div className="relative w-full">
                     <input
                       required
-                      placeholder={
+                      placeholder={t(
                         isListening
-                          ? "(Listening...) Đang nghe..."
-                          : "Ask a question..."
-                      }
+                          ? "join.listeningPlaceholder"
+                          : "join.questionPlaceholder",
+                      )}
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       className="bg-transparent py-1 text-base outline-none font-semibold text-foreground placeholder:text-muted-foreground w-full"
@@ -543,7 +536,6 @@ export default function JoinRoom({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* Microphone Button */}
                 {speechSupported && (
                   <button
                     type="button"
@@ -554,11 +546,11 @@ export default function JoinRoom({ params }: PageProps) {
                         ? "bg-secondary text-primary animate-pulse shadow-inner border border-primary/20"
                         : "bg-secondary hover:bg-secondary/80 text-foreground"
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    title={
+                    title={t(
                       isListening
-                        ? "Click to stop listening"
-                        : "Click to start voice input"
-                    }
+                        ? "join.stopListening"
+                        : "join.startVoiceInput",
+                    )}
                   >
                     {isListening ? (
                       <MicOff size={22} className="opacity-70" />
@@ -601,7 +593,6 @@ export default function JoinRoom({ params }: PageProps) {
         </div>
       </main>
 
-      {/* Toast Notification */}
       <Toast
         message={toastMessage || t("join.questionSent")}
         isVisible={showSentConfirmation}

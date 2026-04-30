@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Interaction, PollConfig } from '@/lib/types/interactions';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from 'next-intl';
 
 interface PollVotingProps {
   interaction: Interaction;
@@ -16,6 +17,7 @@ export function PollVoting({
   respondentId,
   respondentName,
 }: PollVotingProps) {
+  const t = useTranslations();
   const [selectedOptions, setSelectedOptions] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,7 @@ export function PollVoting({
         interaction_id: interaction.id,
         option_index: optionIndex,
         respondent_id: respondentId || null,
-        respondent_name: respondentName || 'Anonymous',
+        respondent_name: respondentName || t('join.anonymous'),
         is_anonymous: !respondentId,
       }));
 
@@ -59,7 +61,7 @@ export function PollVoting({
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting poll response:', error);
-      alert('Failed to submit vote');
+      alert(t('poll.submitFailed'));
     } finally {
       setLoading(false);
     }
@@ -119,20 +121,20 @@ export function PollVoting({
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Submitting...
+                {t('poll.submitting')}
               </>
             ) : (
-              'Vote'
+              t('poll.vote')
             )}
           </button>
         </div>
       ) : (
         <div className="text-center py-6 space-y-2">
-          <p className="text-green-600 font-medium">Thank you for voting!</p>
+          <p className="text-green-600 font-medium">{t('poll.thanks')}</p>
           <p className="text-sm text-muted-foreground">
             {config.show_results === 'live'
-              ? 'Results are being updated live'
-              : 'Results will be revealed when the poll closes'}
+              ? t('poll.resultsLive')
+              : t('poll.resultsClosed')}
           </p>
         </div>
       )}

@@ -78,7 +78,13 @@ export default function Dashboard() {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const title =
       config.title ||
-      `Phien ${new Date().toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" })}`;
+      t("dashboard.defaultSessionTitle", {
+        date: new Date().toLocaleDateString(locale, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+      });
 
     const { data, error } = await supabase
       .from("seminars")
@@ -122,38 +128,30 @@ export default function Dashboard() {
     {
       step: 1,
       icon: Settings,
-      title: "Tao phien & Upload slide",
-      description:
-        "Tao phien moi, upload ban thuyet trinh de AI trich xuat keyword va cau hoi goi y",
-      detail:
-        "AI se phan tich noi dung slide va trich xuat cac tu khoa quan trong, dong thoi tao ra cac cau hoi mau giup khan gia co dinh huong dat cau hoi.",
+      title: t("dashboard.voiceDemo.step1"),
+      description: t("dashboard.voiceDemo.step1Desc"),
+      detail: t("dashboard.voiceDemo.step1Detail"),
     },
     {
       step: 2,
       icon: QrCode,
-      title: "Chia se QR Code",
-      description:
-        "Hien thi QR code hoac chia se ma phong de khan gia tham gia",
-      detail:
-        "Khan gia quet QR hoac nhap ma phong tren dien thoai de gui cau hoi. Co the gui an danh hoac dang ky ten.",
+      title: t("dashboard.voiceDemo.step2"),
+      description: t("dashboard.voiceDemo.step2Desc"),
+      detail: t("dashboard.voiceDemo.step2Detail"),
     },
     {
       step: 3,
       icon: Mic,
-      title: "Bat Voice AI",
-      description:
-        "Bat mic de AI nhan dien giong noi dien gia va khan gia trong thoi gian thuc",
-      detail:
-        "He thong se tu dong phan biet giong noi cua dien gia (nguoi dang trinh bay) va khan gia (nguoi dat cau hoi). Cau hoi se duoc ghi nhan va cau tra loi se duoc ghep tu dong.",
+      title: t("dashboard.voiceDemo.step3"),
+      description: t("dashboard.voiceDemo.step3Desc"),
+      detail: t("dashboard.voiceDemo.step3Detail"),
     },
     {
       step: 4,
       icon: Brain,
-      title: "AI tu dong xu ly",
-      description:
-        "AI phan loai, gom nhom cau hoi tuong tu va ghep cau tra loi tu dong",
-      detail:
-        "Cac cau hoi giong nhau se duoc gom lai, cau hoi duoc nhieu nguoi quan tam se duoc uu tien. Khi dien gia tra loi, AI se tu dong khop cau tra loi voi cau hoi tuong ung.",
+      title: t("dashboard.voiceDemo.step4"),
+      description: t("dashboard.voiceDemo.step4Desc"),
+      detail: t("dashboard.voiceDemo.step4Detail"),
     },
   ];
 
@@ -198,7 +196,7 @@ export default function Dashboard() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/30 text-xs font-medium text-foreground mb-4">
               <Star className="w-3 h-3 text-accent" />
-              Dashboard
+              {t("dashboard.title")}
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-2">
               {t("dashboard.welcomeBack")}{" "}
@@ -230,10 +228,10 @@ export default function Dashboard() {
             </div>
             <div className="text-left">
               <h3 className="font-bold text-foreground">
-                Huong dan su dung Voice HoiThao
+                {t("dashboard.voiceDemo.title")}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Xem cach Voice AI hoat dong trong phien HoiThao
+                {t("dashboard.voiceDemo.subtitle")}
               </p>
             </div>
             {showDemoFlow ? (
@@ -260,7 +258,9 @@ export default function Dashboard() {
                           <item.icon className="w-5 h-5 text-primary" />
                         </div>
                         <span className="text-xs font-bold text-primary">
-                          Buoc {item.step}
+                          {t("dashboard.voiceDemo.stepLabel", {
+                            step: item.step,
+                          })}
                         </span>
                       </div>
                       <h4 className="font-bold text-foreground text-sm mb-2">
@@ -278,7 +278,7 @@ export default function Dashboard() {
               <div className="border-t border-border pt-6">
                 <h4 className="font-bold text-foreground mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-accent" />
-                  Demo chi tiet: Cach Voice AI phan loai cau hoi va tra loi
+                  {t("dashboard.voiceDemo.detailTitle")}
                 </h4>
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Speaker Detection */}
@@ -289,25 +289,24 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <span className="text-xs font-bold text-primary uppercase tracking-wider">
-                          Dien gia
+                          {t("dashboard.voiceDemo.speakerLabel")}
                         </span>
                         <p className="text-sm text-foreground font-medium">
-                          Nguoi dang trinh bay
+                          {t("dashboard.voiceDemo.speakerRole")}
                         </p>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="p-3 rounded-xl bg-card border border-border">
                         <p className="text-sm text-foreground italic">
-                          &quot;Cam on cau hoi cua ban. Ve van de bao mat, chung
-                          toi su dung ma hoa AES-256...&quot;
+                          &quot;{t("dashboard.voiceDemo.speakerQuote")}&quot;
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-foreground font-bold">
-                            Cau tra loi
+                            {t("dashboard.voiceDemo.answerBadge")}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            Tu dong ghep voi cau hoi ve bao mat
+                            {t("dashboard.voiceDemo.autoMatchedAnswer")}
                           </span>
                         </div>
                       </div>
@@ -322,25 +321,24 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <span className="text-xs font-bold text-accent uppercase tracking-wider">
-                          Khan gia
+                          {t("dashboard.voiceDemo.audienceLabel")}
                         </span>
                         <p className="text-sm text-foreground font-medium">
-                          Nguoi tham du
+                          {t("dashboard.voiceDemo.audienceRole")}
                         </p>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="p-3 rounded-xl bg-card border border-border">
                         <p className="text-sm text-foreground italic">
-                          &quot;Toi muon hoi ve van de bao mat du lieu nguoi
-                          dung?&quot;
+                          &quot;{t("dashboard.voiceDemo.audienceQuote")}&quot;
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-foreground font-bold">
-                            Cau hoi moi
+                            {t("dashboard.voiceDemo.newQuestionBadge")}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            +3 nguoi cung hoi tuong tu
+                            {t("dashboard.voiceDemo.similarAudience")}
                           </span>
                         </div>
                       </div>
@@ -353,7 +351,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-3 mb-4">
                     <Brain className="w-6 h-6 text-primary" />
                     <span className="font-bold text-foreground">
-                      AI tu dong khop cau tra loi
+                      {t("dashboard.voiceDemo.autoMatchTitle")}
                     </span>
                   </div>
                   <div className="flex flex-col md:flex-row items-center gap-4">
@@ -361,11 +359,11 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2 mb-2">
                         <Users className="w-4 h-4 text-accent" />
                         <span className="text-xs font-bold text-muted-foreground">
-                          CAU HOI
+                          {t("dashboard.voiceDemo.questionLabel")}
                         </span>
                       </div>
                       <p className="text-sm text-foreground">
-                        &quot;Lam sao de dam bao du lieu khong bi ro ri?&quot;
+                        &quot;{t("dashboard.voiceDemo.questionQuote")}&quot;
                       </p>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0">
@@ -375,12 +373,11 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2 mb-2">
                         <Check className="w-4 h-4 text-accent" />
                         <span className="text-xs font-bold text-accent">
-                          AI MATCHED
+                          {t("dashboard.voiceDemo.aiMatched")}
                         </span>
                       </div>
                       <p className="text-sm text-foreground">
-                        &quot;...chung toi su dung ma hoa AES-256 va audit log
-                        cho moi truy cap...&quot;
+                        &quot;{t("dashboard.voiceDemo.answerQuote")}&quot;
                       </p>
                     </div>
                   </div>
@@ -418,7 +415,7 @@ export default function Dashboard() {
               {liveSessions > 0 && (
                 <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/20 text-xs font-bold text-foreground">
                   <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                  Live
+                  {t("dashboard.liveBadge")}
                 </span>
               )}
             </div>
@@ -453,8 +450,8 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Upload Presentation Feature */}
           <div className="bg-card rounded-2xl border border-border p-6 relative overflow-hidden group hover:border-primary/30 transition-colors">
-            <div className="absolute top-4 right-4 px-2 py-1 rounded-full bg-primary/10 text-xs font-bold text-primary">
-              Moi
+              <div className="absolute top-4 right-4 px-2 py-1 rounded-full bg-primary/10 text-xs font-bold text-primary">
+              {t("dashboard.newBadge")}
             </div>
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -462,11 +459,10 @@ export default function Dashboard() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-foreground text-lg mb-2">
-                  Upload ban thuyet trinh
+                  {t("dashboard.uploadFeature.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  AI se trich xuat keyword tu slide de cai thien do chinh xac
-                  nhan dien giong noi va tao cau hoi goi y cho khan gia.
+                  {t("dashboard.uploadFeature.description")}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground border border-border">
@@ -483,7 +479,7 @@ export default function Dashboard() {
                   onClick={() => setShowCreateModal(true)}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
-                  Thu ngay
+                  {t("dashboard.tryNow")}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -501,28 +497,27 @@ export default function Dashboard() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-foreground text-lg mb-2">
-                  Voice HoiThao
+                  {t("dashboard.voiceFeature.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Tu dong nhan dien giong noi, phan biet dien gia va khan gia.
-                  AI se ghep cau tra loi voi cau hoi tuong ung.
+                  {t("dashboard.voiceFeature.description")}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground border border-border">
-                    Tieng Viet
+                    {t("createSession.vietnamese")}
                   </span>
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground border border-border">
-                    English
+                    {t("createSession.english")}
                   </span>
                   <span className="px-3 py-1.5 rounded-full bg-secondary text-xs font-medium text-foreground border border-border">
-                    Realtime
+                    {t("dashboard.realtime")}
                   </span>
                 </div>
                 <button
                   onClick={() => setShowCreateModal(true)}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
                 >
-                  Bat dau su dung
+                  {t("dashboard.startUsing")}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -539,7 +534,7 @@ export default function Dashboard() {
             </h2>
             {seminars.length > 0 && (
               <span className="text-sm text-muted-foreground">
-                {seminars.length} phien
+                {t("dashboard.sessionCount", {count: seminars.length})}
               </span>
             )}
           </div>
@@ -564,7 +559,7 @@ export default function Dashboard() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full transition-all shadow-lg shadow-primary/25"
               >
                 <PlusCircle className="w-4 h-4" />
-                Tao phien dau tien
+                {t("dashboard.createFirstSession")}
               </button>
             </div>
           ) : (

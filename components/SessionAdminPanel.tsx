@@ -51,27 +51,27 @@ export function SessionAdminPanel({
   const tabs: TabDef[] = [
     {
       id: 'interactions',
-      label: 'Interactions',
+      label: t('adminPage.tabInteractions'),
       icon: <MessageCircle className="w-4 h-4" />,
     },
     {
       id: 'analytics',
-      label: 'Analytics',
+      label: t('adminPage.tabAnalytics'),
       icon: <BarChart3 className="w-4 h-4" />,
     },
     {
       id: 'settings',
-      label: 'Settings',
+      label: t('adminPage.tabSettings'),
       icon: <Settings className="w-4 h-4" />,
     },
     {
       id: 'materials',
-      label: 'Materials',
+      label: t('adminPage.tabMaterials'),
       icon: <FileText className="w-4 h-4" />,
     },
     {
       id: 'guide',
-      label: 'Guide',
+      label: t('adminPage.tabGuide'),
       icon: <HelpCircle className="w-4 h-4" />,
     },
   ];
@@ -85,7 +85,7 @@ export function SessionAdminPanel({
     const success = await createInteraction(
       seminarId,
       'poll',
-      'New Poll',
+      t('adminPage.newPoll'),
       undefined,
       config
     );
@@ -94,7 +94,7 @@ export function SessionAdminPanel({
       setCreatingType(null);
       // Interactions list will update via real-time subscription
     } else {
-      alert('Failed to create poll');
+      alert(t('adminPage.failedToCreatePoll'));
     }
   }
 
@@ -103,10 +103,12 @@ export function SessionAdminPanel({
       {/* Header */}
       <div className="px-5 py-4 border-b border-border bg-card">
         <h2 className="text-lg font-bold text-foreground">
-          {seminarTitle ? `${seminarTitle} - Admin` : 'Session Admin'}
+          {seminarTitle
+            ? `${seminarTitle} - ${t('adminPage.adminPanel')}`
+            : t('adminPage.sessionAdmin')}
         </h2>
         <p className="text-xs text-muted-foreground mt-1">
-          Manage interactions, analytics, and settings
+          {t('adminPage.manageDesc')}
         </p>
       </div>
 
@@ -144,7 +146,7 @@ export function SessionAdminPanel({
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium text-sm"
               >
                 <Plus className="w-4 h-4" />
-                Add New Interaction
+                {t('adminPage.addNewInteraction')}
               </button>
             )}
 
@@ -192,7 +194,7 @@ export function SessionAdminPanel({
             />
             <div className="rounded-lg border border-border bg-card p-4 space-y-4">
               <h3 className="font-semibold text-foreground">
-                Advanced Settings
+                {t('adminPage.advancedSettings')}
               </h3>
               <div className="space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer">
@@ -202,7 +204,7 @@ export function SessionAdminPanel({
                     className="rounded border-border"
                   />
                   <span className="text-sm text-foreground">
-                    Enable Polls
+                    {t('adminPage.enablePolls')}
                   </span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
@@ -211,7 +213,7 @@ export function SessionAdminPanel({
                     className="rounded border-border"
                   />
                   <span className="text-sm text-foreground">
-                    Enable Surveys
+                    {t('adminPage.enableSurveys')}
                   </span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
@@ -220,7 +222,7 @@ export function SessionAdminPanel({
                     className="rounded border-border"
                   />
                   <span className="text-sm text-foreground">
-                    Enable Word Cloud
+                    {t('adminPage.enableWordCloud')}
                   </span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
@@ -229,7 +231,7 @@ export function SessionAdminPanel({
                     className="rounded border-border"
                   />
                   <span className="text-sm text-foreground">
-                    Allow Anonymous Questions
+                    {t('adminPage.allowAnonymousQuestions')}
                   </span>
                 </label>
               </div>

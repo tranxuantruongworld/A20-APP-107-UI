@@ -19,7 +19,7 @@ import {
   Play,
   Info,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface CreateSessionModalProps {
   isOpen: boolean;
@@ -48,6 +48,7 @@ export function CreateSessionModal({
   isCreating = false,
 }: CreateSessionModalProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState<SessionConfig>({
     title: "",
@@ -77,11 +78,21 @@ export function CreateSessionModal({
       "Transformer",
     ],
     questions: [
-      "Machine Learning va Deep Learning khac nhau nhu the nao?",
-      "Lam the nao de chon mo hinh AI phu hop cho bai toan?",
-      "Du lieu training can bao nhieu de dat hieu qua tot?",
-      "Cac thach thuc pho bien khi trien khai AI la gi?",
-      "Transformer architecture hoat dong nhu the nao?",
+      locale === "vi"
+        ? "Machine Learning và Deep Learning khác nhau như thế nào?"
+        : "What is the difference between Machine Learning and Deep Learning?",
+      locale === "vi"
+        ? "Làm thế nào để chọn mô hình AI phù hợp cho bài toán?"
+        : "How do you choose the right AI model for a problem?",
+      locale === "vi"
+        ? "Dữ liệu huấn luyện cần bao nhiêu để đạt hiệu quả tốt?"
+        : "How much training data is needed for strong results?",
+      locale === "vi"
+        ? "Các thách thức phổ biến khi triển khai AI là gì?"
+        : "What are common challenges when deploying AI?",
+      locale === "vi"
+        ? "Kiến trúc Transformer hoạt động như thế nào?"
+        : "How does Transformer architecture work?",
     ],
   };
 
@@ -149,7 +160,9 @@ export function CreateSessionModal({
     if (!config.title.trim()) {
       setConfig((prev) => ({
         ...prev,
-        title: `Phien ${new Date().toLocaleDateString("vi-VN")}`,
+        title: t("createSession.defaultSessionTitle", {
+          date: new Date().toLocaleDateString(locale),
+        }),
       }));
     }
     onCreateSession(config);
@@ -175,10 +188,10 @@ export function CreateSessionModal({
             </div>
             <div>
               <h2 className="text-xl font-bold text-foreground">
-                Tao phien moi
+                {t("createSession.title")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Cau hinh truoc khi bat dau
+                {t("createSession.subtitle")}
               </p>
             </div>
           </div>
@@ -208,10 +221,10 @@ export function CreateSessionModal({
                   className={`text-sm font-medium ${step >= s ? "text-foreground" : "text-muted-foreground"}`}
                 >
                   {s === 1
-                    ? "Thong tin"
+                    ? t("createSession.step1")
                     : s === 2
-                      ? "Upload slide"
-                      : "Cau hinh"}
+                      ? t("createSession.step2")
+                      : t("createSession.step3")}
                 </span>
                 {s < 3 && (
                   <div
@@ -230,11 +243,11 @@ export function CreateSessionModal({
             <div className="space-y-6 py-2">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Ten phien HoiThao
+                  {t("createSession.sessionName")}
                 </label>
                 <input
                   type="text"
-                  placeholder="vd: Workshop AI & Machine Learning"
+                  placeholder={t("createSession.sessionNamePlaceholder")}
                   value={config.title}
                   onChange={(e) =>
                     setConfig((prev) => ({ ...prev, title: e.target.value }))
@@ -245,7 +258,7 @@ export function CreateSessionModal({
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Thoi gian ket thuc (tuy chon)
+                  {t("createSession.endTimeLabel")}
                 </label>
                 <input
                   type="datetime-local"
@@ -256,17 +269,16 @@ export function CreateSessionModal({
                   className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Khi den moc nay, nguoi tham gia van xem duoc seminar nhung se
-                  khong gui them cau hoi/voice.
+                  {t("createSession.endTimeHelp")}
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Mo ta (Description)
+                  {t("createSession.descriptionLabel")}
                 </label>
                 <textarea
-                  placeholder="Noi dung chinh cua phien hoi thao nay la gi? (De AI cham diem lien quan chinh xac hon)"
+                  placeholder={t("createSession.descriptionPlaceholder")}
                   value={config.description}
                   onChange={(e) => setConfig((prev) => ({ ...prev, description: e.target.value }))}
                   className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground min-h-[100px] resize-y"
@@ -302,15 +314,17 @@ export function CreateSessionModal({
                       )}
                     </div>
                   </div>
-                  <h3 className="font-bold text-foreground mb-1">Voice AI</h3>
+                  <h3 className="font-bold text-foreground mb-1">
+                    {t("createSession.voiceAI")}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
-                    Tu dong nhan dien giong noi va phan loai cau hoi/tra loi
+                    {t("createSession.voiceAIDesc")}
                   </p>
                 </div>
 
                 <div className="p-5 rounded-2xl border-2 border-border bg-secondary/20 relative overflow-hidden">
                   <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-accent/20 text-xs font-bold text-foreground">
-                    Sap ra mat
+                    {t("createSession.comingSoon")}
                   </div>
                   <div className="flex items-center justify-between mb-3 opacity-50">
                     <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
@@ -318,10 +332,10 @@ export function CreateSessionModal({
                     </div>
                   </div>
                   <h3 className="font-bold text-foreground mb-1 opacity-50">
-                    Live Polling
+                    {t("createSession.livePoll")}
                   </h3>
                   <p className="text-sm text-muted-foreground opacity-50">
-                    Tao khao sat va quiz thoi gian thuc
+                    {t("createSession.livePollDesc")}
                   </p>
                 </div>
               </div>
@@ -330,12 +344,10 @@ export function CreateSessionModal({
                 <Info className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm text-foreground font-medium">
-                    Tinh nang Voice AI
+                    {t("createSession.voiceAI")}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Khi bat Voice AI, he thong se tu dong nhan dien giong noi
-                    cua dien gia va khan gia, phan loai noi dung thanh cau hoi
-                    hoac cau tra loi.
+                    {t("createSession.voiceAIInfo")}
                   </p>
                 </div>
               </div>
@@ -347,11 +359,10 @@ export function CreateSessionModal({
             <div className="space-y-6 py-2">
               <div className="text-center mb-4">
                 <h3 className="text-lg font-bold text-foreground mb-2">
-                  Upload ban thuyet trinh
+                  {t("createSession.uploadTitle")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  AI se trich xuat keyword va tao cau hoi goi y tu noi dung
-                  slide cua ban
+                  {t("createSession.uploadDesc")}
                 </p>
               </div>
 
@@ -370,12 +381,14 @@ export function CreateSessionModal({
                     <Upload className="w-8 h-8 text-muted-foreground" />
                   </div>
                   <p className="font-medium text-foreground mb-2">
-                    Keo tha file vao day
+                    {t("createSession.dragDrop")}
                   </p>
-                  <p className="text-sm text-muted-foreground mb-4">hoac</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {t("createSession.or")}
+                  </p>
                   <label className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full cursor-pointer transition-all">
                     <FileText className="w-5 h-5" />
-                    Chon file
+                    {t("createSession.selectFile")}
                     <input
                       type="file"
                       accept=".pdf,.ppt,.pptx"
@@ -384,7 +397,7 @@ export function CreateSessionModal({
                     />
                   </label>
                   <p className="text-xs text-muted-foreground mt-4">
-                    Ho tro: PDF, PPT, PPTX (toi da 50MB)
+                    {t("createSession.supportedFormats")}
                   </p>
                 </div>
               ) : (
@@ -411,7 +424,7 @@ export function CreateSessionModal({
                       </div>
                     ) : (
                       <span className="px-3 py-1 rounded-full bg-accent/20 text-xs font-bold text-foreground">
-                        Da xu ly
+                        {t("createSession.processed")}
                       </span>
                     )}
                   </div>
@@ -421,7 +434,7 @@ export function CreateSessionModal({
                       <div className="flex items-center gap-3 mb-4">
                         <Brain className="w-6 h-6 text-primary animate-pulse" />
                         <span className="font-bold text-foreground">
-                          AI dang phan tich...
+                          {t("createSession.processing")}
                         </span>
                       </div>
                       <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
@@ -431,7 +444,7 @@ export function CreateSessionModal({
                         />
                       </div>
                       <p className="text-sm text-muted-foreground mt-3">
-                        Dang trich xuat keyword va tao cau hoi goi y...
+                        {t("createSession.processingDesc")}
                       </p>
                     </div>
                   )}
@@ -443,7 +456,7 @@ export function CreateSessionModal({
                         <div className="flex items-center gap-2 mb-3">
                           <Sparkles className="w-5 h-5 text-accent" />
                           <span className="font-bold text-foreground">
-                            Keyword da trich xuat
+                            {t("createSession.extractedKeywords")}
                           </span>
                           <span className="px-2 py-0.5 rounded-full bg-accent/20 text-xs font-bold text-foreground">
                             {config.extractedKeywords.length}
@@ -460,8 +473,7 @@ export function CreateSessionModal({
                           ))}
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">
-                          Cac keyword nay se giup Voice AI nhan dien chinh xac
-                          hon
+                          {t("createSession.keywordsHelp")}
                         </p>
                       </div>
 
@@ -470,7 +482,7 @@ export function CreateSessionModal({
                         <div className="flex items-center gap-2 mb-3">
                           <MessageCircle className="w-5 h-5 text-primary" />
                           <span className="font-bold text-foreground">
-                            Cau hoi goi y
+                            {t("createSession.suggestedQuestions")}
                           </span>
                           <span className="px-2 py-0.5 rounded-full bg-primary/20 text-xs font-bold text-foreground">
                             {config.suggestedQuestions?.length}
@@ -487,7 +499,7 @@ export function CreateSessionModal({
                           ))}
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">
-                          Cau hoi nay co the duoc hien thi de khan gia tham khao
+                          {t("createSession.questionsHelp")}
                         </p>
                       </div>
                     </>
@@ -499,7 +511,7 @@ export function CreateSessionModal({
                 onClick={() => setStep(3)}
                 className="w-full py-3 bg-secondary hover:bg-secondary/80 text-foreground font-medium rounded-xl transition-colors text-sm"
               >
-                Bo qua buoc nay
+                {t("createSession.skipStep")}
               </button>
             </div>
           )}
@@ -509,12 +521,12 @@ export function CreateSessionModal({
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-3">
-                  Ngon ngu nhan dien giong noi
+                  {t("createSession.voiceLanguage")}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { code: "vi-VN", label: "Tieng Viet" },
-                    { code: "en-US", label: "English" },
+                    { code: "vi-VN", label: t("createSession.vietnamese") },
+                    { code: "en-US", label: t("createSession.english") },
                   ].map((lang) => (
                     <button
                       key={lang.code}
@@ -540,24 +552,24 @@ export function CreateSessionModal({
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-3">
-                  Muc do kiem duyet AI
+                  {t("createSession.moderationLevel")}
                 </label>
                 <div className="space-y-3">
                   {[
                     {
                       level: "strict" as const,
-                      label: "Chat che",
-                      desc: "Loc nghiem ngat tat ca noi dung khong phu hop",
+                      label: t("createSession.strict"),
+                      desc: t("createSession.strictDesc"),
                     },
                     {
                       level: "moderate" as const,
-                      label: "Vua phai",
-                      desc: "Can bang giua kiem duyet va tu do bieu dat",
+                      label: t("createSession.moderate"),
+                      desc: t("createSession.moderateDesc"),
                     },
                     {
                       level: "relaxed" as const,
-                      label: "Nhe nhang",
-                      desc: "Chi loc nhung noi dung vi pham nghiem trong",
+                      label: t("createSession.relaxed"),
+                      desc: t("createSession.relaxedDesc"),
                     },
                   ].map((item) => (
                     <button
@@ -601,48 +613,56 @@ export function CreateSessionModal({
               {/* Summary */}
               <div className="p-4 rounded-xl bg-secondary/50 border border-border">
                 <h4 className="font-bold text-foreground mb-3">
-                  Tom tat cau hinh
+                  {t("createSession.summary")}
                 </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Ten phien</span>
+                    <span className="text-muted-foreground">
+                      {t("createSession.sessionNameLabel")}
+                    </span>
                     <span className="text-foreground font-medium">
                       {config.title ||
-                        `Phien ${new Date().toLocaleDateString("vi-VN")}`}
+                        t("createSession.defaultSessionTitle", {
+                          date: new Date().toLocaleDateString(locale),
+                        })}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Voice AI</span>
+                    <span className="text-muted-foreground">
+                      {t("createSession.voiceAILabel")}
+                    </span>
                     <span
                       className={`font-medium ${config.enableVoiceAI ? "text-accent" : "text-muted-foreground"}`}
                     >
-                      {config.enableVoiceAI ? "Bat" : "Tat"}
+                      {config.enableVoiceAI
+                        ? t("createSession.on")
+                        : t("createSession.off")}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">
-                      Thoi gian ket thuc
+                      {t("createSession.endTimeLabel")}
                     </span>
                     <span className="text-foreground font-medium">
                       {config.endTime
-                        ? new Date(config.endTime).toLocaleString("vi-VN")
-                        : "Khong gioi han"}
+                        ? new Date(config.endTime).toLocaleString(locale)
+                        : t("createSession.noLimit")}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">
-                      File thuyet trinh
+                      {t("createSession.fileLabel")}
                     </span>
                     <span className="text-foreground font-medium">
                       {config.uploadedFile
                         ? config.uploadedFile.name
-                        : "Khong co"}
+                        : t("createSession.noFile")}
                     </span>
                   </div>
                   {config.extractedKeywords && (
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">
-                        Keyword trich xuat
+                        {t("createSession.keywordsLabel")}
                       </span>
                       <span className="text-accent font-medium">
                         {config.extractedKeywords.length}
@@ -662,7 +682,7 @@ export function CreateSessionModal({
             disabled={step === 1}
             className="px-6 py-3 bg-secondary hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed text-foreground font-medium rounded-xl transition-colors"
           >
-            Quay lai
+            {t("createSession.back")}
           </button>
           <div className="flex items-center gap-3">
             {step < 3 ? (
@@ -670,7 +690,7 @@ export function CreateSessionModal({
                 onClick={() => setStep(step + 1)}
                 className="px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-primary/25"
               >
-                Tiep tuc
+                {t("createSession.continue")}
                 <ChevronRight className="w-5 h-5" />
               </button>
             ) : (
@@ -682,12 +702,12 @@ export function CreateSessionModal({
                 {isCreating ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Dang tao...
+                    {t("createSession.creating")}
                   </>
                 ) : (
                   <>
                     <Play className="w-5 h-5" />
-                    Bat dau phien
+                    {t("createSession.startSession")}
                   </>
                 )}
               </button>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Upload, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { PresentationMaterial } from '@/lib/types/interactions';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from 'next-intl';
 
 interface MaterialsUploadProps {
   seminarId: string;
@@ -14,6 +15,7 @@ export function MaterialsUpload({
   seminarId,
   onMaterialAdded,
 }: MaterialsUploadProps) {
+  const t = useTranslations();
   const [materials, setMaterials] = useState<PresentationMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -85,7 +87,7 @@ export function MaterialsUpload({
       }
     } catch (error) {
       console.error('Error uploading material:', error);
-      alert('Failed to upload material');
+      alert(t('materials.uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -151,17 +153,17 @@ export function MaterialsUpload({
           {uploading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Uploading...
+              {t('materials.uploading')}
             </>
           ) : (
             <>
               <Upload className="w-4 h-4" />
-              Upload Material
+              {t('materials.upload')}
             </>
           )}
         </button>
         <p className="text-xs text-muted-foreground mt-3">
-          PDF, PowerPoint, Word, Excel, or images
+          {t('materials.supportedTypes')}
         </p>
       </div>
 
@@ -169,7 +171,7 @@ export function MaterialsUpload({
       {materials.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-semibold text-foreground">
-            {materials.length} Material{materials.length !== 1 ? 's' : ''}
+            {t('materials.count', {count: materials.length})}
           </p>
           {materials.map((material) => (
             <div
@@ -189,7 +191,7 @@ export function MaterialsUpload({
                 <button
                   onClick={() => toggleVisibility(material.id, material.is_visible)}
                   className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground"
-                  title={material.is_visible ? 'Hide' : 'Show'}
+                  title={material.is_visible ? t('materials.hide') : t('materials.show')}
                 >
                   {material.is_visible ? (
                     <Eye className="w-4 h-4" />
@@ -200,7 +202,7 @@ export function MaterialsUpload({
                 <button
                   onClick={() => deleteMaterial(material.id)}
                   className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
-                  title="Delete"
+                  title={t('materials.delete')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -212,7 +214,7 @@ export function MaterialsUpload({
 
       {materials.length === 0 && !loading && (
         <p className="text-center text-sm text-muted-foreground py-6">
-          No materials uploaded yet
+          {t('materials.empty')}
         </p>
       )}
     </div>

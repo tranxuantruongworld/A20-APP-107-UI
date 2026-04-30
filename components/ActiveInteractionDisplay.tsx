@@ -6,6 +6,7 @@ import { Interaction } from '@/lib/types/interactions';
 import { supabase } from '@/lib/supabase';
 import { PollVoting } from './PollVoting';
 import { WordCloudSubmission } from './WordCloudSubmission';
+import { useTranslations } from 'next-intl';
 
 interface ActiveInteractionDisplayProps {
   seminarId: string;
@@ -20,6 +21,7 @@ export function ActiveInteractionDisplay({
   respondentName,
   onInteractionChange,
 }: ActiveInteractionDisplayProps) {
+  const t = useTranslations();
   const [activeInteraction, setActiveInteraction] = useState<Interaction | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -109,7 +111,7 @@ export function ActiveInteractionDisplay({
       return (
         <div className="rounded-2xl border border-border bg-card p-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Survey feature coming soon
+            {t('interactions.surveyComingSoon')}
           </p>
         </div>
       );
@@ -118,7 +120,7 @@ export function ActiveInteractionDisplay({
       return (
         <div className="rounded-2xl border border-border bg-card p-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Quiz feature coming soon
+            {t('interactions.quizComingSoon')}
           </p>
         </div>
       );

@@ -10,7 +10,6 @@ import {
   Cloud,
 } from 'lucide-react';
 import { InteractionType } from '@/lib/types/interactions';
-import { INTERACTION_TEMPLATES } from '@/lib/interactions';
 
 interface InteractionSelectorProps {
   onSelect: (type: InteractionType) => void;
@@ -23,14 +22,6 @@ const INTERACTION_ICONS: Record<InteractionType, React.ReactNode> = {
   survey: <FileText className="w-6 h-6" />,
   assessment: <Pickaxe className="w-6 h-6" />,
   wordcloud: <Cloud className="w-6 h-6" />,
-};
-
-const INTERACTION_LABELS: Record<InteractionType, string> = {
-  qa: 'Q&A',
-  poll: 'Poll',
-  survey: 'Survey',
-  assessment: 'Quiz',
-  wordcloud: 'Word Cloud',
 };
 
 export function InteractionSelector({
@@ -50,7 +41,7 @@ export function InteractionSelector({
   return (
     <div className="space-y-3">
       <p className="text-sm font-semibold text-foreground">
-        Add Interaction
+        {t('interactions.addInteraction')}
       </p>
 
       <div className="grid grid-cols-2 gap-2">
@@ -69,7 +60,7 @@ export function InteractionSelector({
                 {INTERACTION_ICONS[type]}
               </div>
               <p className="text-sm font-medium text-foreground">
-                {INTERACTION_LABELS[type]}
+                {t(`interactions.labels.${type}`)}
               </p>
             </div>
           </button>
@@ -79,11 +70,12 @@ export function InteractionSelector({
       {expandedType && (
         <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            {INTERACTION_LABELS[expandedType]} Description
+            {t('interactions.descriptionTitle', {
+              type: t(`interactions.labels.${expandedType}`),
+            })}
           </p>
           <p className="text-sm text-foreground">
-            {INTERACTION_TEMPLATES[expandedType as keyof typeof INTERACTION_TEMPLATES]?.description ||
-              'Start with a template'}
+            {t(`interactions.descriptions.${expandedType}`)}
           </p>
         </div>
       )}

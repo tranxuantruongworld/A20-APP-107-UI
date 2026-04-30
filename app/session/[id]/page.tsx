@@ -395,7 +395,7 @@ export default function LiveSession() {
               <Star className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-foreground text-lg tracking-tight">
-              HoiThao
+              {t("session.brand")}
             </span>
           </div>
         </div>
@@ -403,7 +403,7 @@ export default function LiveSession() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            LIVE
+            {t("session.live")}
           </div>
           <span className="font-semibold text-foreground">
             {seminar?.title}
@@ -665,7 +665,7 @@ export default function LiveSession() {
             className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all shadow-lg shadow-primary/25"
           >
             <Settings className="w-5 h-5" />
-            Admin Panel
+            {t("adminPage.adminPanel")}
           </Link>
         </aside>
       </div>

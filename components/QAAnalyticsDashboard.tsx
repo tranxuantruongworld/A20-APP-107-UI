@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { BarChart3, TrendingUp, Users, MessageCircle, Loader2, Download } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface AnalyticsData {
   total_questions: number;
@@ -21,6 +22,7 @@ interface QAAnalyticsDashboardProps {
 }
 
 export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
+  const t = useTranslations();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -64,28 +66,28 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
 
   const metrics = [
     {
-      label: 'Total Questions',
+      label: t('analytics.totalQuestions'),
       value: analytics.total_questions,
       icon: MessageCircle,
       color: 'text-blue-600',
       bgColor: 'bg-blue-500/10',
     },
     {
-      label: 'Answered',
+      label: t('analytics.answered'),
       value: analytics.answered_count,
       icon: TrendingUp,
       color: 'text-green-600',
       bgColor: 'bg-green-500/10',
     },
     {
-      label: 'Pending',
+      label: t('analytics.pending'),
       value: analytics.pending_count,
       icon: BarChart3,
       color: 'text-orange-600',
       bgColor: 'bg-orange-500/10',
     },
     {
-      label: 'Participants',
+      label: t('analytics.participants'),
       value: analytics.unique_participants,
       icon: Users,
       color: 'text-purple-600',
@@ -123,14 +125,14 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
       {/* Classification Breakdown */}
       <div className="rounded-lg border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground mb-4">
-          Question Classification
+          {t('analytics.questionClassification')}
         </h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-blue-500" />
               <span className="text-sm text-muted-foreground">
-                Professional Questions
+                {t('analytics.professionalQuestions')}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -153,7 +155,7 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-orange-500" />
               <span className="text-sm text-muted-foreground">
-                Casual Greetings
+                {t('analytics.casualGreetings')}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -176,17 +178,17 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
       {/* Performance Metrics */}
       <div className="rounded-lg border border-border bg-card p-4">
         <h3 className="text-sm font-semibold text-foreground mb-4">
-          Session Performance
+          {t('analytics.sessionPerformance')}
         </h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Questions/min</span>
+            <span className="text-sm text-muted-foreground">{t('analytics.questionsPerMinute')}</span>
             <span className="font-semibold text-foreground">
               {analytics.questions_per_minute.toFixed(2)}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Response Rate</span>
+            <span className="text-sm text-muted-foreground">{t('analytics.responseRate')}</span>
             <span className="font-semibold text-foreground">
               {analytics.total_questions > 0
                 ? Math.round(
@@ -197,9 +199,11 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Session Duration</span>
+            <span className="text-sm text-muted-foreground">{t('analytics.sessionDuration')}</span>
             <span className="font-semibold text-foreground">
-              {analytics.session_duration_minutes} min
+              {t('analytics.durationMinutes', {
+                count: analytics.session_duration_minutes,
+              })}
             </span>
           </div>
         </div>
@@ -208,7 +212,7 @@ export function QAAnalyticsDashboard({ seminarId }: QAAnalyticsDashboardProps) {
       {/* Export Button */}
       <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-secondary transition-colors text-foreground font-medium text-sm">
         <Download className="w-4 h-4" />
-        Export Report
+        {t('analytics.exportReport')}
       </button>
     </div>
   );

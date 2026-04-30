@@ -58,7 +58,7 @@ export default function SessionAdminPage() {
             </div>
             <div>
               <span className="font-bold text-foreground text-lg tracking-tight">
-                HoiThao
+                {t("brand")}
               </span>
               <p className="text-xs text-muted-foreground">{t("adminPanel")}</p>
             </div>
@@ -68,7 +68,7 @@ export default function SessionAdminPage() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            LIVE
+            {t("live")}
           </div>
           <span className="font-semibold text-foreground">{seminarId}</span>
         </div>
@@ -116,11 +116,10 @@ export default function SessionAdminPage() {
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-base font-semibold text-foreground">
-                        Upcoming Interactions Feature
+                        {t("interactionsComingSoonTitle")}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        This page currently shows an introduction and preview
-                        only. No interaction data is saved to Supabase yet.
+                        {t("interactionsComingSoonDesc")}
                       </p>
                     </div>
                   </div>
@@ -128,14 +127,14 @@ export default function SessionAdminPage() {
 
                 <div className="rounded-xl border border-border bg-card p-5 space-y-4">
                   <h4 className="font-semibold text-foreground">
-                    What it will include
+                    {t("includedFeaturesTitle")}
                   </h4>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {[
-                      "Live Poll creation",
-                      "Survey collection",
-                      "Word cloud responses",
-                      "Question classification controls",
+                      t("featureLivePolls"),
+                      t("featureSurveys"),
+                      t("featureWordCloud"),
+                      t("featureClassification"),
                     ].map((item) => (
                       <div
                         key={item}
@@ -150,17 +149,17 @@ export default function SessionAdminPage() {
 
                 <div className="rounded-xl border border-border bg-card p-5 space-y-3">
                   <h4 className="font-semibold text-foreground">
-                    Example UI preview
+                    {t("previewTitle")}
                   </h4>
                   <div className="rounded-lg border border-dashed border-border p-4 bg-secondary/20">
                     <p className="text-sm font-medium text-foreground">
-                      Example Poll: "Which topic should we cover next?"
+                      {t("previewPoll")}
                     </p>
                     <div className="mt-3 space-y-2">
                       {[
-                        "AI in education",
-                        "Data analytics",
-                        "Cloud deployment",
+                        t("previewOption1"),
+                        t("previewOption2"),
+                        t("previewOption3"),
                       ].map((option, idx) => (
                         <div
                           key={option}
@@ -169,7 +168,9 @@ export default function SessionAdminPage() {
                           <span>
                             {idx + 1}. {option}
                           </span>
-                          <span className="text-muted-foreground">demo</span>
+                          <span className="text-muted-foreground">
+                            {t("previewDemo")}
+                          </span>
                         </div>
                       ))}
                     </div>
